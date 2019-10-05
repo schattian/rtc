@@ -39,6 +39,6 @@ func (s Signal) Decompose() ([]bool, error) {
 	case "PUT":
 		return []bool{false, true}, nil
 	default:
-		return nil, fmt.Errorf("the signal \"%v\" cannot be decomoposed", s)
+		return nil, fmt.Errorf("the signal \"%v\" cannot be decomposed", s)
 	}
 }

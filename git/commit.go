@@ -3,8 +3,8 @@ package schematypes
 // Commit is the abstraction that takes the proposed changes to an entity
 // Actually, it can just link one entity
 type Commit struct {
-	ID      int       `json:"id"`
-	Changes []*Change `json:"changes"`
+	ID      int       `json:"id,omitempty"`
+	Changes []*Change `json:"changes,omitempty"`
 }
 
 // GroupBy splits the commit changes by the given comparator cryteria

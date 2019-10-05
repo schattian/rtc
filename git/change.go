@@ -1,15 +1,17 @@
 package schematypes
 
+import "github.com/sebach1/git-crud/schema"
+
 // A Change represents every purposed difference
 type Change struct {
-	ID int `json:"id"`
+	ID int `json:"id,omitempty"`
 
-	TableName  TableName  `json:"table_name"`
-	ColumnName ColumnName `json:"column_name"`
+	TableName  schema.TableName  `json:"table_name,omitempty"`
+	ColumnName schema.ColumnName `json:"column_name,omitempty"`
 
-	Value Value `json:"value"`
+	Value schema.Value `json:"value,omitempty"`
 
-	EntityID ID `json:"entity_id,omitempty"`
+	EntityID schema.ID `json:"entity_id,omitempty"`
 }
 
 // IsUntracked retrieves true if the change is a new entity, otherwise returns false
