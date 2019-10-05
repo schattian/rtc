@@ -1,4 +1,4 @@
-package maptypes
+package schematypes
 
 // A Change represents every purposed difference
 type Change struct {

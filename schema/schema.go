@@ -1,0 +1,69 @@
+package schema
+
+import (
+	"sync"
+)
+
+// colNames plucks all the columnNames from its tables
+func (sch *Schema) colNames() (colNames []ColumnName) {
+	for _, table := range sch.Blueprint {
+		for _, column := range table.Columns {
+			colNames = append(colNames, column.Name)
+		}
+	}
+	return
+}
+
+// tableNames plucks the name from its tables
+func (sch *Schema) tableNames() (tableNames []TableName) {
+	for _, table := range sch.Blueprint {
+		tableNames = append(tableNames, table.Name)
+	}
+	return
+}
+
+// colsByTableName returns the column names given the parent' table name
+func (sch *Schema) colsByTableName(tableName TableName, scope Planisphere) ([]ColumnName, error) {
+	for _, table := range sch.Blueprint {
+		if tableName != table.Name {
+			continue
+		}
+		return table.columnNames(), nil
+	}
+	return nil, scope.preciseTableErr(tableName)
+}
+
+func (sch *Schema) validateTable(tableName TableName, scope Planisphere, wg *sync.WaitGroup, errCh chan<- error) {
+	_, err := sch.colsByTableName(tableName, scope)
+	if err != nil {
+		errCh <- err
+	}
+}
+
+// Validate checks if the context of the given tableName and colName is valid
+func (sch *Schema) Validate(tableName TableName, colName ColumnName, scope Planisphere, wg *sync.WaitGroup, errCh chan<- error) {
+	defer wg.Done()
+	cols, err := sch.colsByTableName(tableName, scope)
+	if err != nil {
+		errCh <- err
+		return
+	}
+
+	for _, col := range cols {
+		if colName == col {
+			return
+		}
+	}
+	errCh <- sch.preciseColErr(colName)
+}
+
+// preciseColErr gives a more accurated error to a validation of a column
+// It assumes the column is errored, and checks if it exists or if instead its a context err
+func (sch *Schema) preciseColErr(colName ColumnName) (err error) {
+	for _, column := range sch.colNames() {
+		if column == colName {
+			return errForeignColumn
+		}
+	}
+	return errUnexistantColumn
+}

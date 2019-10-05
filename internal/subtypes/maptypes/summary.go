@@ -1,4 +1,4 @@
-package maptypes
+package schematypes
 
 // Result is a changes PUSHing result, grouped by changesID that was sent grouped
 // See Commit.GroupBy to see grouping details

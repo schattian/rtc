@@ -1,4 +1,4 @@
-package maptypes
+package schematypes
 
 import (
 	"testing"
