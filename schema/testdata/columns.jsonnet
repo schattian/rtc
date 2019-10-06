@@ -9,5 +9,6 @@ local regularName = 'columnName';
   rare: {
     name: rareName,
   },
+  
   zero:{},
 }

@@ -1,4 +1,4 @@
-package schematypes
+package git
 
 // Commit is the abstraction that takes the proposed changes to an entity
 // Actually, it can just link one entity

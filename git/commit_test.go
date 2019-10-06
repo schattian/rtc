@@ -1,8 +1,6 @@
-package schematypes
+package git
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestCommit_GroupBy(t *testing.T) {
 	type fields struct {
@@ -26,7 +24,7 @@ func TestCommit_GroupBy(t *testing.T) {
 		{
 			name: "all changes are groupable",
 			fields: fields{Changes: []*Change{
-				&Change{}, &Change{}, &Change{},
+				gChanges.Zero, gChanges.Regular.None, gChanges.Regular.Entity,
 			}},
 			args:       args{comparator: alwaysYes},
 			wantQtGrps: 1,
@@ -34,7 +32,7 @@ func TestCommit_GroupBy(t *testing.T) {
 		{
 			name: "all changes are UNgroupable",
 			fields: fields{Changes: []*Change{
-				&Change{}, &Change{}, &Change{},
+				gChanges.Zero, gChanges.Regular.None, gChanges.Regular.Entity,
 			}},
 			args:       args{comparator: alwaysNo},
 			wantQtGrps: 3,
@@ -42,36 +40,22 @@ func TestCommit_GroupBy(t *testing.T) {
 		{
 			name: "changes are groupable if with same tableName",
 			fields: fields{Changes: []*Change{
-				&Change{TableName: "a"}, &Change{TableName: "a"},
-				&Change{TableName: "b"}, &Change{TableName: "b"}, &Change{TableName: "b"},
-				&Change{TableName: "c"},
-				&Change{},
+				gChanges.Regular.None, gChanges.Regular.Untracked, gChanges.Regular.None, gChanges.Rare.Table,
+				gChanges.Regular.Table,
 			}},
 			args:       args{comparator: areSameTable},
-			wantQtGrps: 4,
-		},
-		{
-			name: "SHUFFLED changes are groupable if with same tableName",
-			fields: fields{Changes: []*Change{
-				&Change{},
-				&Change{TableName: "b"}, &Change{TableName: "c"}, &Change{TableName: "a"},
-				&Change{TableName: "a"}, &Change{TableName: "a"}, &Change{TableName: "a"},
-				&Change{TableName: "b"}, &Change{TableName: "b"}, &Change{TableName: "a"},
-			}},
-			args:       args{comparator: areSameTable},
-			wantQtGrps: 4,
+			wantQtGrps: 2,
 		},
 		{
 			name: "changes are groupable if are compatible",
 			fields: fields{Changes: []*Change{
-				&Change{TableName: "a"},
-				&Change{TableName: "a"},
-				&Change{TableName: "a", EntityID: 1}, &Change{TableName: "a", EntityID: 1},
-				&Change{TableName: "b", EntityID: 5},
-				&Change{TableName: "b", EntityID: 3},
+				gChanges.Regular.None, gChanges.Regular.Column,
+				gChanges.Rare.None,
+				gChanges.Zero,
+				gChanges.Regular.Table,
 			}},
 			args:       args{comparator: IsCompatibleWith},
-			wantQtGrps: 5,
+			wantQtGrps: 4,
 		},
 	}
 	for _, tt := range tests {
