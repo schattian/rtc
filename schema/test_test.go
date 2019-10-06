@@ -1,6 +1,6 @@
 package schema
 
-import "github.com/sebach1/git-crud/internal/assist"
+import "github.com/sebach1/git-crud/internal/test/assist"
 
 var (
 	gSchemas goldenSchemas
