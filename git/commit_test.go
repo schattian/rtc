@@ -169,3 +169,35 @@ func TestCommit_Add(t *testing.T) {
 		})
 	}
 }
+
+func TestCommit_Rm(t *testing.T) {
+	type args struct {
+		chg *Change
+	}
+	tests := []struct {
+		name    string
+		comm    *Commit
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "given change doesnt belongs to the commit",
+			comm:    &Commit{Changes: []*Change{gChanges.Regular.None}},
+			args:    args{chg: gChanges.Rare.None},
+			wantErr: true,
+		},
+		{
+			name:    "successfully remove",
+			comm:    &Commit{Changes: []*Change{gChanges.Regular.None}},
+			args:    args{chg: gChanges.Regular.None},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.comm.Rm(tt.args.chg); (err != nil) != tt.wantErr {
+				t.Errorf("Commit.Rm() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
