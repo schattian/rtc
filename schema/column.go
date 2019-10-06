@@ -8,3 +8,12 @@ type Column struct {
 
 // ColumnName is the name of a column
 type ColumnName string
+
+// Validate wraps the column validator func and returns its9 result
+func (c *Column) Validate(val interface{}) error {
+	err := c.Validator(val)
+	if err != nil {
+		return err
+	}
+	return nil
+}
