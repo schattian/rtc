@@ -1,7 +1,6 @@
 package git
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 
@@ -10,8 +9,6 @@ import (
 
 // A Change represents every purposed difference
 type Change struct {
-	ID int `json:"id,omitempty"`
-
 	TableName  schema.TableName  `json:"table_name,omitempty"`
 	ColumnName schema.ColumnName `json:"column_name,omitempty"`
 
@@ -20,7 +17,7 @@ type Change struct {
 	Float32Value float32         `json:"float32_value,omitempty"`
 	Float64Value float64         `json:"float64_value,omitempty"`
 	JSONValue    json.RawMessage `json:"json_value,omitempty"`
-	BytesValue   bytes.Buffer    `json:"bytes_value,omitempty"`
+	BytesValue   []byte          `json:"bytes_value,omitempty"`
 
 	EntityID schema.ID `json:"entity_id,omitempty"`
 
@@ -63,7 +60,7 @@ func (chg *Change) tearDownValue() {
 	case "json":
 		chg.JSONValue = json.RawMessage{}
 	case "bytes":
-		chg.BytesValue = bytes.Buffer{}
+		chg.BytesValue = nil
 	}
 }
 
@@ -98,14 +95,16 @@ func (chg *Change) SetValue(val interface{}) (err error) {
 		chg.Type = "json"
 		return
 	}
-	if byBuff, ok := val.(bytes.Buffer); ok {
-		chg.BytesValue = byBuff
+	if byVal, ok := val.([]byte); ok {
+		chg.BytesValue = byVal
 		chg.Type = "bytes"
 		return
 	}
 
 	return errors.New("the given value cannot be safety typed")
 }
+
+type changesMatcher func(*Change, *Change) bool
 
 // Validate self
 func (chg *Change) Validate() error {
@@ -126,11 +125,22 @@ func (chg *Change) IsUntracked() bool {
 	return false
 }
 
+// Overrides check if the changes will generate be overrided
+func Overrides(chg, otherChg *Change) bool {
+	if !AreCompatible(chg, otherChg) {
+		return false
+	}
+	if chg.ColumnName != otherChg.ColumnName {
+		return false
+	}
+	return true
+}
+
 // Equals checks if the given change will trigger the exactly same action as itself
-// That is: the change is not untracked, the column and table affected are the same
-// and the value is the same
+// Note that Equals prioritizes false on cryteria
+// So, in case needing to check untracked it can use AreCompatibleOrUntracked func
 func (chg *Change) Equals(otherChg *Change) bool {
-	if !IsCompatibleWith(chg, otherChg) {
+	if !AreCompatible(chg, otherChg) {
 		return false
 	}
 	if chg.ColumnName != otherChg.ColumnName {
@@ -142,9 +152,8 @@ func (chg *Change) Equals(otherChg *Change) bool {
 	return true
 }
 
-// IsCompatibleWith checks if the changes belongs to the same table and the same entity
-// Notice that the func is not using syntatic sugar to be a comparator type (see Commit.GroupBy)
-func IsCompatibleWith(chg, otherChg *Change) bool {
+// AreCompatible uses AreCompatibleOnUntracked, plus discarding untracked changes
+func AreCompatible(chg, otherChg *Change) bool {
 	if chg.TableName != otherChg.TableName {
 		return false
 	}

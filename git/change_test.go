@@ -24,8 +24,7 @@ func TestChange_IsUntracked(t *testing.T) {
 		})
 	}
 }
-
-func TestIsCompatibleWith(t *testing.T) {
+func TestAreCompatible(t *testing.T) {
 	type args struct {
 		chg      *Change
 		otherChg *Change
@@ -86,8 +85,8 @@ func TestIsCompatibleWith(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := IsCompatibleWith(tt.args.chg, tt.args.otherChg); got != tt.want {
-				t.Errorf("IsCompatibleWith() = %v, want %v", got, tt.want)
+			if got := AreCompatible(tt.args.chg, tt.args.otherChg); got != tt.want {
+				t.Errorf("AreCompatibleWith() = %v, want %v", got, tt.want)
 			}
 		})
 	}
