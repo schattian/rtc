@@ -7,8 +7,8 @@ type Schema struct {
 	Blueprint []*Table `json:"blueprint,omitempty"`
 }
 
-// ID is an interface made to handle with every type of id types (UUID/GUID/int)
-type ID interface{}
+// ID is a string in order to handle with every kind of id types (UUID/GUID/int)
+type ID string
 
 // TableName is the name of a table
 type TableName string
@@ -29,4 +29,12 @@ type Table struct {
 type Column struct {
 	Name      ColumnName
 	Validator func(*Column) bool
+}
+
+// IsNil verifies if the id is zero-valued
+func (id ID) IsNil() bool {
+	if id == "0" || id == "" {
+		return true
+	}
+	return false
 }
