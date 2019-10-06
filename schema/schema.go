@@ -4,6 +4,13 @@ import (
 	"sync"
 )
 
+// The Schema is the representation of a Database instructive. It uses concepts of SQL.
+// The Schema provided by the schema gives the validation structure.
+type Schema struct {
+	Name      string   `json:"name,omitempty"`
+	Blueprint []*Table `json:"blueprint,omitempty"`
+}
+
 // colNames plucks all the columnNames from its tables
 func (sch *Schema) colNames() (colNames []ColumnName) {
 	for _, table := range sch.Blueprint {
