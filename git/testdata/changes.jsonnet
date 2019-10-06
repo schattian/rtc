@@ -33,6 +33,14 @@ local regularJSONValue = { embedded_value: { another_embedding: 'regularValue' }
 local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
 
 {
+  local regular = self.regular,
+ 
+  inconsistent: {
+    table: regular.none {table_name: ""},
+    column: regular.none {column_name: ""},
+  },
+
+
   regular: {
     local base = self.none,
 
@@ -44,6 +52,7 @@ local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
       id: regularID,
       entity_id: regularEntityID,
     },
+
 
     table: base { table_name: rareTable },
 
