@@ -2,8 +2,6 @@ package store
 
 import (
 	"context"
-
-	"github.com/backersorg/synchronizer/internal/subtypes/schematypes"
 )
 
 // The Store abstracts every CRUD app
