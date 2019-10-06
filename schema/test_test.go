@@ -1,6 +1,6 @@
 package schema
 
-import "github.com/sebach1/git-crud/internal/tassist"
+import "github.com/sebach1/git-crud/internal/assist"
 
 var (
 	gSchemas goldenSchemas
@@ -9,9 +9,9 @@ var (
 )
 
 func init() {
-	tassist.DecodeJsonnet("schemas", &gSchemas)
-	tassist.DecodeJsonnet("columns", &gColumns)
-	tassist.DecodeJsonnet("tables", &gTables)
+	assist.DecodeJsonnet("schemas", &gSchemas)
+	assist.DecodeJsonnet("columns", &gColumns)
+	assist.DecodeJsonnet("tables", &gTables)
 }
 
 type goldenSchemas struct {

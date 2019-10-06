@@ -1,13 +1,13 @@
 package git
 
-import "github.com/sebach1/git-crud/internal/tassist"
+import "github.com/sebach1/git-crud/internal/assist"
 
 var (
 	gChanges goldenChanges
 )
 
 func init() {
-	tassist.DecodeJsonnet("changes", &gChanges)
+	assist.DecodeJsonnet("changes", &gChanges)
 }
 
 type goldenChanges struct {

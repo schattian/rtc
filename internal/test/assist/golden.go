@@ -1,4 +1,4 @@
-package tassist
+package assist
 
 import (
 	"encoding/json"
