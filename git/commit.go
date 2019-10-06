@@ -3,8 +3,6 @@ package git
 import (
 	"fmt"
 	"sync"
-
-	"github.com/pkg/errors"
 )
 
 // Commit is the abstraction that takes the proposed changes to an entity
@@ -14,38 +12,42 @@ type Commit struct {
 	Changes []*Change `json:"changes,omitempty"`
 }
 
+// add a change to the commit (directly appending the change to the commit changes, wout validation)
+func (comm *Commit) add(chg *Change) {
+	comm.Changes = append(comm.Changes, chg)
+}
+
 // Add will attach the given change to the commit changes
 // In case the change is invalid or is already commited, it returns an error
 func (comm *Commit) Add(chg *Change) error {
+
 	err := chg.Validate()
 	if err != nil {
 		return err
 	}
-	if comm.containsChange(chg) {
+	if comm.containsChange(chg) { // checks duplication. It discards untracked changes in the comparison
 		return errDuplicatedChg
 	}
-	for _, otherChg := range comm.Changes { // Then check for overrides
-		if chg.ColumnName == otherChg.ColumnName {
-			err = comm.Rm(otherChg.ID)
-			if err != nil {
-				return errors.Wrap(err, "adding to commit")
-			}
+
+	for idx, otherChg := range comm.Changes { // Then check for overrides
+		if Overrides(chg, otherChg) {
+			comm.rmChangeByIndex(idx)
 		}
 	}
-	comm.Changes = append(comm.Changes, chg)
+	comm.add(chg)
 	return nil
 }
 
 // Rm deletes the given change from the commit
 // This action is irrevertible
-func (comm *Commit) Rm(chgID int) error {
-	for i, chg := range comm.Changes {
-		if chg.ID == chgID {
-			comm.rmChangeByIndex(i)
+func (comm *Commit) Rm(chg *Change) error {
+	for idx, otherChg := range comm.Changes {
+		if chg.Equals(otherChg) {
+			comm.rmChangeByIndex(idx)
 			return nil
 		}
 	}
-	return fmt.Errorf("change with ID %v NOT FOUND", chgID)
+	return fmt.Errorf("change %v NOT FOUND", chg)
 }
 
 // GroupBy splits the commit changes by the given comparator cryteria
@@ -89,7 +91,7 @@ func (comm *Commit) rmChangeByIndex(i int) {
 	lock.Unlock()
 }
 
-// containsChange verifies if the given change is already present
+// containsChange verifies if the given change is already present, and triggering the **exactly** same action
 func (comm *Commit) containsChange(chg *Change) bool {
 	for _, otherChg := range comm.Changes {
 		if chg.Equals(otherChg) {

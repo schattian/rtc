@@ -1,6 +1,10 @@
 package git
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/google/go-cmp/cmp"
+)
 
 func TestCommit_GroupBy(t *testing.T) {
 	type fields struct {
@@ -54,7 +58,7 @@ func TestCommit_GroupBy(t *testing.T) {
 				gChanges.Zero,
 				gChanges.Regular.Table,
 			}},
-			args:       args{comparator: IsCompatibleWith},
+			args:       args{comparator: AreCompatible},
 			wantQtGrps: 4,
 		},
 	}
@@ -91,6 +95,76 @@ func Test_checkIntInSlice(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := checkIntInSlice(tt.args.slice, tt.args.elem); got != tt.want {
 				t.Errorf("checkIntInSlice() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCommit_Add(t *testing.T) {
+	type args struct {
+		chg *Change
+	}
+	tests := []struct {
+		name    string
+		comm    *Commit
+		args    args
+		want    error
+		newComm *Commit
+	}{
+		{
+			name: "change was already added",
+			comm: &Commit{Changes: []*Change{gChanges.Regular.None}},
+			args: args{chg: gChanges.Regular.None},
+			want: errDuplicatedChg,
+		},
+		{
+			name:    "both identical untracked commits",
+			comm:    &Commit{Changes: []*Change{gChanges.Regular.Untracked}},
+			args:    args{chg: gChanges.Regular.Untracked},
+			newComm: &Commit{Changes: []*Change{gChanges.Regular.Untracked, gChanges.Regular.Untracked}},
+		},
+		{
+			name: "column inconsistency",
+			comm: &Commit{Changes: []*Change{gChanges.Regular.None}},
+			args: args{chg: gChanges.Inconsistent.Column},
+			want: errZeroColumn,
+		},
+		{
+			name: "table inconsistency",
+			comm: &Commit{Changes: []*Change{gChanges.Regular.None}},
+			args: args{chg: gChanges.Inconsistent.Table},
+			want: errZeroTable,
+		},
+		{
+			name:    "change modifies the value of a change already in the commit",
+			comm:    &Commit{Changes: []*Change{gChanges.Regular.None}},
+			args:    args{chg: gChanges.Regular.StrValue},
+			newComm: &Commit{Changes: []*Change{gChanges.Regular.StrValue}},
+		},
+		{
+			name:    "change modifies different col of same schema",
+			comm:    &Commit{Changes: []*Change{gChanges.Regular.None}},
+			args:    args{chg: gChanges.Regular.Column},
+			newComm: &Commit{Changes: []*Change{gChanges.Regular.None, gChanges.Regular.Column}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			oldComm := tt.comm
+
+			err := tt.comm.Add(tt.args.chg)
+
+			if err != tt.want {
+				t.Errorf("Commit.Add() error = %v, wantErr %v", err, tt.want)
+			}
+			if err != nil {
+				if diff := cmp.Diff(oldComm, tt.comm); diff != "" {
+					t.Errorf("Commit.Add() errored mismatch (-want +got): %s", diff)
+				}
+				return
+			}
+			if diff := cmp.Diff(tt.newComm, tt.comm); diff != "" {
+				t.Errorf("Commit.Add() mismatch (-want +got): %s", diff)
 			}
 		})
 	}
