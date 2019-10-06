@@ -10,9 +10,10 @@ import (
 // The Store abstracts every CRUD app
 type Store interface {
 
-	// PushSingle will override a single value on the specified field
-	// Its a shortcut for
-	PushSingle(context.Context, schema.Value, schema.ID, schema.TableName, schema.ColumnName) error
+	// PushSingle fast-pushes a single change
+	// Its the representation of a bash alias like:
+	// `git add . && git commit && git push`
+	PushSingle(context.Context, *git.Change) error
 
 	// Push will post the given commit. It returns a slice of IDs
 	Push(context.Context, *git.Commit) (*git.Summary, error)
