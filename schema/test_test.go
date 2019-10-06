@@ -15,21 +15,21 @@ func init() {
 }
 
 type goldenSchemas struct {
-	Basic     *Schema
-	Rare      *Schema
-	BasicRare *Schema `json:"basic_rare"`
-	Zero      *Schema
+	Basic     *Schema `json:"basic,omitempty"`
+	Rare      *Schema `json:"rare,omitempty"`
+	BasicRare *Schema `json:"basic_rare,omitempty"`
+	Zero      *Schema `json:"zero,omitempty"`
 }
 
 type goldenTables struct {
-	Basic     *Table
-	Rare      *Table
-	BasicRare *Table `json:"basic_rare"`
-	Zero      *Table
+	Basic     *Table `json:"basic,omitempty"`
+	Rare      *Table `json:"rare,omitempty"`
+	BasicRare *Table `json:"basic_rare,omitempty"`
+	Zero      *Table `json:"zero,omitempty"`
 }
 
 type goldenColumns struct {
-	Basic *Column
-	Rare  *Column
-	Zero  *Column
+	Basic *Column `json:"basic,omitempty"`
+	Rare  *Column `json:"rare,omitempty"`
+	Zero  *Column `json:"zero,omitempty"`
 }

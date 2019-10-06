@@ -1,4 +1,4 @@
-package schematypes
+package git
 
 import "github.com/sebach1/git-crud/schema"
 
@@ -16,7 +16,7 @@ type Change struct {
 
 // IsUntracked retrieves true if the change is a new entity, otherwise returns false
 func (chg *Change) IsUntracked() bool {
-	if chg.EntityID == nil {
+	if chg.EntityID.IsNil() {
 		return true
 	}
 	return false
@@ -31,7 +31,7 @@ func IsCompatibleWith(chg, otherChg *Change) bool {
 	if chg.EntityID != otherChg.EntityID {
 		return false
 	}
-	if chg.EntityID == nil { // In case of both of them are nil (see that the above comparison discards 2x checking)
+	if chg.IsUntracked() { // In case of both of EntityIDs are nil (see that the above comparison discards 2x checking)
 		return false
 	}
 	return true
