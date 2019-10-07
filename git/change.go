@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/sebach1/git-crud/internal/integrity"
-	"github.com/sebach1/git-crud/schema"
 )
 
 // A Change represents every purposed difference
@@ -20,7 +19,7 @@ type Change struct {
 	JSONValue    json.RawMessage `json:"json_value,omitempty"`
 	BytesValue   []byte          `json:"bytes_value,omitempty"`
 
-	EntityID schema.ID `json:"entity_id,omitempty"`
+	EntityID integrity.ID `json:"entity_id,omitempty"`
 
 	ValueType string `json:"value_type,omitempty"`
 }

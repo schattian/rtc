@@ -1,4 +1,4 @@
-package schema
+package integrity
 
 // ID is a string in order to handle with every kind of id types (UUID/GUID/int)
 type ID string
