@@ -98,53 +98,53 @@ func TestChange_SetValue(t *testing.T) {
 	}
 	cleansedChgs := []*Change{gChanges.Regular.CleanValue, gChanges.Rare.CleanValue}
 	tests := []struct {
-		name     string
-		chg      *Change
-		args     args
-		wantErr  bool
-		wantType string
+		name          string
+		chg           *Change
+		args          args
+		wantErr       bool
+		wantValueType string
 	}{
 		{
-			name:     "string",
-			chg:      randChg(cleansedChgs...),
-			args:     args{val: gChanges.Regular.StrValue.StrValue},
-			wantErr:  false,
-			wantType: "string",
+			name:          "string",
+			chg:           randChg(cleansedChgs...),
+			args:          args{val: gChanges.Regular.StrValue.StrValue},
+			wantErr:       false,
+			wantValueType: "string",
 		},
 		{
-			name:     "json",
-			chg:      randChg(cleansedChgs...),
-			args:     args{val: gChanges.Regular.JSONValue.JSONValue},
-			wantErr:  false,
-			wantType: "json",
+			name:          "json",
+			chg:           randChg(cleansedChgs...),
+			args:          args{val: gChanges.Regular.JSONValue.JSONValue},
+			wantErr:       false,
+			wantValueType: "json",
 		},
 		{
-			name:     "int",
-			chg:      randChg(cleansedChgs...),
-			args:     args{val: gChanges.Regular.IntValue.IntValue},
-			wantErr:  false,
-			wantType: "int",
+			name:          "int",
+			chg:           randChg(cleansedChgs...),
+			args:          args{val: gChanges.Regular.IntValue.IntValue},
+			wantErr:       false,
+			wantValueType: "int",
 		},
 		{
-			name:     "float32",
-			chg:      randChg(cleansedChgs...),
-			args:     args{val: gChanges.Regular.Float32Value.Float32Value},
-			wantErr:  false,
-			wantType: "float32",
+			name:          "float32",
+			chg:           randChg(cleansedChgs...),
+			args:          args{val: gChanges.Regular.Float32Value.Float32Value},
+			wantErr:       false,
+			wantValueType: "float32",
 		},
 		{
-			name:     "float64",
-			chg:      randChg(cleansedChgs...),
-			args:     args{val: gChanges.Regular.Float64Value.Float64Value},
-			wantErr:  false,
-			wantType: "float64",
+			name:          "float64",
+			chg:           randChg(cleansedChgs...),
+			args:          args{val: gChanges.Regular.Float64Value.Float64Value},
+			wantErr:       false,
+			wantValueType: "float64",
 		},
 		{
-			name:     "nil",
-			chg:      randChg(cleansedChgs...),
-			args:     args{val: nil},
-			wantErr:  true,
-			wantType: "",
+			name:          "nil",
+			chg:           randChg(cleansedChgs...),
+			args:          args{val: nil},
+			wantErr:       true,
+			wantValueType: "",
 		},
 	}
 	for _, tt := range tests {
@@ -152,8 +152,8 @@ func TestChange_SetValue(t *testing.T) {
 			if err := tt.chg.SetValue(tt.args.val); (err != nil) != tt.wantErr {
 				t.Errorf("Change.SetValue() error got: %v, wantErr %v", err, tt.wantErr)
 			}
-			if gotType := tt.chg.Type; gotType != tt.wantType {
-				t.Errorf("Change.SetValue() type saved mismatch; got: %v, want: %v", gotType, tt.wantType)
+			if gotValueType := tt.chg.ValueType; gotValueType != tt.wantValueType {
+				t.Errorf("Change.SetValue() type saved mismatch; got: %v, want: %v", gotValueType, tt.wantValueType)
 			}
 		})
 	}

@@ -21,13 +21,13 @@ type Change struct {
 
 	EntityID schema.ID `json:"entity_id,omitempty"`
 
-	Type string
+	ValueType string `json:"value_type,omitempty"`
 }
 
 // Value gives an interface handling the real value
 // Used to perform comparisons
 func (chg *Change) Value() interface{} {
-	switch chg.Type {
+	switch chg.ValueType {
 	case "string":
 		return chg.StrValue
 	case "int":
@@ -45,8 +45,8 @@ func (chg *Change) Value() interface{} {
 }
 
 func (chg *Change) tearDownValue() {
-	defer func() { chg.Type = "" }()
-	switch chg.Type {
+	defer func() { chg.ValueType = "" }()
+	switch chg.ValueType {
 	case "string":
 		chg.StrValue = ""
 
@@ -72,32 +72,32 @@ func (chg *Change) SetValue(val interface{}) (err error) {
 
 	if strVal, ok := val.(string); ok {
 		chg.StrValue = strVal
-		chg.Type = "string"
+		chg.ValueType = "string"
 		return
 	}
 	if intVal, ok := val.(int); ok {
 		chg.IntValue = intVal
-		chg.Type = "int"
+		chg.ValueType = "int"
 		return
 	}
 	if f32Val, ok := val.(float32); ok {
 		chg.Float32Value = f32Val
-		chg.Type = "float32"
+		chg.ValueType = "float32"
 		return
 	}
 	if f64Val, ok := val.(float64); ok {
 		chg.Float64Value = f64Val
-		chg.Type = "float64"
+		chg.ValueType = "float64"
 		return
 	}
 	if jsVal, ok := val.(json.RawMessage); ok {
 		chg.JSONValue = jsVal
-		chg.Type = "json"
+		chg.ValueType = "json"
 		return
 	}
 	if byVal, ok := val.([]byte); ok {
 		chg.BytesValue = byVal
-		chg.Type = "bytes"
+		chg.ValueType = "bytes"
 		return
 	}
 
