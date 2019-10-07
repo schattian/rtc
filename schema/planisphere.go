@@ -2,6 +2,8 @@ package schema
 
 import (
 	"fmt"
+
+	"github.com/sebach1/git-crud/internal/integrity"
 )
 
 // A Planisphere describes the scope in which the gSchemas will be searched in
@@ -22,7 +24,7 @@ func (psph Planisphere) GetSchemaFromName(schemaName string) (*Schema, error) {
 
 // preciseTableErr will assume there is an error with the tableName. Then, it precises the current behavor.
 // To achieve it, checks if the given table exists in the planisphere.
-func (psph Planisphere) preciseTableErr(tableName TableName) (err error) {
+func (psph Planisphere) preciseTableErr(tableName integrity.TableName) (err error) {
 	for _, sch := range psph {
 		for _, table := range sch.tableNames() {
 			if table == tableName {

@@ -3,11 +3,13 @@ package schema
 import (
 	"reflect"
 	"testing"
+
+	"github.com/sebach1/git-crud/internal/integrity"
 )
 
 func Test_preciseTableErr(t *testing.T) {
 	type args struct {
-		tableName TableName
+		tableName integrity.TableName
 	}
 
 	tests := []struct {

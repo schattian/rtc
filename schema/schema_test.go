@@ -2,12 +2,14 @@ package schema
 
 import (
 	"testing"
+
+	"github.com/sebach1/git-crud/internal/integrity"
 )
 
 func TestSchema_preciseColErr(t *testing.T) {
 	type args struct {
 		sch     *Schema
-		colName ColumnName
+		colName integrity.ColumnName
 	}
 	tests := []struct {
 		name string

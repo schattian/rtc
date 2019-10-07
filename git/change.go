@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 
+	"github.com/sebach1/git-crud/internal/integrity"
 	"github.com/sebach1/git-crud/schema"
 )
 
 // A Change represents every purposed difference
 type Change struct {
-	TableName  schema.TableName  `json:"table_name,omitempty"`
-	ColumnName schema.ColumnName `json:"column_name,omitempty"`
+	TableName  integrity.TableName  `json:"table_name,omitempty"`
+	ColumnName integrity.ColumnName `json:"column_name,omitempty"`
 
 	StrValue     string          `json:"str_value,omitempty"`
 	IntValue     int             `json:"int_value,omitempty"`

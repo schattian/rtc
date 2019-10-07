@@ -1,14 +1,14 @@
 package git
 
-// type Owner struct {
-// 	Collaborators []Collaborator
-// }
+type Owner struct {
+	Collaborators []Collaborator
+}
 
-// // Orchestrate sends the order to all the collaborators to execute
-// // the needed actions in order to achieve the commitment
-// func (o *Owner) Orchestrate(comm *Commit) {
-// 	comm.GroupBy(AreCompatible)
-// }
+// Orchestrate sends the order to all the collaborators to execute
+// the needed actions in order to achieve the commitment
+func (o *Owner) Orchestrate(comm *Commit) {
+	comm.GroupBy(AreCompatible)
+}
 
 // func (o *Owner) Pull(context.Context, *Commit) (*Commit, error) {
 // 	return nil

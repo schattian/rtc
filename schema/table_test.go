@@ -5,23 +5,24 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/sebach1/git-crud/internal/integrity"
 )
 
 func TestTable_columnNames(t *testing.T) {
 	tests := []struct {
 		name         string
 		table        *Table
-		wantColNames []ColumnName
+		wantColNames []integrity.ColumnName
 	}{
 		{
 			name:         "single-column table",
 			table:        gTables.Basic,
-			wantColNames: []ColumnName{gColumns.Basic.Name},
+			wantColNames: []integrity.ColumnName{gColumns.Basic.Name},
 		},
 		{
 			name:         "multi-column table",
 			table:        gTables.BasicRare,
-			wantColNames: []ColumnName{gColumns.Basic.Name, gColumns.Rare.Name},
+			wantColNames: []integrity.ColumnName{gColumns.Basic.Name, gColumns.Rare.Name},
 		},
 		{
 			name:         "table is zero-valued",
