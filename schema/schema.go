@@ -11,6 +11,14 @@ type Schema struct {
 	Blueprint []*Table `json:"blueprint,omitempty"`
 }
 
+// Owner creates the owner given the schema
+// func (sch *Schema) Owner() (owner *git.Owner) {
+// 	for _, table := range sch.Blueprint {
+// 		owner.Collaborators = append(owner.Collaborators, table.Maintainer)
+// 	}
+// 	return
+// }
+
 // colNames plucks all the columnNames from its tables
 func (sch *Schema) colNames() (colNames []ColumnName) {
 	for _, table := range sch.Blueprint {

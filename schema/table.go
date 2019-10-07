@@ -4,6 +4,7 @@ package schema
 type Table struct {
 	Name    TableName `json:"name,omitempty"`
 	Columns []*Column `json:"columns,omitempty"`
+	// Maintainer git.Collaborator `json:"maintainer,omitempty"`
 }
 
 // TableName is the name of a table
