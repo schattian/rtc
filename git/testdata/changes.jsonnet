@@ -48,7 +48,7 @@ local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
       table_name: regularTable,
       column_name: regularColumn,
       str_value: regularStringValue,
-      type: regularType,
+      value_type: regularType,
       id: regularID,
       entity_id: regularEntityID,
     },
@@ -58,21 +58,21 @@ local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
 
     column: base { column_name: rareColumn },
 
-    str_value: base { str_value: rareStringValue, type: strType },
+    str_value: base { str_value: rareStringValue, value_type: strType },
 
-    int_value: base { int_value: regularIntValue, type: intType, str_value: '' },
+    int_value: base { int_value: regularIntValue, value_type: intType, str_value: '' },
 
-    float32_value: base { float32_value: regularFloat32Value, type: float32Type },
+    float32_value: base { float32_value: regularFloat32Value, value_type: float32Type },
 
-    float64_value: base { float64_value: regularFloat64Value, type: float64Type },
+    float64_value: base { float64_value: regularFloat64Value, value_type: float64Type },
 
     id: base { id: rareID },
 
     entity: base { entity_id: rareEntityID },
 
-    json_value: base { json_value: regularJSONValue, type: jsonType, str_value: '' },
+    json_value: base { json_value: regularJSONValue, value_type: jsonType, str_value: '' },
 
-    clean_value: base { str_value: '', type: '' },
+    clean_value: base { str_value: '', value_type: '' },
 
     untracked: base { entity_id: '' },
   },
@@ -84,7 +84,7 @@ local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
       table_name: rareTable,
       column_name: rareColumn,
       int_value: rareIntValue,
-      type: rareType,
+      value_type: rareType,
       id: rareID,
       entity_id: rareEntityID,
     },
@@ -95,13 +95,13 @@ local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
 
     int_value: base { int_value: regularIntValue },
 
-    str_value: base { str_value: rareStringValue, type: strType, int_value: 0 },
+    str_value: base { str_value: rareStringValue, value_type: strType, int_value: 0 },
 
     id: base { id: regularID },
 
-    json_value: base { json_value: rareJSONValue, type: jsonType, int_value: 0 },
+    json_value: base { json_value: rareJSONValue, value_type: jsonType, int_value: 0 },
 
-    clean_value: base { int_value: 0, type: '' },
+    clean_value: base { int_value: 0, value_type: '' },
 
     entity: base { entity_id: regularEntityID },
 
