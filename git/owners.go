@@ -1,37 +1,86 @@
 package git
 
+import (
+	"context"
+	"sync"
+
+	"github.com/sebach1/git-crud/internal/integrity"
+)
+
 type Owner struct {
-	Collaborators []Collaborator
+	wg         *sync.WaitGroup
+	mergeConfs chan error
+	summ       chan *Result
 }
 
-// Orchestrate sends the order to all the collaborators to execute
-// the needed actions in order to achieve the commitment
-func (o *Owner) Orchestrate(comm *Commit, name string, strategy changesMatcher) {
-	pR := PullRequest{Name: name}
-	for _, changes := range comm.GroupBy(strategy) {
+// Orchestrate sends the order to all the collaborators available to execute
+// the needed actions in order to achieve the commitment, creating a new PullRequest
+func (own *Owner) Orchestrate(
+	ctx context.Context,
+	community *Community,
+	schName integrity.SchemaName,
+	comm *Commit,
+	strategy changesMatcher,
+) {
+	own.wg = new(sync.WaitGroup)
+	var pR PullRequest
+
+	for _, changes := range comm.GroupBy(strategy) { // Splits incompatibilities onto the pR
 		comm := &Commit{Changes: changes}
 		pR.Commits = append(pR.Commits, comm)
 	}
-	o.Merge(pR)
+	pR.AssignTeam(community, schName)
+	go own.Merge(ctx, &pR)
 	return
 }
 
-func (o *Owner) Merge(pR *PullRequest) {
+func (own *Owner) Merge(ctx context.Context, pR *PullRequest) {
 	for _, comm := range pR.Commits {
+
+		tableName, err := comm.TableName()
+		if err != nil {
+			own.mergeConfs <- err
+		}
+
+		commType, err := comm.Type()
+		if err != nil {
+			own.mergeConfs <- err
+			continue // Notice that this action discards the commit
+		}
+
+		switch commType {
+
+		case "create", "update":
+			own.wg.Add(1)
+			go own.Push(ctx, comm)
+
+		case "retrieve":
+			own.wg.Add(1)
+			go own.Pull(ctx, comm)
+
+		case "delete":
+			own.wg.Add(1)
+			go own.Delete(ctx, comm)
+
+		}
 	}
+	own.wg.Wait()
 }
 
-// ! A PR will be generated after a commit can be splitted into non-compatible changes
-// ! A PR will be splitted in subCommits
+func (own *Owner) Pull(ctx context.Context, comm *Commit) (*Commit, error) {
+	defer own.wg.Done()
 
-// func (o *Owner) Pull(context.Context, *Commit) (*Commit, error) {
-// 	return nil
-// }
+	pR.Team.Delegate(tableName)
+	return comm, err
+}
 
-// func (o *Owner) Push(context.Context, *Commit) (Summary, error) {
-// 	return
-// }
+func (own *Owner) Push(ctx context.Context, comm *Commit) (Summary, error) {
+	defer own.wg.Done()
+	return own.summ, err
+}
 
-// func (o *Owner) Delete(context.Context, *Commit) (Summary, error) {
-// 	return
-// }
+func (own *Owner) Delete(ctx context.Context, comm *Commit) (Summary, error) {
+	defer own.wg.Done()
+
+	return own.summ, err
+}
