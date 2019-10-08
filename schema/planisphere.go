@@ -10,7 +10,7 @@ import (
 type Planisphere []*Schema
 
 // GetSchemaFromName retrieves the schema assigned to the name and checks if it exists and is of the desired kind
-func (psph Planisphere) GetSchemaFromName(schemaName string) (*Schema, error) {
+func (psph Planisphere) GetSchemaFromName(schemaName integrity.SchemaName) (*Schema, error) {
 	for _, sch := range psph {
 		if sch == nil {
 			continue

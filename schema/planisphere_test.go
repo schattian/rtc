@@ -42,7 +42,7 @@ func Test_preciseTableErr(t *testing.T) {
 
 func TestPlanisphere_GetSchemaFromName(t *testing.T) {
 	type args struct {
-		schemaName string
+		schemaName integrity.SchemaName
 	}
 
 	tests := []struct {
