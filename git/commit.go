@@ -12,11 +12,6 @@ type Commit struct {
 	Changes []*Change `json:"changes,omitempty"`
 }
 
-// add a change to the commit (directly appending the change to the commit changes, wout validation)
-func (comm *Commit) add(chg *Change) {
-	comm.Changes = append(comm.Changes, chg)
-}
-
 // Add will attach the given change to the commit changes
 // In case the change is invalid or is already commited, it returns an error
 func (comm *Commit) Add(chg *Change) error {
@@ -51,8 +46,8 @@ func (comm *Commit) Rm(chg *Change) error {
 }
 
 // GroupBy splits the commit changes by the given comparator cryteria
-// See that comparator MUST define an equivalence relation (reflexive, transitive, symmetric)
-func (comm *Commit) GroupBy(comparator func(*Change, *Change) bool) (grpChanges [][]*Change) {
+// See that strategy MUST define an equivalence relation (reflexive, transitive, symmetric)
+func (comm *Commit) GroupBy(strategy changesMatcher) (grpChanges [][]*Change) {
 	var omitTrans []int // Omits the transitivity of the comparisons storing the <j> element
 	// Notice that <i> will not be iterated another time, so it isn't useful
 	for i, chg := range comm.Changes {
@@ -67,7 +62,7 @@ func (comm *Commit) GroupBy(comparator func(*Change, *Change) bool) (grpChanges 
 
 			if i < j { // Checks the groupability only for all inside
 				//  the upper-strict triangular form the 1-d matrix
-				if comparator(chg, otherChg) {
+				if strategy(chg, otherChg) {
 					iChgs = append(iChgs, otherChg)
 					omitTrans = append(omitTrans, j)
 				}
@@ -78,6 +73,11 @@ func (comm *Commit) GroupBy(comparator func(*Change, *Change) bool) (grpChanges 
 		grpChanges = append(grpChanges, iChgs)
 	}
 	return
+}
+
+// add a change to the commit (directly appending the change to the commit changes, wout validation)
+func (comm *Commit) add(chg *Change) {
+	comm.Changes = append(comm.Changes, chg)
 }
 
 // rmChangeByIndex will delete without preserving order giving the desired index to delete
