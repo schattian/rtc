@@ -22,6 +22,8 @@ type Change struct {
 	EntityID integrity.ID `json:"entity_id,omitempty"`
 
 	ValueType string `json:"value_type,omitempty"`
+
+	Type integrity.CRUD `json:"type,omitempty"`
 }
 
 // Value gives an interface handling the real value
@@ -49,14 +51,12 @@ func (chg *Change) tearDownValue() {
 	switch chg.ValueType {
 	case "string":
 		chg.StrValue = ""
-
 	case "int":
 		chg.IntValue = 0
 	case "float32":
 		chg.Float32Value = 0
 	case "float64":
 		chg.Float64Value = 0
-
 	case "json":
 		chg.JSONValue = json.RawMessage{}
 	case "bytes":
@@ -106,25 +106,6 @@ func (chg *Change) SetValue(val interface{}) (err error) {
 
 type changesMatcher func(*Change, *Change) bool
 
-// Validate self
-func (chg *Change) Validate() error {
-	if chg.TableName == "" {
-		return errZeroTable
-	}
-	if chg.ColumnName == "" {
-		return errZeroColumn
-	}
-	return nil
-}
-
-// IsUntracked retrieves true if the change is a new entity, otherwise returns false
-func (chg *Change) IsUntracked() bool {
-	if chg.EntityID.IsNil() {
-		return true
-	}
-	return false
-}
-
 // Overrides check if the changes will generate be overrided
 func Overrides(chg, otherChg *Change) bool {
 	if !AreCompatible(chg, otherChg) {
@@ -152,7 +133,7 @@ func (chg *Change) Equals(otherChg *Change) bool {
 	return true
 }
 
-// AreCompatible uses AreCompatibleOnUntracked, plus discarding untracked changes
+// AreCompatible checks if the given changes can be used to merge them into the same action
 func AreCompatible(chg, otherChg *Change) bool {
 	if chg.TableName != otherChg.TableName {
 		return false
@@ -160,8 +141,114 @@ func AreCompatible(chg, otherChg *Change) bool {
 	if chg.EntityID != otherChg.EntityID {
 		return false
 	}
-	if chg.IsUntracked() { // In case of both of EntityIDs are nil (see that the above comparison discards 2x checking)
+	if chg.Type == "create" { // In case of both of EntityIDs are nil
+		//  (see that the above comparison discards 2x checking)
+		return false
+	}
+	if chg.Type != otherChg.Type {
 		return false
 	}
 	return true
+}
+
+// Validate self
+func (chg *Change) Validate() error {
+	if chg.TableName == "" {
+		return errNilTable
+	}
+	if chg.Type == "" {
+		newType, err := chg.classifyType()
+		if err != nil {
+			return err
+		}
+		chg.Type = newType
+	} else {
+		err := chg.validateType()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// Notice that this implementation could be did just because CRUD patterns are mutually exclusive
+func (chg *Change) classifyType() (integrity.CRUD, error) {
+	if chg.validateCreate() == nil {
+		return "create", nil
+	}
+	if chg.validateRetrieve() == nil {
+		return "retrieve", nil
+	}
+	if chg.validateUpdate() == nil {
+		return "update", nil
+	}
+	if chg.validateDelete() == nil {
+		return "delete", nil
+	}
+	return "", errUnclassifiableChg
+}
+
+func (chg *Change) validateType() error {
+	err := chg.Type.Validate()
+	if err != nil {
+		return err
+	}
+	switch chg.Type {
+	case "create":
+		err = chg.validateCreate()
+	case "retrieve":
+		err = chg.validateRetrieve()
+	case "update":
+		err = chg.validateUpdate()
+	case "delete":
+		err = chg.validateDelete()
+	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (chg *Change) validateCreate() error {
+	if chg.EntityID.IsNil() {
+		return errNotNilEntityID
+	}
+	if chg.ValueType == "" {
+		return errNilValue
+	}
+	return nil
+}
+
+func (chg *Change) validateRetrieve() (err error) {
+	if chg.ValueType != "" {
+		return errNotNilValue
+	}
+	return nil
+}
+
+func (chg *Change) validateUpdate() error {
+	if chg.EntityID.IsNil() {
+		return errNilEntityID
+	}
+	if chg.ColumnName == "" {
+		return errNilColumn
+	}
+	if chg.ValueType == "" {
+		return errNilValue
+	}
+	return nil
+}
+
+func (chg *Change) validateDelete() error {
+	if chg.EntityID.IsNil() {
+		return errNilEntityID
+	}
+	if chg.ValueType != "" {
+		return errNotNilValue
+	}
+	if chg.ColumnName != "" {
+		return errNilColumn
+	}
+	return nil
 }
