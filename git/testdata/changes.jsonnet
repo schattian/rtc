@@ -1,3 +1,5 @@
+//  Notice that regular & rare types are all from UPDATE operation type
+//  due to perform exhaustive fields analysis, and being UPDATE which takes all the fields
 local regularID = 1;
 local rareID = 101;
 
@@ -32,12 +34,16 @@ local rareIntValue = 9001;
 local regularJSONValue = { embedded_value: { another_embedding: 'regularValue' } };
 local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
 
+local toCreate(x) = x { entity_id: '', type: 'create' };
+local toRetrieve(x) = x { value_type: '', str_value: '', type: 'retrieve' };
+local toDelete(x) = x { value_type: '', str_value: '', column: '', type: 'delete' };
+
 {
   local regular = self.regular,
- 
+
   inconsistent: {
-    table: regular.none {table_name: ""},
-    column: regular.none {column_name: ""},
+    table: regular.none { table_name: '' },
+    column: regular.none { column_name: '' },
   },
 
 
@@ -53,6 +59,10 @@ local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
       entity_id: regularEntityID,
     },
 
+    create: toCreate(base),
+    retrieve: toRetrieve(base),
+    update: base {type: "update"},
+    delete: toDelete(base),
 
     table: base { table_name: rareTable },
 
@@ -89,6 +99,12 @@ local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
       entity_id: rareEntityID,
     },
 
+    create: toCreate(base),
+    retrieve: toRetrieve(base),
+    update: base,
+    delete: toDelete(base),
+
+
     table: base { table_name: regularTable },
 
     column: base { column_name: regularColumn },
@@ -104,7 +120,7 @@ local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
     clean_value: base { int_value: 0, value_type: '' },
 
     entity: base { entity_id: regularEntityID },
-
+    
     untracked: base { entity_id: '' },
   },
 
