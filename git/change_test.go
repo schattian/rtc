@@ -5,25 +5,6 @@ import (
 	"testing"
 )
 
-func TestChange_IsUntracked(t *testing.T) {
-	tests := []struct {
-		name string
-		chg  *Change
-		want bool
-	}{
-		{name: "entity_id is not set up", chg: gChanges.Zero, want: true},
-		{name: "entity_id is zero-value", chg: gChanges.Regular.Untracked, want: true},
-
-		{name: "entity_id is filled", chg: gChanges.Regular.None, want: false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.chg.IsUntracked(); got != tt.want {
-				t.Errorf("Change.IsUntracked() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 func TestAreCompatible(t *testing.T) {
 	type args struct {
 		chg      *Change
