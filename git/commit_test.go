@@ -127,13 +127,13 @@ func TestCommit_Add(t *testing.T) {
 			name: "column inconsistency",
 			comm: &Commit{Changes: []*Change{gChanges.Regular.None}},
 			args: args{chg: gChanges.Inconsistent.Column},
-			want: errZeroColumn,
+			want: errNilColumn,
 		},
 		{
 			name: "table inconsistency",
 			comm: &Commit{Changes: []*Change{gChanges.Regular.None}},
 			args: args{chg: gChanges.Inconsistent.Table},
-			want: errZeroTable,
+			want: errNilTable,
 		},
 		{
 			name:    "change modifies the value of a change already in the commit",
