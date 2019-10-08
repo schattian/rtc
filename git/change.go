@@ -227,6 +227,36 @@ func (chg *Change) validateRetrieve() (err error) {
 	return nil
 }
 
+func (chg *Change) ToKeyVal() map[string]interface{} {
+	jsonified := map[string]interface{}{
+		string(chg.ColumnName): chg.Value(),
+	}
+	if !chg.EntityID.IsNil() {
+		jsonified["id"] = chg.EntityID
+	}
+	return jsonified
+}
+
+func (chg *Change) ToJSON() (json.RawMessage, error) {
+	jsonified := struct {
+		Table  integrity.TableName  `json:"table,omitempty"`
+		Column integrity.ColumnName `json:"column,omitempty"`
+		ID     integrity.ID         `json:"id,omitempty"`
+		Value  interface{}          `json:"value,omitempty"`
+	}{
+		Table:  chg.TableName,
+		Column: chg.ColumnName,
+		Value:  chg.Value(),
+		ID:     chg.EntityID,
+	}
+	msgBytes, err := json.Marshal(jsonified)
+	if err != nil {
+		return nil, err
+	}
+	msg := json.RawMessage(msgBytes)
+	return msg, nil
+}
+
 func (chg *Change) validateUpdate() error {
 	if chg.EntityID.IsNil() {
 		return errNilEntityID
