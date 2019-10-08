@@ -1,8 +1,11 @@
 package git
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
+
+	"github.com/sebach1/git-crud/internal/integrity"
 )
 
 // Commit is the abstraction that takes the proposed changes to an entity
@@ -31,6 +34,63 @@ func (comm *Commit) Add(chg *Change) error {
 	}
 	comm.add(chg)
 	return nil
+}
+
+// func (comm *Commit) Table() integrity.TableName {
+
+// }
+
+func (comm *Commit) ToJSON() (json.RawMessage, error) {
+	mapComm := comm.ToKeyVal()
+	bytes, err := json.Marshal(mapComm)
+	if err != nil {
+		return nil, err
+	}
+	return json.RawMessage(bytes), nil
+}
+
+func (comm *Commit) ToKeyVal() map[string]interface{} {
+	mapComm := make(map[string]interface{})
+	for _, chg := range comm.Changes {
+		chgMap := chg.ToKeyVal()
+		for col, val := range chgMap {
+			mapComm[col] = val
+		}
+	}
+	return mapComm
+}
+
+// func (comm *Commit) ToJSON() (json.RawMessage, error) {
+// 	for _, chg := range comm.Changes {
+// 		jsChg := chg.ToJSON()
+
+// 	}
+// }
+
+func (comm *Commit) TableName() (tableName integrity.TableName, err error) {
+	for _, chg := range comm.Changes {
+		if tableName != "" {
+			if chg.TableName != tableName {
+				return "", errMixedTables
+			}
+			continue
+		}
+		tableName = chg.TableName
+	}
+	return
+}
+
+func (comm *Commit) Type() (commType integrity.CRUD, err error) {
+	for _, chg := range comm.Changes {
+		if commType != "" {
+			if chg.Type != commType {
+				return "", errMixedTypes
+			}
+			continue
+		}
+		commType = chg.Type
+	}
+	return
 }
 
 // Rm deletes the given change from the commit
