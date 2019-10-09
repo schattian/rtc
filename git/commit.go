@@ -13,6 +13,8 @@ import (
 type Commit struct {
 	ID      int       `json:"id,omitempty"`
 	Changes []*Change `json:"changes,omitempty"`
+
+	Reviewer Collaborator `json:"reviewer,omitempty"`
 }
 
 // Add will attach the given change to the commit changes
@@ -35,10 +37,6 @@ func (comm *Commit) Add(chg *Change) error {
 	comm.add(chg)
 	return nil
 }
-
-// func (comm *Commit) Table() integrity.TableName {
-
-// }
 
 func (comm *Commit) ToJSON() (json.RawMessage, error) {
 	mapComm := comm.ToKeyVal()
