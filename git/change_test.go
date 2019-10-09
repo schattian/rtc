@@ -42,8 +42,8 @@ func TestAreCompatible(t *testing.T) {
 		{
 			name: "both nil entities_id and same tableName",
 			args: args{
-				chg:      gChanges.Regular.Untracked,
-				otherChg: gChanges.Regular.Untracked,
+				chg:      gChanges.Regular.Create,
+				otherChg: gChanges.Regular.Create,
 			},
 			want: false,
 		},

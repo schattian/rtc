@@ -118,8 +118,6 @@ func Overrides(chg, otherChg *Change) bool {
 }
 
 // Equals checks if the given change will trigger the exactly same action as itself
-// Note that Equals prioritizes false on cryteria
-// So, in case needing to check untracked it can use AreCompatibleOrUntracked func
 func (chg *Change) Equals(otherChg *Change) bool {
 	if !AreCompatible(chg, otherChg) {
 		return false
@@ -130,6 +128,7 @@ func (chg *Change) Equals(otherChg *Change) bool {
 	if chg.Value() != otherChg.Value() {
 		return false
 	}
+
 	return true
 }
 
@@ -211,7 +210,7 @@ func (chg *Change) validateType() error {
 }
 
 func (chg *Change) validateCreate() error {
-	if chg.EntityID.IsNil() {
+	if !chg.EntityID.IsNil() {
 		return errNotNilEntityID
 	}
 	if chg.ValueType == "" {
