@@ -44,7 +44,7 @@ func TestCommit_GroupBy(t *testing.T) {
 		{
 			name: "changes are groupable if with same tableName",
 			fields: fields{Changes: []*Change{
-				gChanges.Regular.None, gChanges.Regular.Untracked, gChanges.Regular.None, gChanges.Rare.Table,
+				gChanges.Regular.None, gChanges.Regular.Create, gChanges.Regular.None, gChanges.Rare.Table,
 				gChanges.Regular.Table,
 			}},
 			args:       args{comparator: areSameTable},
@@ -119,15 +119,9 @@ func TestCommit_Add(t *testing.T) {
 		},
 		{
 			name:    "both identical untracked commits",
-			comm:    &Commit{Changes: []*Change{gChanges.Regular.Untracked}},
-			args:    args{chg: gChanges.Regular.Untracked},
-			newComm: &Commit{Changes: []*Change{gChanges.Regular.Untracked, gChanges.Regular.Untracked}},
-		},
-		{
-			name: "column inconsistency",
-			comm: &Commit{Changes: []*Change{gChanges.Regular.None}},
-			args: args{chg: gChanges.Inconsistent.Column},
-			want: errNilColumn,
+			comm:    &Commit{Changes: []*Change{gChanges.Regular.Create}},
+			args:    args{chg: gChanges.Regular.Create},
+			newComm: &Commit{Changes: []*Change{gChanges.Regular.Create, gChanges.Regular.Create}},
 		},
 		{
 			name: "table inconsistency",
@@ -153,7 +147,6 @@ func TestCommit_Add(t *testing.T) {
 			oldComm := tt.comm
 
 			err := tt.comm.Add(tt.args.chg)
-
 			if err != tt.want {
 				t.Errorf("Commit.Add() error = %v, wantErr %v", err, tt.want)
 			}

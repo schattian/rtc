@@ -36,6 +36,7 @@ local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
 
 local toCreate(x) = x { entity_id: '', type: 'create' };
 local toRetrieve(x) = x { value_type: '', str_value: '', type: 'retrieve' };
+local toUpdate(x) = x { type: 'update' };
 local toDelete(x) = x { value_type: '', str_value: '', column: '', type: 'delete' };
 
 {
@@ -43,7 +44,7 @@ local toDelete(x) = x { value_type: '', str_value: '', column: '', type: 'delete
 
   inconsistent: {
     table: regular.none { table_name: '' },
-    column: regular.none { column_name: '' },
+    column: regular.none { column_name: '', entity_id: ""},  // Contains entity to avoid unclassifiable handlings
   },
 
 
@@ -61,7 +62,7 @@ local toDelete(x) = x { value_type: '', str_value: '', column: '', type: 'delete
 
     create: toCreate(base),
     retrieve: toRetrieve(base),
-    update: base {type: "update"},
+    update: toUpdate(base),
     delete: toDelete(base),
 
     table: base { table_name: rareTable },
@@ -101,7 +102,7 @@ local toDelete(x) = x { value_type: '', str_value: '', column: '', type: 'delete
 
     create: toCreate(base),
     retrieve: toRetrieve(base),
-    update: base,
+    update: toUpdate(base),
     delete: toDelete(base),
 
 

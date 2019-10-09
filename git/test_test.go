@@ -34,9 +34,13 @@ type variadicChanges struct {
 	JSONValue    *Change `json:"json_value,omitempty"`
 	CleanValue   *Change `json:"clean_value,omitempty"`
 
-	ID        *Change `json:"id,omitempty"`
-	Entity    *Change `json:"entity,omitempty"`
-	Untracked *Change `json:"untracked,omitempty"`
+	ID     *Change `json:"id,omitempty"`
+	Entity *Change `json:"entity,omitempty"`
+
+	Create   *Change `json:"create,omitempty"`
+	Retrieve *Change `json:"retrieve,omitempty"`
+	Update   *Change `json:"update,omitempty"`
+	Delete   *Change `json:"delete,omitempty"`
 }
 
 func randChg(chgs ...*Change) *Change {
