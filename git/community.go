@@ -9,7 +9,7 @@ func (community *Community) LookFor(schName integrity.SchemaName) (*Team, error)
 		return nil, errNilCommunity
 	}
 	for _, team := range *community {
-		if team.Schema.Name == schName {
+		if team.AssignedSchema == schName {
 			return team, nil
 		}
 	}
