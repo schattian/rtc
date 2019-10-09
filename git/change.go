@@ -7,7 +7,7 @@ import (
 	"github.com/sebach1/git-crud/internal/integrity"
 )
 
-// A Change represents every purposed difference
+// A Change represents every purposed/lookup for difference
 type Change struct {
 	TableName  integrity.TableName  `json:"table_name,omitempty"`
 	ColumnName integrity.ColumnName `json:"column_name,omitempty"`
@@ -44,24 +44,6 @@ func (chg *Change) Value() interface{} {
 		return chg.BytesValue
 	}
 	return nil
-}
-
-func (chg *Change) tearDownValue() {
-	defer func() { chg.ValueType = "" }()
-	switch chg.ValueType {
-	case "string":
-		chg.StrValue = ""
-	case "int":
-		chg.IntValue = 0
-	case "float32":
-		chg.Float32Value = 0
-	case "float64":
-		chg.Float64Value = 0
-	case "json":
-		chg.JSONValue = json.RawMessage{}
-	case "bytes":
-		chg.BytesValue = nil
-	}
 }
 
 // SetValue performs type assertion over the given value and sets the value over the given change
@@ -104,8 +86,6 @@ func (chg *Change) SetValue(val interface{}) (err error) {
 	return errors.New("the given value cannot be safety typed")
 }
 
-type changesMatcher func(*Change, *Change) bool
-
 // Overrides check if the changes will generate be overrided
 func Overrides(chg, otherChg *Change) bool {
 	if !AreCompatible(chg, otherChg) {
@@ -132,25 +112,7 @@ func (chg *Change) Equals(otherChg *Change) bool {
 	return true
 }
 
-// AreCompatible checks if the given changes can be used to merge them into the same action
-func AreCompatible(chg, otherChg *Change) bool {
-	if chg.TableName != otherChg.TableName {
-		return false
-	}
-	if chg.EntityID != otherChg.EntityID {
-		return false
-	}
-	if chg.Type == "create" { // In case of both of EntityIDs are nil
-		//  (see that the above comparison discards 2x checking)
-		return false
-	}
-	if chg.Type != otherChg.Type {
-		return false
-	}
-	return true
-}
-
-// Validate self
+// Validate self, wrapping up type validations and table assertion
 func (chg *Change) Validate() error {
 	if chg.TableName == "" {
 		return errNilTable
@@ -171,21 +133,38 @@ func (chg *Change) Validate() error {
 	return nil
 }
 
-// Notice that this implementation could be did just because CRUD patterns are mutually exclusive
-func (chg *Change) classifyType() (integrity.CRUD, error) {
-	if chg.validateCreate() == nil {
-		return "create", nil
+// ToMap retrieves a map with the minimum required -not validable- data
+// id est: {column_name: value}
+func (chg *Change) ToMap() map[string]interface{} {
+	jsonified := make(map[string]interface{})
+	if chg.ColumnName != "" {
+		jsonified[string(chg.ColumnName)] = chg.Value()
 	}
-	if chg.validateRetrieve() == nil {
-		return "retrieve", nil
+	if !chg.EntityID.IsNil() {
+		jsonified["id"] = chg.EntityID
 	}
-	if chg.validateUpdate() == nil {
-		return "update", nil
+	return jsonified
+}
+
+// ToJSON converts the map version (returned by ToMap) to a json.RawMessage
+func (chg *Change) ToJSON() (json.RawMessage, error) {
+	jsonified := struct {
+		Table  integrity.TableName  `json:"table,omitempty"`
+		Column integrity.ColumnName `json:"column,omitempty"`
+		ID     integrity.ID         `json:"id,omitempty"`
+		Value  interface{}          `json:"value,omitempty"`
+	}{
+		Table:  chg.TableName,
+		Column: chg.ColumnName,
+		Value:  chg.Value(),
+		ID:     chg.EntityID,
 	}
-	if chg.validateDelete() == nil {
-		return "delete", nil
+	msgBytes, err := json.Marshal(jsonified)
+	if err != nil {
+		return nil, err
 	}
-	return "", errUnclassifiableChg
+	msg := json.RawMessage(msgBytes)
+	return msg, nil
 }
 
 func (chg *Change) validateType() error {
@@ -209,9 +188,30 @@ func (chg *Change) validateType() error {
 	return nil
 }
 
+// ClassifyType will auto-bind the change to the accurated type
+// Notice that this implementation could be did just because CRUD patterns are mutually exclusive
+func (chg *Change) classifyType() (integrity.CRUD, error) {
+	if chg.validateCreate() == nil {
+		return "create", nil
+	}
+	if chg.validateRetrieve() == nil {
+		return "retrieve", nil
+	}
+	if chg.validateUpdate() == nil {
+		return "update", nil
+	}
+	if chg.validateDelete() == nil {
+		return "delete", nil
+	}
+	return "", errUnclassifiableChg
+}
+
 func (chg *Change) validateCreate() error {
 	if !chg.EntityID.IsNil() {
 		return errNotNilEntityID
+	}
+	if chg.ColumnName == "" {
+		return errNilColumn
 	}
 	if chg.ValueType == "" {
 		return errNilValue
@@ -223,37 +223,10 @@ func (chg *Change) validateRetrieve() (err error) {
 	if chg.ValueType != "" {
 		return errNotNilValue
 	}
+	if chg.ColumnName == "" {
+		return errNilColumn
+	}
 	return nil
-}
-
-func (chg *Change) ToKeyVal() map[string]interface{} {
-	jsonified := map[string]interface{}{
-		string(chg.ColumnName): chg.Value(),
-	}
-	if !chg.EntityID.IsNil() {
-		jsonified["id"] = chg.EntityID
-	}
-	return jsonified
-}
-
-func (chg *Change) ToJSON() (json.RawMessage, error) {
-	jsonified := struct {
-		Table  integrity.TableName  `json:"table,omitempty"`
-		Column integrity.ColumnName `json:"column,omitempty"`
-		ID     integrity.ID         `json:"id,omitempty"`
-		Value  interface{}          `json:"value,omitempty"`
-	}{
-		Table:  chg.TableName,
-		Column: chg.ColumnName,
-		Value:  chg.Value(),
-		ID:     chg.EntityID,
-	}
-	msgBytes, err := json.Marshal(jsonified)
-	if err != nil {
-		return nil, err
-	}
-	msg := json.RawMessage(msgBytes)
-	return msg, nil
 }
 
 func (chg *Change) validateUpdate() error {
@@ -277,7 +250,25 @@ func (chg *Change) validateDelete() error {
 		return errNotNilValue
 	}
 	if chg.ColumnName != "" {
-		return errNilColumn
+		return errNotNilColumn
 	}
 	return nil
+}
+
+func (chg *Change) tearDownValue() {
+	defer func() { chg.ValueType = "" }()
+	switch chg.ValueType {
+	case "string":
+		chg.StrValue = ""
+	case "int":
+		chg.IntValue = 0
+	case "float32":
+		chg.Float32Value = 0
+	case "float64":
+		chg.Float64Value = 0
+	case "json":
+		chg.JSONValue = json.RawMessage{}
+	case "bytes":
+		chg.BytesValue = nil
+	}
 }

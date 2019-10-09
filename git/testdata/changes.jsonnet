@@ -37,14 +37,27 @@ local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
 local toCreate(x) = x { entity_id: '', type: 'create' };
 local toRetrieve(x) = x { value_type: '', str_value: '', type: 'retrieve' };
 local toUpdate(x) = x { type: 'update' };
-local toDelete(x) = x { value_type: '', str_value: '', column: '', type: 'delete' };
+local toDelete(x) = x { value_type: '', str_value: '', column_name: '', type: 'delete' };
+
+local createCRUD(x) = {
+  create: toCreate(x),
+  retrieve: toRetrieve(x),
+  update: toUpdate(x),
+  delete: toDelete(x),
+};
 
 {
   local regular = self.regular,
 
   inconsistent: {
-    table: regular.none { table_name: '' },
-    column: regular.none { column_name: '', entity_id: ""},  // Contains entity to avoid unclassifiable handlings
+    crud: {
+      create: regular.crud.create { column_name: '' },
+      retrieve: regular.crud.retrieve { column_name: '' },
+      update: regular.crud.update { column_name: '' },
+      delete: regular.crud.delete { value_type: regular.none.value_type },
+    },
+    table_name: regular.none { table_name: '' },
+    column_name: regular.none { column_name: '', entity_id: '' },  // Contains entity to avoid unclassifiable handlings
   },
 
 
@@ -60,14 +73,11 @@ local toDelete(x) = x { value_type: '', str_value: '', column: '', type: 'delete
       entity_id: regularEntityID,
     },
 
-    create: toCreate(base),
-    retrieve: toRetrieve(base),
-    update: toUpdate(base),
-    delete: toDelete(base),
+    crud: createCRUD(base),
 
-    table: base { table_name: rareTable },
+    table_name: base { table_name: rareTable },
 
-    column: base { column_name: rareColumn },
+    column_name: base { column_name: rareColumn },
 
     str_value: base { str_value: rareStringValue, value_type: strType },
 
@@ -79,13 +89,12 @@ local toDelete(x) = x { value_type: '', str_value: '', column: '', type: 'delete
 
     id: base { id: rareID },
 
-    entity: base { entity_id: rareEntityID },
+    entity_id: base { entity_id: rareEntityID },
 
     json_value: base { json_value: regularJSONValue, value_type: jsonType, str_value: '' },
 
     clean_value: base { str_value: '', value_type: '' },
 
-    untracked: base { entity_id: '' },
   },
 
   rare: {
@@ -100,15 +109,11 @@ local toDelete(x) = x { value_type: '', str_value: '', column: '', type: 'delete
       entity_id: rareEntityID,
     },
 
-    create: toCreate(base),
-    retrieve: toRetrieve(base),
-    update: toUpdate(base),
-    delete: toDelete(base),
+    crud: createCRUD(base),
 
+    table_name: base { table_name: regularTable },
 
-    table: base { table_name: regularTable },
-
-    column: base { column_name: regularColumn },
+    column_name: base { column_name: regularColumn },
 
     int_value: base { int_value: regularIntValue },
 
@@ -118,11 +123,9 @@ local toDelete(x) = x { value_type: '', str_value: '', column: '', type: 'delete
 
     json_value: base { json_value: rareJSONValue, value_type: jsonType, int_value: 0 },
 
-    clean_value: base { int_value: 0, value_type: '' },
+    entity_id: base { entity_id: regularEntityID },
 
-    entity: base { entity_id: regularEntityID },
-    
-    untracked: base { entity_id: '' },
+    clean_value: base { int_value: 0, value_type: '' },
   },
 
   zero: {},

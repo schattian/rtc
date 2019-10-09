@@ -20,7 +20,6 @@ type Commit struct {
 // Add will attach the given change to the commit changes
 // In case the change is invalid or is already commited, it returns an error
 func (comm *Commit) Add(chg *Change) error {
-
 	err := chg.Validate()
 	if err != nil {
 		return err
@@ -34,12 +33,25 @@ func (comm *Commit) Add(chg *Change) error {
 			comm.rmChangeByIndex(idx)
 		}
 	}
-	comm.add(chg)
+	comm.Changes = append(comm.Changes, chg)
 	return nil
 }
 
+// Rm deletes the given change from the commit
+// This action is irrevertible
+func (comm *Commit) Rm(chg *Change) error {
+	for idx, otherChg := range comm.Changes {
+		if chg.Equals(otherChg) {
+			comm.rmChangeByIndex(idx)
+			return nil
+		}
+	}
+	return fmt.Errorf("change %v NOT FOUND", chg)
+}
+
+// ToJSON converts the Map version of the commit to a json.RawMessage
 func (comm *Commit) ToJSON() (json.RawMessage, error) {
-	mapComm := comm.ToKeyVal()
+	mapComm := comm.ToMap()
 	bytes, err := json.Marshal(mapComm)
 	if err != nil {
 		return nil, err
@@ -47,10 +59,12 @@ func (comm *Commit) ToJSON() (json.RawMessage, error) {
 	return json.RawMessage(bytes), nil
 }
 
-func (comm *Commit) ToKeyVal() map[string]interface{} {
+// ToMap returns a map with the content of the commit, ommiting unnecesary fields
+// It takes every change.ToMap and merges onto the resultant map
+func (comm *Commit) ToMap() map[string]interface{} {
 	mapComm := make(map[string]interface{})
 	for _, chg := range comm.Changes {
-		chgMap := chg.ToKeyVal()
+		chgMap := chg.ToMap()
 		for col, val := range chgMap {
 			mapComm[col] = val
 		}
@@ -58,13 +72,8 @@ func (comm *Commit) ToKeyVal() map[string]interface{} {
 	return mapComm
 }
 
-// func (comm *Commit) ToJSON() (json.RawMessage, error) {
-// 	for _, chg := range comm.Changes {
-// 		jsChg := chg.ToJSON()
-
-// 	}
-// }
-
+// TableName checks the unification of the changes' TableNames, and returns an error if there are != 1 TableName
+// Returns the representative tableName of the changes
 func (comm *Commit) TableName() (tableName integrity.TableName, err error) {
 	for _, chg := range comm.Changes {
 		if tableName != "" {
@@ -78,6 +87,8 @@ func (comm *Commit) TableName() (tableName integrity.TableName, err error) {
 	return
 }
 
+// Type checks the unification of the changes' Types, and returns an error if there are != 1 Type
+// Returns the representative type of the changes
 func (comm *Commit) Type() (commType integrity.CRUD, err error) {
 	for _, chg := range comm.Changes {
 		if commType != "" {
@@ -89,18 +100,6 @@ func (comm *Commit) Type() (commType integrity.CRUD, err error) {
 		commType = chg.Type
 	}
 	return
-}
-
-// Rm deletes the given change from the commit
-// This action is irrevertible
-func (comm *Commit) Rm(chg *Change) error {
-	for idx, otherChg := range comm.Changes {
-		if chg.Equals(otherChg) {
-			comm.rmChangeByIndex(idx)
-			return nil
-		}
-	}
-	return fmt.Errorf("change %v NOT FOUND", chg)
 }
 
 // GroupBy splits the commit changes by the given comparator cryteria
@@ -131,11 +130,6 @@ func (comm *Commit) GroupBy(strategy changesMatcher) (grpChanges [][]*Change) {
 		grpChanges = append(grpChanges, iChgs)
 	}
 	return
-}
-
-// add a change to the commit (directly appending the change to the commit changes, wout validation)
-func (comm *Commit) add(chg *Change) {
-	comm.Changes = append(comm.Changes, chg)
 }
 
 // rmChangeByIndex will delete without preserving order giving the desired index to delete

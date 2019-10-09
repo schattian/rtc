@@ -1,9 +1,13 @@
 package git
 
-import "github.com/sebach1/git-crud/internal/integrity"
+import (
+	"github.com/sebach1/git-crud/internal/integrity"
+)
 
+// A Community delimits the teams whose can take a work
 type Community []*Team
 
+// LookFor searches for a team given the correspondent schema (id est: topic abstraction)
 func (community *Community) LookFor(schName integrity.SchemaName) (*Team, error) {
 	if community == nil {
 		return nil, errNilCommunity

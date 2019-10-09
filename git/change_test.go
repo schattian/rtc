@@ -3,75 +3,9 @@ package git
 import (
 	"reflect"
 	"testing"
-)
 
-func TestAreCompatible(t *testing.T) {
-	type args struct {
-		chg      *Change
-		otherChg *Change
-	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		{
-			name: "different entities but same tableName",
-			args: args{
-				chg:      gChanges.Regular.None,
-				otherChg: gChanges.Rare.Table,
-			},
-			want: false,
-		},
-		{
-			name: "all different",
-			args: args{
-				chg:      gChanges.Rare.None,
-				otherChg: gChanges.Regular.None,
-			},
-			want: false,
-		},
-		{
-			name: "diff tableName and same entity",
-			args: args{
-				chg:      gChanges.Regular.None,
-				otherChg: gChanges.Regular.Table,
-			},
-			want: false,
-		},
-		{
-			name: "both nil entities_id and same tableName",
-			args: args{
-				chg:      gChanges.Regular.Create,
-				otherChg: gChanges.Regular.Create,
-			},
-			want: false,
-		},
-		{
-			name: "is mirrored",
-			args: args{
-				chg:      gChanges.Regular.None,
-				otherChg: gChanges.Regular.None,
-			},
-			want: true,
-		},
-		{
-			name: "is mirrored but with diff colName",
-			args: args{
-				chg:      gChanges.Regular.None,
-				otherChg: gChanges.Regular.Column,
-			},
-			want: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := AreCompatible(tt.args.chg, tt.args.otherChg); got != tt.want {
-				t.Errorf("AreCompatibleWith() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+	"github.com/sebach1/git-crud/internal/integrity"
+)
 
 func TestChange_SetValue(t *testing.T) {
 	type args struct {
@@ -181,6 +115,81 @@ func TestChange_Value(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.chg.Value(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Change.Value() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestChange_classifyType(t *testing.T) {
+	tests := []struct {
+		name    string
+		chg     *Change
+		want    integrity.CRUD
+		wantErr bool
+	}{
+		{
+			name:    "correctly typed CREATE",
+			chg:     gChanges.Regular.Create,
+			want:    "create",
+			wantErr: false,
+		},
+		{
+			name:    "correctly typed RETRIEVE",
+			chg:     gChanges.Regular.Retrieve,
+			want:    "retrieve",
+			wantErr: false,
+		},
+		{
+			name:    "correctly typed UPDATE",
+			chg:     gChanges.Regular.Update,
+			want:    "update",
+			wantErr: false,
+		},
+		{
+			name:    "correctly typed DELETE",
+			chg:     gChanges.Regular.Delete,
+			want:    "delete",
+			wantErr: false,
+		},
+		{
+			name: "unclassiffiable inconsistence",
+			chg: randChg(gChanges.Inconsistent.Create, gChanges.Inconsistent.Update,
+				gChanges.Inconsistent.Delete, gChanges.Inconsistent.Retrieve),
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := tt.chg.classifyType()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Change.classifyType() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Error(tt.chg.ValueType)
+				t.Errorf("Change.classifyType() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestChange_validateType(t *testing.T) {
+	tests := []struct {
+		name    string
+		chg     *Change
+		wantErr bool
+	}{
+		{
+			name: "unclassiffiable inconsistence",
+			chg: randChg(gChanges.Inconsistent.Create, gChanges.Inconsistent.Update,
+				gChanges.Inconsistent.Delete, gChanges.Inconsistent.Retrieve),
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := tt.chg.validateType(); (err != nil) != tt.wantErr {
+				t.Errorf("Change.validateType() %v error = %v, wantErr %v", tt.chg.Type, err, tt.wantErr)
 			}
 		})
 	}

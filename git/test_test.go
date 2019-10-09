@@ -7,11 +7,15 @@ import (
 )
 
 var (
-	gChanges goldenChanges
+	gChanges      goldenChanges
+	gTeams        goldenTeams
+	gPullRequests goldenPullRequests
 )
 
 func init() {
 	assist.DecodeJsonnet("changes", &gChanges)
+	assist.DecodeJsonnet("pull_requests", &gPullRequests)
+	assist.DecodeJsonnet("teams", &gTeams)
 }
 
 type goldenChanges struct {
@@ -23,9 +27,9 @@ type goldenChanges struct {
 }
 
 type variadicChanges struct {
-	None   *Change `json:"none,omitempty"`
-	Table  *Change `json:"table,omitempty"`
-	Column *Change `json:"column,omitempty"`
+	None       *Change `json:"none,omitempty"`
+	TableName  *Change `json:"table_name,omitempty"`
+	ColumnName *Change `json:"column_name,omitempty"`
 
 	StrValue     *Change `json:"str_value,omitempty"`
 	IntValue     *Change `json:"int_value,omitempty"`
@@ -34,15 +38,56 @@ type variadicChanges struct {
 	JSONValue    *Change `json:"json_value,omitempty"`
 	CleanValue   *Change `json:"clean_value,omitempty"`
 
-	ID     *Change `json:"id,omitempty"`
-	Entity *Change `json:"entity,omitempty"`
+	ChgCRUD `json:"crud,omitempty"`
 
+	ID       *Change `json:"id,omitempty"`
+	EntityID *Change `json:"entity_id,omitempty"`
+}
+
+func randChg(chgs ...*Change) *Change {
+	return chgs[rand.Intn(len(chgs)-1)]
+}
+
+type goldenPullRequests struct {
+	Basic *PullRequest `json:"basic,omitempty"`
+
+	Full *PullRequest `json:"full,omitempty"`
+
+	PrCRUD `json:"crud,omitempty"`
+
+	ZeroCommits *PullRequest `json:"zero_commits,omitempty"`
+	ZeroTeam    *PullRequest `json:"zero_team,omitempty"`
+
+	Zero *PullRequest `json:"zero,omitempty"`
+}
+
+type ChgCRUD struct {
 	Create   *Change `json:"create,omitempty"`
 	Retrieve *Change `json:"retrieve,omitempty"`
 	Update   *Change `json:"update,omitempty"`
 	Delete   *Change `json:"delete,omitempty"`
 }
 
-func randChg(chgs ...*Change) *Change {
-	return chgs[rand.Intn(len(chgs)-1)]
+type PrCRUD struct {
+	Create   *Change `json:"create,omitempty"`
+	Retrieve *Change `json:"retrieve,omitempty"`
+	Update   *Change `json:"update,omitempty"`
+	Delete   *Change `json:"delete,omitempty"`
+}
+
+type goldenTeams struct {
+	Basic     *Team `json:"basic,omitempty"`
+	Rare      *Team `json:"rare,omitempty"`
+	BasicRare *Team `json:"basic_rare,omitempty"`
+
+	Inconsistent *Team `json:"inconsistent,omitempty"`
+
+	ZeroMembers *Team `json:"zero_members,omitempty"`
+	Zero        *Team `json:"zero,omitempty"`
+}
+
+func (chg *Change) copy() *Change {
+	copyChg := new(Change)
+	*copyChg = *chg
+	return copyChg
 }
