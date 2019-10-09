@@ -25,10 +25,10 @@ func Test_preciseTableErr(t *testing.T) {
 			want: errForeignTable,
 		},
 		{
-			name: "given tableName doenst exists on any scoped schema",
+			name: "given tableName doesn't exists on any scoped schema",
 			args: args{gTables.Zero.Name},
 			psph: Planisphere{gSchemas.Basic, gSchemas.Rare},
-			want: errUnexistantTable,
+			want: errNonexistentTable,
 		},
 	}
 	for _, tt := range tests {

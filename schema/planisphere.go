@@ -19,10 +19,10 @@ func (psph Planisphere) GetSchemaFromName(schemaName integrity.SchemaName) (*Sch
 			return sch, nil
 		}
 	}
-	return nil, fmt.Errorf("the desired schema doesnt exists. Given: %v", schemaName)
+	return nil, fmt.Errorf("the desired schema doesn't exists. Given: %v", schemaName)
 }
 
-// preciseTableErr will assume there is an error with the tableName. Then, it precises the current behavor.
+// preciseTableErr will assume there is an error with the tableName. Then, it precises the current behavior.
 // To achieve it, checks if the given table exists in the planisphere.
 func (psph Planisphere) preciseTableErr(tableName integrity.TableName) (err error) {
 	for _, sch := range psph {
@@ -32,5 +32,5 @@ func (psph Planisphere) preciseTableErr(tableName integrity.TableName) (err erro
 			}
 		}
 	}
-	return errUnexistantTable
+	return errNonexistentTable
 }

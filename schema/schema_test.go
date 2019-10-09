@@ -22,14 +22,14 @@ func TestSchema_preciseColErr(t *testing.T) {
 			want: errForeignColumn,
 		},
 		{
-			name: "column doesnt exists in the schema",
+			name: "column doesn't exists in the schema",
 			args: args{sch: gSchemas.Basic, colName: gColumns.Rare.Name},
-			want: errUnexistantColumn,
+			want: errNonexistentColumn,
 		},
 		{
 			name: "schema caller is zero-valued",
 			args: args{sch: gSchemas.Zero, colName: gColumns.Basic.Name},
-			want: errUnexistantColumn,
+			want: errNonexistentColumn,
 		},
 	}
 	for _, tt := range tests {

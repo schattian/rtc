@@ -86,7 +86,7 @@ func (chg *Change) SetValue(val interface{}) (err error) {
 	return errors.New("the given value cannot be safety typed")
 }
 
-// Overrides check if the changes will generate be overrided
+// Overrides check if the changes will generate be overridden
 func Overrides(chg, otherChg *Change) bool {
 	if !AreCompatible(chg, otherChg) {
 		return false
@@ -136,19 +136,19 @@ func (chg *Change) Validate() error {
 // ToMap retrieves a map with the minimum required -not validable- data
 // id est: {column_name: value}
 func (chg *Change) ToMap() map[string]interface{} {
-	jsonified := make(map[string]interface{})
+	chgMap := make(map[string]interface{})
 	if chg.ColumnName != "" {
-		jsonified[string(chg.ColumnName)] = chg.Value()
+		chgMap[string(chg.ColumnName)] = chg.Value()
 	}
 	if !chg.EntityID.IsNil() {
-		jsonified["id"] = chg.EntityID
+		chgMap["id"] = chg.EntityID
 	}
-	return jsonified
+	return chgMap
 }
 
 // ToJSON converts the map version (returned by ToMap) to a json.RawMessage
 func (chg *Change) ToJSON() (json.RawMessage, error) {
-	jsonified := struct {
+	chgJSON := struct {
 		Table  integrity.TableName  `json:"table,omitempty"`
 		Column integrity.ColumnName `json:"column,omitempty"`
 		ID     integrity.ID         `json:"id,omitempty"`
@@ -159,7 +159,7 @@ func (chg *Change) ToJSON() (json.RawMessage, error) {
 		Value:  chg.Value(),
 		ID:     chg.EntityID,
 	}
-	msgBytes, err := json.Marshal(jsonified)
+	msgBytes, err := json.Marshal(chgJSON)
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +188,7 @@ func (chg *Change) validateType() error {
 	return nil
 }
 
-// ClassifyType will auto-bind the change to the accurated type
+// ClassifyType will auto-bind the change to the accurate type
 // Notice that this implementation could be did just because CRUD patterns are mutually exclusive
 func (chg *Change) classifyType() (integrity.CRUD, error) {
 	if chg.validateCreate() == nil {

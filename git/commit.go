@@ -18,7 +18,7 @@ type Commit struct {
 }
 
 // Add will attach the given change to the commit changes
-// In case the change is invalid or is already commited, it returns an error
+// In case the change is invalid or is already committed, it returns an error
 func (comm *Commit) Add(chg *Change) error {
 	err := chg.Validate()
 	if err != nil {
@@ -38,7 +38,7 @@ func (comm *Commit) Add(chg *Change) error {
 }
 
 // Rm deletes the given change from the commit
-// This action is irrevertible
+// This action is irreversible
 func (comm *Commit) Rm(chg *Change) error {
 	for idx, otherChg := range comm.Changes {
 		if chg.Equals(otherChg) {
@@ -59,7 +59,7 @@ func (comm *Commit) ToJSON() (json.RawMessage, error) {
 	return json.RawMessage(bytes), nil
 }
 
-// ToMap returns a map with the content of the commit, ommiting unnecesary fields
+// ToMap returns a map with the content of the commit, omitting unnecessary fields
 // It takes every change.ToMap and merges onto the resultant map
 func (comm *Commit) ToMap() map[string]interface{} {
 	mapComm := make(map[string]interface{})
@@ -102,13 +102,13 @@ func (comm *Commit) Type() (commType integrity.CRUD, err error) {
 	return
 }
 
-// GroupBy splits the commit changes by the given comparator cryteria
+// GroupBy splits the commit changes by the given comparator criteria
 // See that strategy MUST define an equivalence relation (reflexive, transitive, symmetric)
 func (comm *Commit) GroupBy(strategy changesMatcher) (grpChanges [][]*Change) {
 	var omitTrans []int // Omits the transitivity of the comparisons storing the <j> element
 	// Notice that <i> will not be iterated another time, so it isn't useful
 	for i, chg := range comm.Changes {
-		if checkIntInSlice(omitTrans, i) { // iterate only if <i> wasnt checked (due to
+		if checkIntInSlice(omitTrans, i) { // iterate only if <i> wasn't checked (due to
 			// equivalence relation property we can avoid them)
 			continue
 		}
@@ -134,7 +134,7 @@ func (comm *Commit) GroupBy(strategy changesMatcher) (grpChanges [][]*Change) {
 
 // rmChangeByIndex will delete without preserving order giving the desired index to delete
 func (comm *Commit) rmChangeByIndex(i int) {
-	var lock sync.Mutex // Avoid overlapping itself with a paralell call
+	var lock sync.Mutex // Avoid overlapping itself with a parallel call
 	lock.Lock()
 	lastIndex := len(comm.Changes) - 1
 	comm.Changes[i] = comm.Changes[lastIndex]

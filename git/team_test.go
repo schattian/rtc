@@ -26,7 +26,7 @@ func TestTeam_Delegate(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "a member isnt assigned to the given table",
+			name:    "a member isn't assigned to the given table",
 			team:    gTeams.ZeroMembers.mockedCopy(gChanges.Regular.None.TableName, nil),
 			args:    args{tableName: gChanges.Regular.TableName.TableName},
 			want:    &collabMock{},

@@ -152,7 +152,7 @@ func TestChange_classifyType(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "unclassiffiable inconsistence",
+			name: "unclassifiable inconsistency",
 			chg: randChg(gChanges.Inconsistent.Create, gChanges.Inconsistent.Update,
 				gChanges.Inconsistent.Delete, gChanges.Inconsistent.Retrieve),
 			wantErr: true,
@@ -180,7 +180,7 @@ func TestChange_validateType(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "unclassiffiable inconsistence",
+			name: "unclassifiable inconsistency",
 			chg: randChg(gChanges.Inconsistent.Create, gChanges.Inconsistent.Update,
 				gChanges.Inconsistent.Delete, gChanges.Inconsistent.Retrieve),
 			wantErr: true,

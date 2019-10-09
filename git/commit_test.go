@@ -156,7 +156,7 @@ func TestCommit_Add(t *testing.T) {
 			}
 			if err != nil {
 				if diff := cmp.Diff(oldComm, tt.comm); diff != "" {
-					t.Errorf("Commit.Add() errored mismatch (-want +got): %s", diff)
+					t.Errorf("Commit.Add() mismatch (-want +got): %s", diff)
 				}
 				return
 			}
@@ -178,7 +178,7 @@ func TestCommit_Rm(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "given change doesnt belongs to the commit",
+			name:    "given change doesn't belongs to the commit",
 			comm:    &Commit{Changes: []*Change{gChanges.Regular.None}},
 			args:    args{chg: gChanges.Rare.None},
 			wantErr: true,

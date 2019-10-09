@@ -13,14 +13,6 @@ type Schema struct {
 	Blueprint []*Table             `json:"blueprint,omitempty"`
 }
 
-// Owner creates the owner given the schema
-// func (sch *Schema) Owner() (owner *git.Owner) {
-// 	for _, table := range sch.Blueprint {
-// 		owner.Collaborators = append(owner.Collaborators, table.Maintainer)
-// 	}
-// 	return
-// }
-
 // colNames plucks all the columnNames from its tables
 func (sch *Schema) colNames() (colNames []integrity.ColumnName) {
 	for _, table := range sch.Blueprint {
@@ -80,7 +72,7 @@ func (sch *Schema) Validate(
 	errCh <- sch.preciseColErr(colName)
 }
 
-// preciseColErr gives a more accurated error to a validation of a column
+// preciseColErr gives a more accurate error to a validation of a column
 // It assumes the column is errored, and checks if it exists or if instead its a context err
 func (sch *Schema) preciseColErr(colName integrity.ColumnName) (err error) {
 	for _, column := range sch.colNames() {
@@ -88,5 +80,5 @@ func (sch *Schema) preciseColErr(colName integrity.ColumnName) (err error) {
 			return errForeignColumn
 		}
 	}
-	return errUnexistantColumn
+	return errNonexistentColumn
 }

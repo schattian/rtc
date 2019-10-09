@@ -4,8 +4,8 @@ import "errors"
 
 var (
 	// Changes
-	errDuplicatedChg     = errors.New("the change is ALREADY COMMITED")
-	errUnclassifiableChg = errors.New("the change DOESNT respect any PATTERN and thus CANNOT be CLASSIFIABLE")
+	errDuplicatedChg     = errors.New("the change is ALREADY COMMITTED")
+	errUnclassifiableChg = errors.New("the change DOESN'T respect any PATTERN and thus CANNOT be CLASSIFIABLE")
 
 	// Table
 	errNilTable = errors.New("change's TABLE cannot be NIL")
