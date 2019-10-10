@@ -1,7 +1,6 @@
 package git
 
 import (
-	"encoding/json"
 	"fmt"
 	"sync"
 
@@ -47,16 +46,6 @@ func (comm *Commit) Rm(chg *Change) error {
 		}
 	}
 	return fmt.Errorf("change %v NOT FOUND", chg)
-}
-
-// ToJSON converts the Map version of the commit to a json.RawMessage
-func (comm *Commit) ToJSON() (json.RawMessage, error) {
-	mapComm := comm.ToMap()
-	bytes, err := json.Marshal(mapComm)
-	if err != nil {
-		return nil, err
-	}
-	return json.RawMessage(bytes), nil
 }
 
 // ToMap returns a map with the content of the commit, omitting unnecessary fields

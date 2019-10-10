@@ -146,27 +146,6 @@ func (chg *Change) ToMap() map[string]interface{} {
 	return chgMap
 }
 
-// ToJSON converts the map version (returned by ToMap) to a json.RawMessage
-func (chg *Change) ToJSON() (json.RawMessage, error) {
-	chgJSON := struct {
-		Table  integrity.TableName  `json:"table,omitempty"`
-		Column integrity.ColumnName `json:"column,omitempty"`
-		ID     integrity.ID         `json:"id,omitempty"`
-		Value  interface{}          `json:"value,omitempty"`
-	}{
-		Table:  chg.TableName,
-		Column: chg.ColumnName,
-		Value:  chg.Value(),
-		ID:     chg.EntityID,
-	}
-	msgBytes, err := json.Marshal(chgJSON)
-	if err != nil {
-		return nil, err
-	}
-	msg := json.RawMessage(msgBytes)
-	return msg, nil
-}
-
 func (chg *Change) validateType() error {
 	err := chg.Type.Validate()
 	if err != nil {
