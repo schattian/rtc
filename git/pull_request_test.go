@@ -22,7 +22,7 @@ func TestPullRequest_AssignTeam(t *testing.T) {
 	}{
 		{
 			name: "correctly assigns the team",
-			pR:   gPullRequests.ZeroTeam,
+			pR:   gPullRequests.ZeroTeam.copy(),
 			args: args{
 				community: &Community{gTeams.Basic},
 				schName:   gTeams.Basic.AssignedSchema,
@@ -32,7 +32,7 @@ func TestPullRequest_AssignTeam(t *testing.T) {
 		},
 		{
 			name: "team not in the community",
-			pR:   gPullRequests.ZeroTeam,
+			pR:   gPullRequests.ZeroTeam.copy(),
 			args: args{
 				community: &Community{gTeams.Rare},
 				schName:   gTeams.Basic.AssignedSchema,
@@ -41,7 +41,7 @@ func TestPullRequest_AssignTeam(t *testing.T) {
 		},
 		{
 			name: "given community is nil",
-			pR:   gPullRequests.ZeroTeam,
+			pR:   gPullRequests.ZeroTeam.copy(),
 			args: args{
 				community: nil,
 				schName:   gTeams.Basic.AssignedSchema,
@@ -50,9 +50,7 @@ func TestPullRequest_AssignTeam(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			err := tt.pR.AssignTeam(tt.args.community, tt.args.schName)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("PullRequest.AssignTeam() error = %v, wantErr %v", err, tt.wantErr)

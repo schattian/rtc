@@ -85,9 +85,3 @@ type goldenTeams struct {
 	ZeroMembers *Team `json:"zero_members,omitempty"`
 	Zero        *Team `json:"zero,omitempty"`
 }
-
-func (chg *Change) copy() *Change {
-	copyChg := new(Change)
-	*copyChg = *chg
-	return copyChg
-}

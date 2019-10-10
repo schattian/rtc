@@ -1,6 +1,10 @@
 package git
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/google/go-cmp/cmp"
+)
 
 func TestAreCompatible(t *testing.T) {
 	t.Parallel()
@@ -76,6 +80,8 @@ func TestAreCompatible(t *testing.T) {
 			t.Parallel()
 			if got := AreCompatible(tt.args.chg, tt.args.otherChg); got != tt.want {
 				t.Errorf("AreCompatibleWith() = %v, want %v", got, tt.want)
+				diff := cmp.Diff(tt.args.chg, tt.args.otherChg)
+				t.Error(diff)
 			}
 		})
 	}

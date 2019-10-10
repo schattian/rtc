@@ -9,6 +9,7 @@ import (
 )
 
 func TestCommit_GroupBy(t *testing.T) {
+	t.Parallel()
 	type fields struct {
 		ID      int
 		Changes []*Change
@@ -65,7 +66,9 @@ func TestCommit_GroupBy(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			comm := &Commit{
 				ID:      tt.fields.ID,
 				Changes: tt.fields.Changes,
@@ -94,7 +97,9 @@ func Test_checkIntInSlice(t *testing.T) {
 		{name: "elem is zero-value", args: args{slice: []int{}, elem: 0}, want: false},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := checkIntInSlice(tt.args.slice, tt.args.elem); got != tt.want {
 				t.Errorf("checkIntInSlice() = %v, want %v", got, tt.want)
 			}
@@ -116,33 +121,33 @@ func TestCommit_Add(t *testing.T) {
 	}{
 		{
 			name: "change was already added",
-			comm: &Commit{Changes: []*Change{gChanges.Regular.None}},
-			args: args{chg: gChanges.Regular.None},
+			comm: &Commit{Changes: []*Change{gChanges.Regular.Update.copy()}},
+			args: args{chg: gChanges.Regular.None.copy()},
 			want: errDuplicatedChg,
 		},
 		{
 			name:    "both identical untracked commits",
-			comm:    &Commit{Changes: []*Change{gChanges.Regular.Create}},
-			args:    args{chg: gChanges.Regular.Create},
+			comm:    &Commit{Changes: []*Change{gChanges.Regular.Create.copy()}},
+			args:    args{chg: gChanges.Regular.Create.copy()},
 			newComm: &Commit{Changes: []*Change{gChanges.Regular.Create, gChanges.Regular.Create}},
 		},
 		{
 			name: "table inconsistency",
-			comm: &Commit{Changes: []*Change{gChanges.Regular.None}},
-			args: args{chg: gChanges.Inconsistent.TableName},
+			comm: &Commit{Changes: []*Change{gChanges.Regular.Update}},
+			args: args{chg: gChanges.Inconsistent.TableName.copy()},
 			want: errNilTable,
 		},
 		{
 			name:    "change modifies the value of a change already in the commit",
-			comm:    &Commit{Changes: []*Change{gChanges.Regular.None}},
-			args:    args{chg: gChanges.Regular.StrValue},
-			newComm: &Commit{Changes: []*Change{gChanges.Regular.StrValue}},
+			comm:    &Commit{Changes: []*Change{gChanges.Regular.Update}},
+			args:    args{chg: gChanges.Regular.StrValue.copy()},
+			newComm: &Commit{Changes: []*Change{gChanges.Regular.StrValue.copy().changeType("update")}},
 		},
 		{
 			name:    "change modifies different col of same schema",
-			comm:    &Commit{Changes: []*Change{gChanges.Regular.None}},
-			args:    args{chg: gChanges.Regular.ColumnName},
-			newComm: &Commit{Changes: []*Change{gChanges.Regular.None, gChanges.Regular.ColumnName}},
+			comm:    &Commit{Changes: []*Change{gChanges.Regular.Update}},
+			args:    args{chg: gChanges.Regular.ColumnName.copy()},
+			newComm: &Commit{Changes: []*Change{gChanges.Regular.Update, gChanges.Regular.ColumnName.copy().changeType("update")}},
 		},
 	}
 	for _, tt := range tests {
@@ -150,9 +155,6 @@ func TestCommit_Add(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			oldComm := tt.comm
-			if tt.args.chg == nil {
-				panic(tt.name)
-			}
 			err := tt.comm.Add(tt.args.chg)
 			if err != tt.want {
 				t.Errorf("Commit.Add() error = %v, wantErr %v", err, tt.want)
@@ -183,14 +185,14 @@ func TestCommit_Rm(t *testing.T) {
 	}{
 		{
 			name:    "given change doesn't belongs to the commit",
-			comm:    &Commit{Changes: []*Change{gChanges.Regular.None}},
-			args:    args{chg: gChanges.Rare.None},
+			comm:    &Commit{Changes: []*Change{gChanges.Regular.None.copy()}},
+			args:    args{chg: gChanges.Rare.None.copy()},
 			wantErr: true,
 		},
 		{
 			name:    "successfully remove",
-			comm:    &Commit{Changes: []*Change{gChanges.Regular.None}},
-			args:    args{chg: gChanges.Regular.None},
+			comm:    &Commit{Changes: []*Change{gChanges.Regular.None.copy()}},
+			args:    args{chg: gChanges.Regular.None.copy()},
 			wantErr: false,
 		},
 	}
