@@ -3,6 +3,7 @@ package git
 import "testing"
 
 func TestAreCompatible(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		chg      *Change
 		otherChg *Change
@@ -70,7 +71,9 @@ func TestAreCompatible(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := AreCompatible(tt.args.chg, tt.args.otherChg); got != tt.want {
 				t.Errorf("AreCompatibleWith() = %v, want %v", got, tt.want)
 			}

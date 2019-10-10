@@ -41,6 +41,7 @@ func Test_preciseTableErr(t *testing.T) {
 }
 
 func TestPlanisphere_GetSchemaFromName(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		schemaName integrity.SchemaName
 	}
@@ -89,7 +90,9 @@ func TestPlanisphere_GetSchemaFromName(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got, err := tt.psph.GetSchemaFromName(tt.args.schemaName)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Planisphere.GetSchemaFromName() error = %v, wantErr %v", err, tt.wantErr)

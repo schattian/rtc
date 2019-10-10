@@ -103,6 +103,7 @@ func Test_checkIntInSlice(t *testing.T) {
 }
 
 func TestCommit_Add(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		chg *Change
 	}
@@ -145,7 +146,9 @@ func TestCommit_Add(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			oldComm := tt.comm
 			if tt.args.chg == nil {
 				panic(tt.name)
@@ -168,6 +171,7 @@ func TestCommit_Add(t *testing.T) {
 }
 
 func TestCommit_Rm(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		chg *Change
 	}
@@ -191,7 +195,9 @@ func TestCommit_Rm(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if err := tt.comm.Rm(tt.args.chg); (err != nil) != tt.wantErr {
 				t.Errorf("Commit.Rm() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -200,6 +206,7 @@ func TestCommit_Rm(t *testing.T) {
 }
 
 func TestCommit_ToMap(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name string
 		comm *Commit
@@ -237,7 +244,9 @@ func TestCommit_ToMap(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if diff := cmp.Diff(tt.want, tt.comm.ToMap()); diff != "" {
 				t.Errorf("Commmit.ToMap() mismatch (-want +got): %s", diff)
 			}
@@ -247,7 +256,7 @@ func TestCommit_ToMap(t *testing.T) {
 }
 
 func TestCommit_TableName(t *testing.T) {
-
+	t.Parallel()
 	tests := []struct {
 		name          string
 		comm          *Commit
@@ -271,7 +280,9 @@ func TestCommit_TableName(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			gotTableName, err := tt.comm.TableName()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Commit.TableName() error = %v, wantErr %v", err, tt.wantErr)
@@ -285,7 +296,7 @@ func TestCommit_TableName(t *testing.T) {
 }
 
 func TestCommit_Type(t *testing.T) {
-
+	t.Parallel()
 	tests := []struct {
 		name         string
 		comm         *Commit
@@ -309,7 +320,9 @@ func TestCommit_Type(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			gotCommType, err := tt.comm.Type()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Commit.Type() error = %v, wantErr %v", err, tt.wantErr)

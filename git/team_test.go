@@ -8,6 +8,7 @@ import (
 )
 
 func TestTeam_Delegate(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		tableName integrity.TableName
 	}
@@ -34,7 +35,9 @@ func TestTeam_Delegate(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got, err := tt.team.Delegate(tt.args.tableName)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Team.Delegate() error = %v, wantErr %v", err, tt.wantErr)

@@ -8,6 +8,7 @@ import (
 )
 
 func TestPullRequest_AssignTeam(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		community *Community
 		schName   integrity.SchemaName
@@ -49,7 +50,9 @@ func TestPullRequest_AssignTeam(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			err := tt.pR.AssignTeam(tt.args.community, tt.args.schName)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("PullRequest.AssignTeam() error = %v, wantErr %v", err, tt.wantErr)

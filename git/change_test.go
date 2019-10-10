@@ -8,6 +8,7 @@ import (
 )
 
 func TestChange_SetValue(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		val interface{}
 	}
@@ -63,7 +64,9 @@ func TestChange_SetValue(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if err := tt.chg.SetValue(tt.args.val); (err != nil) != tt.wantErr {
 				t.Errorf("Change.SetValue() error got: %v, wantErr %v", err, tt.wantErr)
 			}
@@ -75,6 +78,7 @@ func TestChange_SetValue(t *testing.T) {
 }
 
 func TestChange_Value(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name string
 		chg  *Change
@@ -112,7 +116,9 @@ func TestChange_Value(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if got := tt.chg.Value(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Change.Value() = %v, want %v", got, tt.want)
 			}
@@ -121,6 +127,7 @@ func TestChange_Value(t *testing.T) {
 }
 
 func TestChange_classifyType(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name    string
 		chg     *Change
@@ -159,7 +166,9 @@ func TestChange_classifyType(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			got, err := tt.chg.classifyType()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Change.classifyType() error = %v, wantErr %v", err, tt.wantErr)
@@ -174,6 +183,7 @@ func TestChange_classifyType(t *testing.T) {
 }
 
 func TestChange_validateType(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name    string
 		chg     *Change
@@ -187,7 +197,9 @@ func TestChange_validateType(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if err := tt.chg.validateType(); (err != nil) != tt.wantErr {
 				t.Errorf("Change.validateType() %v error = %v, wantErr %v", tt.chg.Type, err, tt.wantErr)
 			}

@@ -8,6 +8,7 @@ import (
 )
 
 func TestSchema_preciseColErr(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		sch     *Schema
 		colName integrity.ColumnName
@@ -34,7 +35,9 @@ func TestSchema_preciseColErr(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			if err := tt.args.sch.preciseColErr(tt.args.colName); err != tt.want {
 				t.Errorf("Schema.preciseColErr() error = %v, want %v", err, tt.want)
 			}
@@ -43,6 +46,7 @@ func TestSchema_preciseColErr(t *testing.T) {
 }
 
 func TestSchema_Validate(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		tableName   integrity.TableName
 		colName     integrity.ColumnName
@@ -94,7 +98,9 @@ func TestSchema_Validate(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			tt.args.wg.Add(1)
 			go tt.sch.Validate(tt.args.tableName, tt.args.colName, tt.args.helperScope, tt.args.wg, tt.args.errCh)
 			tt.args.wg.Wait()
