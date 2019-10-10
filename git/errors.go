@@ -31,7 +31,7 @@ var (
 	errNilCommunity   = errors.New("the COMMUNITY cannot be NIL")
 
 	// Team
-	errNoCollaborators = errors.New("there are NOT COLLABORATORS to achieve this COLUMN")
+	errNoCollaborators = errors.New("there are NOT COLLABORATORS to achieve this TABLE")
 
 	// Owner
 	errErroredMerge = errors.New("the MERGE was ERRORED")
