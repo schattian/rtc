@@ -7,11 +7,7 @@ local CRUD = {
   update: changes.regular.crud.update,
   delete: changes.regular.crud.delete,
 };
-
-// local CRUDGen(exc) = {
-//   team: teams.basic,
-//   commits: [if exc.count(f) == 0 then CRUD.f for f in std.objectFields(CRUD)],
-// };
+local chgToComm(x) = { changes: [x] };
 
 {
   local basic = self.basic,
@@ -19,41 +15,50 @@ local CRUD = {
   basic: {
     team: teams.basic,
     commits: [
-      changes.regular.none,
+      chgToComm(changes.regular.none),
     ],
   },
 
   full: basic {
-    commits: [
-      CRUD
-    ],
+    team: teams.basic,
+    commits:
+      [
+        chgToComm(CRUD.create),
+        chgToComm(CRUD.retrieve),
+        chgToComm(CRUD.update),
+        chgToComm(CRUD.delete),
+      ],
   },
 
+  crud: {
+    create: basic {
+      team: teams.basic,
+      commits: [
+        chgToComm(CRUD.create),
+      ],
+    },
 
-  create: basic {
-    commits: [
-      changes.regular.crud.create,
-    ],
+    retrieve: basic {
+      team: teams.basic,
+      commits: [
+        chgToComm(CRUD.retrieve),
+      ],
+    },
+
+    update: basic {
+      team: teams.basic,
+      commits: [
+        chgToComm(CRUD.update),
+      ],
+    },
+
+    delete: basic {
+      team: teams.basic,
+      commits: [
+        chgToComm(CRUD.delete),
+      ],
+    },
   },
-
-  retrieve: basic {
-    commits: [
-      CRUD.retrieve
-    ],
-  },
-
-  update: basic {
-    commits: [
-      CRUD.update
-    ],
-  },
-
-  delete: basic {
-    commits: [
-      CRUD.delete
-    ],
-  },
-
 
   zero_commits: basic {
     commits: [],
