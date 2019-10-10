@@ -13,6 +13,43 @@ type Schema struct {
 	Blueprint []*Table             `json:"blueprint,omitempty"`
 }
 
+// Validate checks if the context of the given tableName and colName is valid
+// Notice that, as well as the wrapper validations should provoke a chained
+// of undesired (and maybe more confusing than clear) errs, the errCh should be buffered w/sz=1
+func (sch *Schema) Validate(
+	tableName integrity.TableName,
+	colName integrity.ColumnName,
+	helperScope *Planisphere,
+	wg *sync.WaitGroup,
+	errCh chan<- error,
+) {
+	defer wg.Done()
+
+	cols, err := sch.colsByTableName(tableName, helperScope)
+	if err != nil {
+		errCh <- err
+		return
+	}
+
+	for _, col := range cols {
+		if colName == col {
+			return
+		}
+	}
+	errCh <- sch.preciseColErr(colName)
+}
+
+// colsByTableName returns the column names given the parent' table name
+func (sch *Schema) colsByTableName(tableName integrity.TableName, helperScope *Planisphere) ([]integrity.ColumnName, error) {
+	for _, table := range sch.Blueprint {
+		if tableName != table.Name {
+			continue
+		}
+		return table.columnNames(), nil
+	}
+	return nil, helperScope.preciseTableErr(tableName)
+}
+
 // colNames plucks all the columnNames from its tables
 func (sch *Schema) colNames() (colNames []integrity.ColumnName) {
 	for _, table := range sch.Blueprint {
@@ -29,47 +66,6 @@ func (sch *Schema) tableNames() (tableNames []integrity.TableName) {
 		tableNames = append(tableNames, table.Name)
 	}
 	return
-}
-
-// colsByTableName returns the column names given the parent' table name
-func (sch *Schema) colsByTableName(tableName integrity.TableName, scope Planisphere) ([]integrity.ColumnName, error) {
-	for _, table := range sch.Blueprint {
-		if tableName != table.Name {
-			continue
-		}
-		return table.columnNames(), nil
-	}
-	return nil, scope.preciseTableErr(tableName)
-}
-
-func (sch *Schema) validateTable(tableName integrity.TableName, scope Planisphere, wg *sync.WaitGroup, errCh chan<- error) {
-	_, err := sch.colsByTableName(tableName, scope)
-	if err != nil {
-		errCh <- err
-	}
-}
-
-// Validate checks if the context of the given tableName and colName is valid
-func (sch *Schema) Validate(
-	tableName integrity.TableName,
-	colName integrity.ColumnName,
-	scope Planisphere,
-	wg *sync.WaitGroup,
-	errCh chan<- error) {
-
-	defer wg.Done()
-	cols, err := sch.colsByTableName(tableName, scope)
-	if err != nil {
-		errCh <- err
-		return
-	}
-
-	for _, col := range cols {
-		if colName == col {
-			return
-		}
-	}
-	errCh <- sch.preciseColErr(colName)
 }
 
 // preciseColErr gives a more accurate error to a validation of a column

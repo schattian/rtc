@@ -74,6 +74,13 @@ func TestPlanisphere_GetSchemaFromName(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:    "giving mixed correct schemas w/nil",
+			args:    args{gSchemas.Basic.Name},
+			psph:    Planisphere{nil, gSchemas.Basic, nil},
+			want:    gSchemas.Basic,
+			wantErr: false,
+		},
+		{
 			name:    "giving no schema",
 			args:    args{gSchemas.Basic.Name},
 			psph:    Planisphere{},
