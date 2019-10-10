@@ -69,10 +69,10 @@ type ChgCRUD struct {
 }
 
 type PrCRUD struct {
-	Create   *Change `json:"create,omitempty"`
-	Retrieve *Change `json:"retrieve,omitempty"`
-	Update   *Change `json:"update,omitempty"`
-	Delete   *Change `json:"delete,omitempty"`
+	Create   *PullRequest `json:"create,omitempty"`
+	Retrieve *PullRequest `json:"retrieve,omitempty"`
+	Update   *PullRequest `json:"update,omitempty"`
+	Delete   *PullRequest `json:"delete,omitempty"`
 }
 
 type goldenTeams struct {
