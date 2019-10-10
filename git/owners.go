@@ -78,7 +78,12 @@ func (own *Owner) Push(ctx context.Context, comm *Commit) (*Commit, error) {
 	defer own.wg.Done()
 	newComm := new(Commit)
 	*newComm = *comm
-	newComm, err := comm.Reviewer.Push(ctx, newComm)
+	err := comm.Reviewer.Init(ctx)
+	if err != nil {
+		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "pushing from owner")}
+		return comm, err
+	}
+	newComm, err = comm.Reviewer.Push(ctx, newComm)
 	if err != nil {
 		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "pushing from owner")}
 		return comm, err
@@ -92,7 +97,12 @@ func (own *Owner) Pull(ctx context.Context, comm *Commit) (*Commit, error) {
 	defer own.wg.Done()
 	newComm := new(Commit)
 	*newComm = *comm
-	newComm, err := comm.Reviewer.Pull(ctx, newComm)
+	err := comm.Reviewer.Init(ctx)
+	if err != nil {
+		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "pushing from owner")}
+		return comm, err
+	}
+	newComm, err = comm.Reviewer.Pull(ctx, newComm)
 	if err != nil {
 		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "pulling from owner")}
 		return comm, err
@@ -106,7 +116,12 @@ func (own *Owner) Delete(ctx context.Context, comm *Commit) (*Commit, error) {
 	defer own.wg.Done()
 	newComm := new(Commit)
 	*newComm = *comm
-	newComm, err := comm.Reviewer.Delete(ctx, newComm)
+	err := comm.Reviewer.Init(ctx)
+	if err != nil {
+		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "pushing from owner")}
+		return comm, err
+	}
+	newComm, err = comm.Reviewer.Delete(ctx, newComm)
 	if err != nil {
 		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "deleting from owner")}
 		return comm, err

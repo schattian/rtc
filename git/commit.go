@@ -1,6 +1,7 @@
 package git
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
 
@@ -46,6 +47,23 @@ func (comm *Commit) Rm(chg *Change) error {
 		}
 	}
 	return fmt.Errorf("change %v NOT FOUND", chg)
+}
+
+// Unmarshal the commit onto a given data structure through a given format
+// ? Use reflection during unmarshal to take tags format
+func (comm *Commit) Unmarshal(data interface{}, format string) error {
+	switch format {
+	case "json":
+		rawJSON, err := integrity.ToJSON(comm)
+		if err != nil {
+			return err
+		}
+		err = json.Unmarshal(rawJSON, data)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // ToMap returns a map with the content of the commit, omitting unnecessary fields

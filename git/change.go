@@ -133,6 +133,13 @@ func (chg *Change) Validate() error {
 	return nil
 }
 
+// // FromMap decodes the commit from its map version
+// func (comm *Commit) FromMap(Map map[string]interface{}) {
+// 	from col, val := range Map{
+
+// 	}
+// }
+
 // ToMap retrieves a map with the minimum required -not validable- data
 // id est: {column_name: value}
 func (chg *Change) ToMap() map[string]interface{} {

@@ -14,3 +14,18 @@ func (crud CRUD) Validate() error {
 	}
 	return fmt.Errorf("INVALID CRUD operation: %v", crud)
 }
+
+// ToHTTPVerb retrieves the CRUD synonym by REST HTTP convention
+func (crud CRUD) ToHTTPVerb() string {
+	switch crud {
+	case "create":
+		return "POST"
+	case "retrieve":
+		return "GET"
+	case "update":
+		return "PUT"
+	case "delete":
+		return "DELETE"
+	}
+	return ""
+}
