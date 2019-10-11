@@ -2,7 +2,9 @@ package git
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"sync"
 
 	"github.com/sebach1/git-crud/internal/integrity"
@@ -62,6 +64,42 @@ func (comm *Commit) Unmarshal(data interface{}, format string) error {
 		if err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+// CommitFrom takes a io.ReadCloser as the guideline of a new commit
+func CommitFrom(body io.ReadCloser) (comm *Commit, err error) {
+	var bodyMap map[string]interface{}
+
+	err = json.NewDecoder(body).Decode(&bodyMap)
+	if err != nil {
+		return nil, err
+	}
+
+	err = comm.FromMap(bodyMap)
+	if err != nil {
+		return nil, err
+	}
+
+	return
+}
+
+// FromMap decodes the commit from its map version
+// Notice that FromMap() is reciprocal to ToMap(), so it doesn't assign a table
+func (comm *Commit) FromMap(Map map[string]interface{}) error {
+	maybeID := Map["id"]
+	ID, ok := maybeID.(integrity.ID)
+	if !ok && maybeID != nil {
+		return errors.New("the ENTITY_ID is NOT an ID type")
+	}
+	delete(Map, "id")
+
+	for col, val := range Map {
+		chg := new(Change)
+		chg.FromMap(map[string]interface{}{col: val})
+		chg.EntityID = ID
+		comm.Changes = append(comm.Changes, chg)
 	}
 	return nil
 }

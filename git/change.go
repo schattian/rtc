@@ -86,7 +86,7 @@ func (chg *Change) SetValue(val interface{}) (err error) {
 	return errors.New("the given value cannot be safety typed")
 }
 
-// Overrides check if the changes will generate be overridden
+// Overrides check if changes are overridable by each other
 func Overrides(chg, otherChg *Change) bool {
 	if !AreCompatible(chg, otherChg) {
 		return false
@@ -133,12 +133,23 @@ func (chg *Change) Validate() error {
 	return nil
 }
 
-// // FromMap decodes the commit from its map version
-// func (comm *Commit) FromMap(Map map[string]interface{}) {
-// 	from col, val := range Map{
-
-// 	}
-// }
+// FromMap decodes the commit from its map version
+// Notice that FromMap() is reciprocal to ToMap(), so it doesn't assign a table
+func (chg *Change) FromMap(Map map[string]interface{}) error {
+	for col, val := range Map {
+		if col == "id" {
+			realVal, ok := val.(integrity.ID)
+			if !ok {
+				return errors.New("the ENTITY_ID is NOT an ID type")
+			}
+			chg.EntityID = realVal
+			continue
+		}
+		chg.ColumnName = integrity.ColumnName(col)
+		chg.SetValue(val)
+	}
+	return nil
+}
 
 // ToMap retrieves a map with the minimum required -not validable- data
 // id est: {column_name: value}
