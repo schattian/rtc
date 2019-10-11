@@ -12,7 +12,7 @@ import (
 	"github.com/sebach1/git-crud/valide"
 )
 
-// ! TODO: Add aggregations (to sort, pre-fetch, etc)
+//! TODO: Add aggregations (to sort, pre-fetch, etc)
 
 const baseURL = "https://api.github.com"
 
@@ -27,6 +27,16 @@ var (
 					&schema.Column{Name: "name", Validator: valide.String},
 					&schema.Column{Name: "private", Validator: valide.String},
 				},
+			},
+		},
+	}
+
+	// OpenSource is the open source code community
+	OpenSource = &git.Community{
+		&git.Team{
+			AssignedSchema: "github",
+			Members: []*git.Member{
+				&git.Member{AssignedTable: "repositories", Collab: new(repositories)}, //? Take all the members from the same
 			},
 		},
 	}
