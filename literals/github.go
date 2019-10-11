@@ -34,10 +34,6 @@ var (
 
 type repositories struct{}
 
-func (r *repositories) Init(ctx context.Context) error {
-	return nil
-}
-
 func (r *repositories) Push(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
 	commType, _ := comm.Type()
 
@@ -57,8 +53,11 @@ func (r *repositories) Push(ctx context.Context, comm *git.Commit) (*git.Commit,
 	}
 
 	defer res.Body.Close()
-	// json.Unmarshal(res.)
-	return nil, nil
+	commit, err := git.CommitFrom(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	return commit, nil
 }
 
 func (r *repositories) Pull(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
@@ -67,6 +66,10 @@ func (r *repositories) Pull(ctx context.Context, comm *git.Commit) (*git.Commit,
 
 func (r *repositories) Delete(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
 	return nil, nil
+}
+
+func (r *repositories) Init(ctx context.Context) error {
+	return nil
 }
 
 func (r *repositories) URL(username string) string {
