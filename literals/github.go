@@ -21,11 +21,20 @@ var (
 	GitHub = &schema.Schema{
 		Name: "github",
 		Blueprint: []*schema.Table{
+
 			&schema.Table{
 				Name: "repositories",
 				Columns: []*schema.Column{
 					&schema.Column{Name: "name", Validator: valide.String},
 					&schema.Column{Name: "private", Validator: valide.String},
+				},
+			},
+
+			&schema.Table{
+				Name: "organizations",
+				Columns: []*schema.Column{
+					&schema.Column{Name: "name", Validator: valide.String},
+					&schema.Column{Name: "projects", Validator: valide.Bytes},
 				},
 			},
 		},
@@ -36,7 +45,7 @@ var (
 		&git.Team{
 			AssignedSchema: "github",
 			Members: []*git.Member{
-				&git.Member{AssignedTable: "repositories", Collab: new(repositories)}, //? Take all the members from the same
+				&git.Member{AssignedTable: "repositories", Collab: new(repositories)},
 			},
 		},
 	}
