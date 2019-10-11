@@ -51,8 +51,7 @@ func (r *repositories) Push(ctx context.Context, comm *git.Commit) (*git.Commit,
 	if err != nil {
 		return nil, err
 	}
-
-	req, err := http.NewRequest(commType.ToHTTPVerb(), r.URL(""), bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, commType.ToHTTPVerb(), r.URL(""), bytes.NewReader(body))
 	if err != nil {
 		return nil, err
 	}
