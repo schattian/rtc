@@ -37,7 +37,6 @@ func (own *Owner) Orchestrate(
 	own.Summary = make(chan *Result, len(pR.Commits))
 	go own.Merge(ctx, &pR)
 	own.wg.Wait()
-	return
 }
 
 // Merge performs the needed actions in order to merge the pullRequest

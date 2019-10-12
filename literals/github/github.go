@@ -1,4 +1,4 @@
-package literals
+package github
 
 import (
 	"bytes"
@@ -8,11 +8,10 @@ import (
 
 	"github.com/sebach1/git-crud/git"
 	"github.com/sebach1/git-crud/internal/integrity"
+	"github.com/sebach1/git-crud/literals"
 	"github.com/sebach1/git-crud/schema"
 	"github.com/sebach1/git-crud/valide"
 )
-
-//! TODO: Add aggregations (to sort, pre-fetch, etc)
 
 const baseURL = "https://api.github.com"
 
@@ -53,9 +52,12 @@ var (
 	}
 )
 
-type repositories struct{}
+type repositories struct {
+	literals.Base
+}
+
 type organizations struct {
-	repositories
+	literals.Base
 }
 
 func (orgs *organizations) Push(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
@@ -107,19 +109,6 @@ func (r *repositories) Push(ctx context.Context, comm *git.Commit) (*git.Commit,
 	}
 	return commit, nil
 }
-
-func (r *repositories) Pull(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
-	return nil, nil
-}
-
-func (r *repositories) Delete(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
-	return nil, nil
-}
-
-func (r *repositories) Init(ctx context.Context) error {
-	return nil
-}
-
 func (r *repositories) URL(username string) string {
 	return fmt.Sprintf("%v/user/%v/repos", baseURL, username)
 }
