@@ -94,13 +94,20 @@ func (comm *Commit) FromMap(Map map[string]interface{}) error {
 	if !ok && maybeID != nil {
 		return errors.New("the ENTITY_ID is NOT an ID type")
 	}
-	delete(Map, "id")
+	if maybeID != nil {
+		delete(Map, "id")
+	}
 
 	for col, val := range Map {
 		chg := new(Change)
 		chg.FromMap(map[string]interface{}{col: val})
-		chg.EntityID = ID
 		comm.Changes = append(comm.Changes, chg)
+	}
+
+	if !ID.IsNil() {
+		for _, chg := range comm.Changes {
+			chg.EntityID = ID
+		}
 	}
 	return nil
 }
@@ -116,6 +123,14 @@ func (comm *Commit) ToMap() map[string]interface{} {
 		}
 	}
 	return mapComm
+}
+
+// ColumnNames retrieves all ColumnName for each change
+func (comm *Commit) ColumnNames() (colNames []integrity.ColumnName) {
+	for _, chg := range comm.Changes {
+		colNames = append(colNames, chg.ColumnName)
+	}
+	return
 }
 
 // TableName checks the unification of the changes' TableNames, and returns an error if there are != 1 TableName
