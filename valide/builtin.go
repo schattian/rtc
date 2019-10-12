@@ -1,6 +1,7 @@
 package valide
 
 import (
+	"encoding/json"
 	"errors"
 )
 
@@ -32,6 +33,21 @@ func Float32(v interface{}) error {
 func Float64(v interface{}) error {
 	if _, ok := v.(float64); !ok {
 		return errors.New("the value isn't a valid float64")
+	}
+	return nil
+}
+
+// JSON tries to unmarshal an interface to a json value; if cant it returns an err
+func JSON(v interface{}) error {
+	byVal, ok := v.([]byte)
+	if !ok {
+		return errors.New("the value isn't a valid []byte")
+	}
+
+	var validator struct{}
+	err := json.Unmarshal(byVal, &validator)
+	if err != nil {
+		return errors.New("the value isn't a valid JSON")
 	}
 	return nil
 }
