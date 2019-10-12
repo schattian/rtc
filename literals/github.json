@@ -1,0 +1,27 @@
+{
+    "name": "GitHub",
+    "blueprint": [
+        {
+            "name": "repositories",
+            "columns": [
+                {
+                    "name": "name", "type": "string"
+                },
+                {
+                    "name": "private", "type": "string"
+                }
+            ]
+        },
+        {
+            "name": "organizations",
+            "columns": [
+                {
+                    "name": "name", "type": "string"
+                },
+                {
+                    "name": "projects", "type": "bytes"
+                }
+            ]
+        }
+    ]
+}

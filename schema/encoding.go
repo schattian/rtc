@@ -6,10 +6,10 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	"github.com/BurntSushi/toml"
 	"gopkg.in/yaml.v2"
 )
 
+// FromFilename retrieves a schema with the decoded data of the given filename
 func FromFilename(filename string) (sch *Schema, err error) {
 	body, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -18,8 +18,6 @@ func FromFilename(filename string) (sch *Schema, err error) {
 
 	ext := filepath.Ext(filename)
 	switch ext {
-	case ".toml":
-		_, err = toml.Decode(string(body), sch)
 	case ".json":
 		err = json.NewDecoder(bytes.NewReader(body)).Decode(sch)
 	case ".yaml":

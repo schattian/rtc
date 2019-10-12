@@ -46,12 +46,41 @@ var (
 			AssignedSchema: "github",
 			Members: []*git.Member{
 				&git.Member{AssignedTable: "repositories", Collab: new(repositories)},
+				&git.Member{AssignedTable: "organizations", Collab: new(organizations)},
 			},
 		},
 	}
 )
 
 type repositories struct{}
+type organizations struct {
+	repositories
+}
+
+func (orgs *organizations) Push(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
+	commType, _ := comm.Type()
+
+	body, err := integrity.ToJSON(comm)
+	if err != nil {
+		return nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, commType.ToHTTPVerb(), orgs.URL(""), bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer res.Body.Close()
+	commit, err := git.CommitFrom(res.Body)
+	if err != nil {
+		return nil, err
+	}
+	return commit, nil
+}
 
 func (r *repositories) Push(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
 	commType, _ := comm.Type()
@@ -92,4 +121,8 @@ func (r *repositories) Init(ctx context.Context) error {
 
 func (r *repositories) URL(username string) string {
 	return fmt.Sprintf("%v/user/%v/repos", baseURL, username)
+}
+
+func (orgs *organizations) URL(orgname string) string {
+	return fmt.Sprintf("%v/orgs/%v", baseURL, orgname)
 }
