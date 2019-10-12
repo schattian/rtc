@@ -26,6 +26,5 @@ func FromFilename(filename string) (sch *Schema, err error) {
 	if err != nil {
 		return nil, err
 	}
-
 	return
 }

@@ -27,7 +27,7 @@ var (
 					&schema.Column{Name: "name", Validator: valide.String},
 					&schema.Column{Name: "private", Validator: valide.String},
 				},
-				OptionKeys: []integrity.OptionKey{"owner"},
+				OptionKeys: []integrity.OptionKey{"username"},
 			},
 
 			&schema.Table{
@@ -36,6 +36,7 @@ var (
 					&schema.Column{Name: "name", Validator: valide.String},
 					&schema.Column{Name: "projects", Validator: valide.Bytes},
 				},
+				OptionKeys: []integrity.OptionKey{"owner"},
 			},
 		},
 	}
@@ -67,7 +68,18 @@ func (orgs *organizations) Push(ctx context.Context, comm *git.Commit) (*git.Com
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequestWithContext(ctx, commType.ToHTTPVerb(), orgs.URL(""), bytes.NewReader(body))
+
+	opts, err := comm.Options()
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(
+		ctx,
+		commType.ToHTTPVerb(),
+		orgs.URL(opts["owner"].(string)),
+		bytes.NewReader(body),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +104,18 @@ func (r *repositories) Push(ctx context.Context, comm *git.Commit) (*git.Commit,
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequestWithContext(ctx, commType.ToHTTPVerb(), r.URL(""), bytes.NewReader(body))
+
+	opts, err := comm.Options()
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(
+		ctx,
+		commType.ToHTTPVerb(),
+		r.URL(opts["username"].(string)),
+		bytes.NewReader(body),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -109,10 +132,11 @@ func (r *repositories) Push(ctx context.Context, comm *git.Commit) (*git.Commit,
 	}
 	return commit, nil
 }
+
 func (r *repositories) URL(username string) string {
 	return fmt.Sprintf("%v/user/%v/repos", baseURL, username)
 }
 
-func (orgs *organizations) URL(orgname string) string {
-	return fmt.Sprintf("%v/orgs/%v", baseURL, orgname)
+func (orgs *organizations) URL(owner string) string {
+	return fmt.Sprintf("%v/orgs/%v", baseURL, owner)
 }
