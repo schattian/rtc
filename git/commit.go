@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"reflect"
 	"sync"
 
 	"github.com/sebach1/git-crud/internal/integrity"
@@ -128,6 +129,21 @@ func (comm *Commit) TableName() (tableName integrity.TableName, err error) {
 			continue
 		}
 		tableName = chg.TableName
+	}
+	return
+}
+
+// Options checks the unification of the changes' Options, and returns an error if there are not shared
+// Returns the representative Options of the changes
+func (comm *Commit) Options() (opts Options, err error) {
+	for _, chg := range comm.Changes {
+		if opts != nil {
+			if !reflect.DeepEqual(chg.Options, opts) {
+				return nil, errMixedOpts
+			}
+			continue
+		}
+		opts = chg.Options
 	}
 	return
 }

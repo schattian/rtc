@@ -25,6 +25,7 @@ var (
 	// Commit
 	errMixedTypes  = errors.New("the TYPES over the commit are MIXED")
 	errMixedTables = errors.New("the TABLES over the commit are MIXED")
+	errMixedOpts   = errors.New("the OPTIONS over the commit are MIXED")
 
 	// Community
 	errNotFoundSchema = errors.New("the SCHEMA NAME provided is NOT FOUND")

@@ -28,6 +28,7 @@ var (
 					&schema.Column{Name: "name", Validator: valide.String},
 					&schema.Column{Name: "private", Validator: valide.String},
 				},
+				OptionKeys: []integrity.OptionKey{"owner"},
 			},
 
 			&schema.Table{

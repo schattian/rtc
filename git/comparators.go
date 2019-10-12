@@ -1,5 +1,7 @@
 package git
 
+import "reflect"
+
 type changesMatcher func(*Change, *Change) bool
 
 // AreCompatible checks if two changes could be joint to perform any action
@@ -15,6 +17,9 @@ func AreCompatible(chg, otherChg *Change) bool {
 		return false
 	}
 	if chg.Type != otherChg.Type {
+		return false
+	}
+	if !reflect.DeepEqual(chg.Options, otherChg.Options) {
 		return false
 	}
 	return true

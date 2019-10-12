@@ -6,8 +6,9 @@ import (
 
 // A Table is the representation of SQL table (or Mongo/CQL Collections) which acts as a collection of entities.
 type Table struct {
-	Name    integrity.TableName `json:"name,omitempty"`
-	Columns []*Column           `json:"columns,omitempty"`
+	Name       integrity.TableName   `json:"name,omitempty"`
+	Columns    []*Column             `json:"columns,omitempty"`
+	OptionKeys []integrity.OptionKey `json:"options,omitempty"`
 }
 
 func (t *Table) columnNames() (colNames []integrity.ColumnName) {
