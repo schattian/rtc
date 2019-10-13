@@ -4,18 +4,27 @@ import (
 	"math/rand"
 
 	"github.com/sebach1/git-crud/internal/test/assist"
+	"github.com/sebach1/git-crud/schema"
 )
 
 var (
 	gChanges      goldenChanges
 	gTeams        goldenTeams
 	gPullRequests goldenPullRequests
+
+	gSchemas schema.GoldenSchemas
+	gTables  schema.GoldenTables
+	gColumns schema.GoldenColumns
 )
 
 func init() {
 	assist.DecodeJsonnet("changes", &gChanges)
 	assist.DecodeJsonnet("pull_requests", &gPullRequests)
 	assist.DecodeJsonnet("teams", &gTeams)
+
+	assist.DecodeJsonnet("schemas", &gSchemas)
+	assist.DecodeJsonnet("tables", &gTables)
+	assist.DecodeJsonnet("columns", &gColumns)
 }
 
 type goldenChanges struct {
@@ -25,7 +34,6 @@ type goldenChanges struct {
 
 	Zero *Change `json:"zero,omitempty"`
 }
-
 type variadicChanges struct {
 	None       *Change `json:"none,omitempty"`
 	TableName  *Change `json:"table_name,omitempty"`
