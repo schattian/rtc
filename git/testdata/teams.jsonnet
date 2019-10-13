@@ -1,4 +1,4 @@
-local schemas = import '../../schema/testdata/schemas.jsonnet';
+local schemas = import './schemas.jsonnet';
 
 {
   local basic = self.basic,

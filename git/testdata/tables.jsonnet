@@ -1,0 +1,1 @@
+../../schema/testdata/tables.jsonnet
