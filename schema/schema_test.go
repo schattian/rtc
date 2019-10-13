@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/sebach1/git-crud/internal/integrity"
+	"github.com/sebach1/git-crud/valide"
 )
 
 func TestSchema_preciseColErr(t *testing.T) {
@@ -51,6 +52,7 @@ func TestSchema_Validate(t *testing.T) {
 		tableName   integrity.TableName
 		colName     integrity.ColumnName
 		optionKeys  []integrity.OptionKey
+		val         interface{}
 		helperScope *Planisphere
 	}
 	tests := []struct {
@@ -77,6 +79,18 @@ func TestSchema_Validate(t *testing.T) {
 				tableName:   gTables.Basic.Name,
 				colName:     gColumns.Basic.Name,
 				optionKeys:  []integrity.OptionKey{gTables.Rare.OptionKeys[0]},
+				helperScope: &Planisphere{gSchemas.Basic},
+			},
+			wantErr: true,
+		},
+		{
+			name: "value doesn't pass the column validator func",
+			sch:  gSchemas.Basic.copy().addColValidator(gColumns.Basic.Name, valide.String),
+			args: args{
+				tableName:   gTables.Basic.Name,
+				colName:     gColumns.Basic.Name,
+				val:         3,
+				optionKeys:  []integrity.OptionKey{},
 				helperScope: &Planisphere{gSchemas.Basic},
 			},
 			wantErr: true,
@@ -111,7 +125,7 @@ func TestSchema_Validate(t *testing.T) {
 			wg := new(sync.WaitGroup)
 			errCh := make(chan error, 1)
 			wg.Add(1)
-			go tt.sch.Validate(tt.args.tableName, tt.args.colName, tt.args.optionKeys, tt.args.helperScope, wg, errCh)
+			go tt.sch.Validate(tt.args.tableName, tt.args.colName, tt.args.optionKeys, tt.args.val, tt.args.helperScope, wg, errCh)
 			wg.Wait()
 			isErrored := len(errCh) == 1
 			if isErrored && !tt.wantErr {

@@ -20,6 +20,7 @@ func (sch *Schema) Validate(
 	tableName integrity.TableName,
 	colName integrity.ColumnName,
 	optionKeys []integrity.OptionKey,
+	val interface{},
 	helperScope *Planisphere,
 	wg *sync.WaitGroup,
 	errCh chan<- error,
@@ -39,8 +40,13 @@ func (sch *Schema) Validate(
 		}
 	}
 
-	for _, col := range table.columnNames() {
-		if colName == col {
+	for _, col := range table.Columns {
+		if colName == col.Name {
+			err := col.Validate(val)
+			if err != nil {
+				errCh <- err
+				return
+			}
 			return
 		}
 	}
