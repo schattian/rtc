@@ -18,6 +18,7 @@ type Commit struct {
 	Changes []*Change `json:"changes,omitempty"`
 
 	Reviewer Collaborator `json:"reviewer,omitempty"`
+	Errored  bool
 }
 
 // Add will attach the given change to the commit changes
