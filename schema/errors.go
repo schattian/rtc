@@ -4,11 +4,11 @@ import "errors"
 
 var (
 	// Table errs
-	errNonexistentTable = errors.New("the table given doesn't exists")
-	errForeignTable     = errors.New("the table given doesn't belongs to the given schema")
+	errNonexistentTable = errors.New("the TABLE given does NOT EXISTS")
+	errForeignTable     = errors.New("the TABLE given does NOT BELONGS to the given SCHEMA")
 	errInvalidOptionKey = errors.New("the provided OPTION KEY is INVALID OR NOT DEFINED")
 
 	// Column errs
-	errNonexistentColumn = errors.New("the column given doesn't exists")
-	errForeignColumn     = errors.New("the column given doesn't belongs to the given table")
+	errNonexistentColumn = errors.New("the COLUMN given does NOT EXISTS")
+	errForeignColumn     = errors.New("the COLUMNS given does NOT BELONGS to the given TABLE")
 )
