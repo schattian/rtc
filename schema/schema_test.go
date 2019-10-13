@@ -50,9 +50,8 @@ func TestSchema_Validate(t *testing.T) {
 	type args struct {
 		tableName   integrity.TableName
 		colName     integrity.ColumnName
+		optionKeys  []integrity.OptionKey
 		helperScope *Planisphere
-		wg          *sync.WaitGroup
-		errCh       chan error
 	}
 	tests := []struct {
 		name    string
@@ -66,11 +65,21 @@ func TestSchema_Validate(t *testing.T) {
 			args: args{
 				tableName:   gTables.Basic.Name,
 				colName:     gColumns.Basic.Name,
+				optionKeys:  []integrity.OptionKey{gTables.Basic.OptionKeys[0]},
 				helperScope: &Planisphere{gSchemas.Basic},
-				wg:          new(sync.WaitGroup),
-				errCh:       make(chan error, 1),
 			},
 			wantErr: false,
+		},
+		{
+			name: "optionKey nonexistant",
+			sch:  gSchemas.Basic,
+			args: args{
+				tableName:   gTables.Basic.Name,
+				colName:     gColumns.Basic.Name,
+				optionKeys:  []integrity.OptionKey{gTables.Rare.OptionKeys[0]},
+				helperScope: &Planisphere{gSchemas.Basic},
+			},
+			wantErr: true,
 		},
 		{
 			name: "column not inside any table",
@@ -78,9 +87,8 @@ func TestSchema_Validate(t *testing.T) {
 			args: args{
 				tableName:   gTables.Basic.Name,
 				colName:     gColumns.Rare.Name,
+				optionKeys:  []integrity.OptionKey{gTables.Basic.OptionKeys[0]},
 				helperScope: &Planisphere{gSchemas.Basic},
-				wg:          new(sync.WaitGroup),
-				errCh:       make(chan error, 1),
 			},
 			wantErr: true,
 		},
@@ -90,9 +98,8 @@ func TestSchema_Validate(t *testing.T) {
 			args: args{
 				tableName:   gTables.Rare.Name,
 				colName:     gColumns.Basic.Name,
+				optionKeys:  []integrity.OptionKey{},
 				helperScope: &Planisphere{gSchemas.Basic},
-				wg:          new(sync.WaitGroup),
-				errCh:       make(chan error, 1),
 			},
 			wantErr: true,
 		},
@@ -101,12 +108,14 @@ func TestSchema_Validate(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			tt.args.wg.Add(1)
-			go tt.sch.Validate(tt.args.tableName, tt.args.colName, tt.args.helperScope, tt.args.wg, tt.args.errCh)
-			tt.args.wg.Wait()
-			isErrored := len(tt.args.errCh) == 1
+			wg := new(sync.WaitGroup)
+			errCh := make(chan error, 1)
+			wg.Add(1)
+			go tt.sch.Validate(tt.args.tableName, tt.args.colName, tt.args.optionKeys, tt.args.helperScope, wg, errCh)
+			wg.Wait()
+			isErrored := len(errCh) == 1
 			if isErrored && !tt.wantErr {
-				err := <-tt.args.errCh
+				err := <-errCh
 				t.Errorf("Schema.Validate() error: %v; wantErr %v", err, tt.wantErr)
 			}
 			if !isErrored && tt.wantErr {

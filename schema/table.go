@@ -8,7 +8,7 @@ import (
 type Table struct {
 	Name       integrity.TableName   `json:"name,omitempty"`
 	Columns    []*Column             `json:"columns,omitempty"`
-	OptionKeys []integrity.OptionKey `json:"options,omitempty"`
+	OptionKeys []integrity.OptionKey `json:"option_keys,omitempty"`
 }
 
 func (t *Table) columnNames() (colNames []integrity.ColumnName) {

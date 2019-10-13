@@ -19,19 +19,27 @@ type Schema struct {
 func (sch *Schema) Validate(
 	tableName integrity.TableName,
 	colName integrity.ColumnName,
+	optionKeys []integrity.OptionKey,
 	helperScope *Planisphere,
 	wg *sync.WaitGroup,
 	errCh chan<- error,
 ) {
 	defer wg.Done()
 
-	cols, err := sch.colsByTableName(tableName, helperScope)
+	table, err := sch.tableByName(tableName, helperScope)
 	if err != nil {
 		errCh <- err
 		return
 	}
 
-	for _, col := range cols {
+	for _, key := range optionKeys {
+		if !table.optionKeyIsValid(key) {
+			errCh <- errInvalidOptionKey
+			return
+		}
+	}
+
+	for _, col := range table.columnNames() {
 		if colName == col {
 			return
 		}
@@ -39,13 +47,20 @@ func (sch *Schema) Validate(
 	errCh <- sch.preciseColErr(colName)
 }
 
-// colsByTableName returns the column names given the parent' table name
-func (sch *Schema) colsByTableName(tableName integrity.TableName, helperScope *Planisphere) ([]integrity.ColumnName, error) {
-	for _, table := range sch.Blueprint {
-		if tableName != table.Name {
-			continue
+func (t *Table) optionKeyIsValid(key integrity.OptionKey) bool {
+	for _, validKey := range t.OptionKeys {
+		if validKey == key {
+			return true
 		}
-		return table.columnNames(), nil
+	}
+	return false
+}
+
+func (sch *Schema) tableByName(tableName integrity.TableName, helperScope *Planisphere) (*Table, error) {
+	for _, table := range sch.Blueprint {
+		if tableName == table.Name {
+			return table, nil
+		}
 	}
 	return nil, helperScope.preciseTableErr(tableName)
 }
