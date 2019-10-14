@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"errors"
 	"sync"
 
 	"github.com/sebach1/git-crud/internal/integrity"
@@ -26,6 +27,11 @@ func (sch *Schema) Validate(
 	errCh chan<- error,
 ) {
 	defer wg.Done()
+	defer func() {
+		if r := recover(); r != nil {
+			errCh <- errors.New("schema.Validate() unhandled PANIC")
+		}
+	}()
 
 	table, err := sch.tableByName(tableName, helperScope)
 	if err != nil {
@@ -63,6 +69,9 @@ func (t *Table) optionKeyIsValid(key integrity.OptionKey) bool {
 }
 
 func (sch *Schema) tableByName(tableName integrity.TableName, helperScope *Planisphere) (*Table, error) {
+	if len(sch.Blueprint) == 0 {
+		return nil, errNilBlueprint
+	}
 	for _, table := range sch.Blueprint {
 		if tableName == table.Name {
 			return table, nil
