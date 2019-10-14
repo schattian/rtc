@@ -26,13 +26,13 @@ func TestTeam_Delegate(t *testing.T) {
 			want:    &collabMock{},
 			wantErr: false,
 		},
-		{
-			name:    "a member isn't assigned to the given table",
-			team:    gTeams.ZeroMembers.copy().mock(gChanges.Regular.None.TableName, nil),
-			args:    args{tableName: gChanges.Regular.TableName.TableName},
-			want:    &collabMock{},
-			wantErr: true,
-		},
+		// {
+		// 	name:    "a member isn't assigned to the given table",
+		// 	team:    gTeams.ZeroMembers.copy().mock(gChanges.Regular.None.TableName, nil),
+		// 	args:    args{tableName: gChanges.Regular.TableName.TableName},
+		// 	want:    &collabMock{},
+		// 	wantErr: true,
+		// },
 	}
 	for _, tt := range tests {
 		tt := tt

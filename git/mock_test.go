@@ -52,7 +52,7 @@ func (pR *PullRequest) mock(tableName integrity.TableName, err error) *PullReque
 // Copies and pushes a MOCKED COLLABORATOR with the ASSIGNED TABLE which RETURNS THE GIVEN ERROR
 func (t *Team) mock(tableName integrity.TableName, err error) *Team {
 	mock := &collabMock{Err: err}
-	t.Members = append(t.Members, &Member{AssignedTable: tableName, Collab: mock})
+	t.AddMember(tableName, mock, true /*forces mock*/)
 	return t
 }
 
@@ -73,7 +73,7 @@ func (t *Team) copy() *Team {
 	*team = *t
 	var newMembers []*Member
 	for _, member := range t.Members {
-		newMembers = append(newMembers, member)
+		newMembers = append(newMembers, member.copy())
 	}
 	team.Members = newMembers
 	return team
