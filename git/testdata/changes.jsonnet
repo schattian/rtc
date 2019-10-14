@@ -1,3 +1,6 @@
+local columns = import 'columns.jsonnet';
+local tables = import 'tables.jsonnet';
+
 //  Notice that regular & rare types are all from UPDATE operation type
 //  due to perform exhaustive fields analysis, and being UPDATE which takes all the fields
 local regularID = 1;
@@ -5,13 +8,6 @@ local rareID = 101;
 
 local regularEntityID = '01EntityID';
 local rareEntityID = '001EntityID';
-
-local regularTable = 'regularTable';
-local rareTable = 'rareTable';
-
-local regularColumn = 'regularColumn';
-local rareColumn = 'rareColumn';
-
 
 local strType = 'string';
 local intType = 'int';
@@ -65,8 +61,8 @@ local createCRUD(x) = {
     local base = self.none,
 
     none: {
-      table_name: regularTable,
-      column_name: regularColumn,
+      table_name: tables.basic.name,
+      column_name: columns.basic.name,
       str_value: regularStringValue,
       value_type: regularType,
       id: regularID,
@@ -75,9 +71,9 @@ local createCRUD(x) = {
 
     crud: createCRUD(base),
 
-    table_name: base { table_name: rareTable },
+    table_name: base { table_name: tables.rare.name },
 
-    column_name: base { column_name: rareColumn },
+    column_name: base { column_name: columns.rare.name },
 
     str_value: base { str_value: rareStringValue, value_type: strType },
 
@@ -101,8 +97,8 @@ local createCRUD(x) = {
     local base = self.none,
 
     none: {
-      table_name: rareTable,
-      column_name: rareColumn,
+      table_name: tables.rare.name,
+      column_name: columns.rare.name,
       int_value: rareIntValue,
       value_type: rareType,
       id: rareID,
@@ -111,9 +107,9 @@ local createCRUD(x) = {
 
     crud: createCRUD(base),
 
-    table_name: base { table_name: regularTable },
+    table_name: base { table_name: tables.basic.name },
 
-    column_name: base { column_name: regularColumn },
+    column_name: base { column_name: columns.basic.name },
 
     int_value: base { int_value: regularIntValue },
 

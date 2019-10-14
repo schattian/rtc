@@ -17,6 +17,7 @@ local basicRareName = 'basicRareSchemaName';
   basic_rare: {
     name: basicRareName,
     blueprint: [
+      tables.basic_rare,
       tables.basic,
       tables.rare,
     ],

@@ -1,6 +1,7 @@
+local columns = import 'columns.jsonnet';
+
 local rareName = 'rareTableName';
 local regularName = 'tableName';
-local columns = import 'columns.jsonnet';
 local rareRegularName = 'rareRegularName';
 local regularOptionKey = "regularOptionKey";
 local rareOptionKey = "rareOptionKey";
