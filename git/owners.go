@@ -14,54 +14,9 @@ import (
 // Notice that an Owner is a Collaborator
 type Owner struct {
 	Project *schema.Planisphere
-
-	wg      *sync.WaitGroup
 	Summary chan *Result
-}
 
-func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx int) {
-	defer own.wg.Done()
-	comm := pR.Commits[commIdx]
-	defer func() {
-		if comm.Reviewer == nil {
-			comm.Errored = true
-		}
-	}()
-
-	schErrCh := make(chan error, len(comm.Changes))
-	for _, chg := range comm.Changes {
-		own.wg.Add(1)
-		go sch.Validate(chg.TableName, chg.ColumnName, chg.Options.Keys(), chg.Value(), own.Project, own.wg, schErrCh)
-	}
-
-	tableName, err := comm.TableName()
-	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "revieweing pr")}
-		return
-	}
-
-	_, err = comm.Options()
-	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "revieweing pr")}
-		return
-	}
-
-	if len(schErrCh) > 0 {
-		var errs string
-		for err := range schErrCh {
-			errs += err.Error()
-			errs += "; "
-		}
-		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "revieweing pr")}
-		return
-	}
-
-	reviewer, err := pR.Team.Delegate(tableName)
-	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "revieweing pr")}
-		return
-	}
-	comm.Reviewer = reviewer
+	wg *sync.WaitGroup
 }
 
 // Orchestrate sends the order to all the collaborators available to execute
@@ -73,6 +28,11 @@ func (own *Owner) Orchestrate(
 	comm *Commit,
 	strategy changesMatcher,
 ) error {
+	err := own.Validate()
+	if err != nil {
+		return err
+	}
+
 	sch, err := own.Project.GetSchemaFromName(schName)
 	if err != nil {
 		return err
@@ -186,11 +146,62 @@ func (own *Owner) Delete(ctx context.Context, comm *Commit) (*Commit, error) {
 	return comm, nil
 }
 
-// func (own *Owner) IsAlreadySummarized(commID int) bool {
-// 	for summ := range own.Summary {
-// 		if summ.CommitID == commID {
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }
+// Validate validates itself integrity to be able to perform orchestration & reviewing (owner)
+func (own *Owner) Validate() error {
+	if own.Project == nil {
+		return errNilProject
+	}
+	if len(*own.Project) == 0 {
+		return errEmptyProject
+	}
+	return nil
+}
+
+// ReviewPRCommit wraps schema validations to a specified commit of the given PullRequest
+func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx int) {
+	var err error
+	defer own.wg.Done()
+	comm := pR.Commits[commIdx]
+	defer func() {
+		if err != nil {
+			own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "reviewing merge")}
+			comm.Errored = true
+		}
+	}()
+
+	schErrCh := make(chan error, len(comm.Changes))
+	for _, chg := range comm.Changes {
+		own.wg.Add(1)
+		go sch.Validate(chg.TableName, chg.ColumnName, chg.Options.Keys(), chg.Value(), own.Project, own.wg, schErrCh)
+	}
+
+	tableName, err := comm.TableName()
+	if err != nil {
+		return
+	}
+
+	_, err = comm.Options()
+	if err != nil {
+		return
+	}
+
+	_, err = comm.Type()
+	if err != nil {
+		return
+	}
+
+	if len(schErrCh) > 0 {
+		var errs string
+		for err := range schErrCh {
+			errs += err.Error()
+			errs += "; "
+		}
+		return
+	}
+
+	reviewer, err := pR.Team.Delegate(tableName)
+	if err != nil {
+		return
+	}
+	comm.Reviewer = reviewer
+}
