@@ -29,12 +29,15 @@ local rareIntValue = 9001;
 
 local regularJSONValue = { embedded_value: { another_embedding: 'regularValue' } };
 local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
-
 local toCreate(x) = x { entity_id: '', type: 'create' };
 local toRetrieve(x) = x { value_type: '', str_value: '', type: 'retrieve' };
 local toUpdate(x) = x { type: 'update' };
 local toDelete(x) = x { value_type: '', str_value: '', column_name: '', type: 'delete' };
 
+local regularOptionKey = tables.regularOptionKey;
+local rareOptionKey = tables.rareOptionKey;
+local regularOptionValue = 'regularOptionValue';
+local rareOptionValue = 'rareOptionValue';
 local createCRUD(x) = {
   create: toCreate(x),
   retrieve: toRetrieve(x),
@@ -67,6 +70,9 @@ local createCRUD(x) = {
       value_type: regularType,
       id: regularID,
       entity_id: regularEntityID,
+      options: {
+        regularOptionKey: regularOptionValue,
+      },
     },
 
     crud: createCRUD(base),
@@ -103,6 +109,9 @@ local createCRUD(x) = {
       value_type: rareType,
       id: rareID,
       entity_id: rareEntityID,
+      options: {
+        rareOptionKey: rareOptionValue,
+      },
     },
 
     crud: createCRUD(base),

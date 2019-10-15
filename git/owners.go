@@ -2,6 +2,7 @@ package git
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/sebach1/git-crud/schema"
@@ -161,6 +162,8 @@ func (own *Owner) Validate() error {
 func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx int) {
 	var err error
 	defer own.wg.Done()
+	var reviewWg sync.WaitGroup
+
 	comm := pR.Commits[commIdx]
 	defer func() {
 		if err != nil {
@@ -170,9 +173,9 @@ func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx in
 	}()
 
 	schErrCh := make(chan error, len(comm.Changes))
+	reviewWg.Add(len(comm.Changes))
 	for _, chg := range comm.Changes {
-		own.wg.Add(1)
-		go sch.Validate(chg.TableName, chg.ColumnName, chg.Options.Keys(), chg.Value(), own.Project, own.wg, schErrCh)
+		go sch.Validate(chg.TableName, chg.ColumnName, chg.Options.Keys(), chg.Value(), own.Project, &reviewWg, schErrCh)
 	}
 
 	tableName, err := comm.TableName()
@@ -190,12 +193,16 @@ func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx in
 		return
 	}
 
+	reviewWg.Wait()
+	close(schErrCh)
 	if len(schErrCh) > 0 {
 		var errs string
 		for err := range schErrCh {
 			errs += err.Error()
 			errs += "; "
 		}
+		fmt.Println(errs)
+		err = errors.New(errs)
 		return
 	}
 
