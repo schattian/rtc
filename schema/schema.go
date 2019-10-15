@@ -46,9 +46,16 @@ func (sch *Schema) Validate(
 		}
 	}
 
+	if colName == "" { // Skip column validation (before the change MUST BE TYPE VALIDATED)
+		return
+	}
+
 	for _, col := range table.Columns {
 		if colName == col.Name {
-			err := col.Validate(val)
+			if val == nil {
+				return
+			}
+			err = col.Validate(val)
 			if err != nil {
 				errCh <- err
 				return
