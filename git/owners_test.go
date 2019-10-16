@@ -156,6 +156,17 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 			wantQtErr: 1,
 		},
 		{
+			name: "commit CHANGE IS INCONSISTENT",
+			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
+			args: args{
+				sch: gSchemas.Basic,
+				pR: gPullRequests.ZeroCommits.copy().addCommit(
+					&Commit{Changes: []*Change{gChanges.Inconsistent.Delete}},
+				).mock(gTables.Basic.Name, nil),
+			},
+			wantQtErr: 1,
+		},
+		{
 			name: "commit is MIXED OPTIONS",
 			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
 			args: args{
@@ -229,6 +240,24 @@ func TestOwner_Orchestrate(t *testing.T) {
 		wantQtResErrs int // Quantity of results in summary that are errored
 	}{
 		{
+			name: "fully successful",
+			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
+			args: args{
+				ctx:       context.Background(),
+				community: &Community{gTeams.Basic.copy().mock(gChanges.Regular.None.TableName, nil)},
+				schName:   gSchemas.Basic.Name,
+				comm: &Commit{Changes: []*Change{
+					gChanges.Regular.Create.copy(),
+					gChanges.Regular.Retrieve.copy(),
+					gChanges.Regular.Update.copy(),
+					gChanges.Regular.Delete.copy(),
+				}},
+				strategy: AreCompatible,
+			},
+			wantErr:       false,
+			wantQtResErrs: 0,
+		},
+		{
 			name: "but NIL PROJECT",
 			own:  &Owner{},
 			args: args{
@@ -252,24 +281,6 @@ func TestOwner_Orchestrate(t *testing.T) {
 			},
 			wantErr:       false,
 			wantQtResErrs: 1,
-		},
-		{
-			name: "fully successful",
-			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
-			args: args{
-				ctx:       context.Background(),
-				community: &Community{gTeams.Basic.copy().mock(gChanges.Regular.None.TableName, nil)},
-				schName:   gSchemas.Basic.Name,
-				comm: &Commit{Changes: []*Change{
-					gChanges.Regular.Create.copy(),
-					gChanges.Regular.Retrieve.copy(),
-					gChanges.Regular.Update.copy(),
-					gChanges.Regular.Delete.copy(),
-				}},
-				strategy: AreCompatible,
-			},
-			wantErr:       false,
-			wantQtResErrs: 0,
 		},
 		{
 			name: "but COLLABORATORS MOCK RETURNS ERRS",

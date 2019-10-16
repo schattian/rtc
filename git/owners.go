@@ -173,7 +173,7 @@ func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx in
 	schErrCh := make(chan error, len(comm.Changes))
 	reviewWg.Add(len(comm.Changes))
 	for _, chg := range comm.Changes {
-		err := chg.Validate() // Performed sync to be strictly before any type assertion of the entire commit
+		err = chg.Validate() // Performed sync to be strictly before any type assertion of the entire commit
 		if err != nil {
 			return
 		}

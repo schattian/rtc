@@ -31,11 +31,9 @@ type Change struct {
 // SetOption assigns the given key to the given value. Returns an error if the key is not allowed for any option
 func (chg *Change) SetOption(key integrity.OptionKey, val interface{}) error {
 	if key == "" {
-		return errors.New("the OPTION KEY is NIL")
+		return errNilOptionKey
 	}
-	if chg.Options != nil {
-		delete(chg.Options, key)
-	} else {
+	if chg.Options == nil {
 		chg.Options = make(Options)
 	}
 	chg.Options[key] = val

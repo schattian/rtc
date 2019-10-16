@@ -2,6 +2,7 @@ package git
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/sebach1/git-crud/internal/integrity"
 )
@@ -62,13 +63,22 @@ func (pR *PullRequest) addCommit(comm *Commit) *PullRequest {
 	return pullRequest
 }
 
+func (opts *Options) assignAndReturn(k integrity.OptionKey, v interface{}) Options {
+	newOpts := *opts
+	newOpts[k] = v
+	*opts = newOpts
+	return *opts
+}
+
 func (m *Member) copy() *Member {
+	panicIfNilAtCopy(m, "MEMBER")
 	member := new(Member)
 	*member = *m
 	return member
 }
 
 func (t *Team) copy() *Team {
+	panicIfNilAtCopy(t, "TEAM")
 	team := new(Team)
 	*team = *t
 	var newMembers []*Member
@@ -79,13 +89,33 @@ func (t *Team) copy() *Team {
 	return team
 }
 
+func (opts *Options) copy() Options {
+	panicIfNilAtCopy(opts, "OPTIONS")
+	newOpts := make(Options)
+	for k, v := range *opts {
+		newOpts[k] = v
+	}
+	return newOpts
+}
+
 func (chg *Change) copy() *Change {
-	newChg := new(Change)
+	panicIfNilAtCopy(chg, "CHANGE")
+	newChg := &Change{}
 	*newChg = *chg
+	if chg.Options != nil {
+		newChg.Options = chg.Options.copy()
+	}
 	return newChg
 }
 
+func panicIfNilAtCopy(elem interface{}, msg string) {
+	if elem == nil {
+		panic(fmt.Sprintf("the %v must be != nil to execute the copy", msg))
+	}
+}
+
 func (comm *Commit) copy() *Commit {
+	panicIfNilAtCopy(comm, "COMMIT")
 	newComm := new(Commit)
 	*newComm = *comm
 	var newChgs []*Change
@@ -97,6 +127,7 @@ func (comm *Commit) copy() *Commit {
 }
 
 func (pR *PullRequest) copy() *PullRequest {
+	panicIfNilAtCopy(pR, "PULL REQUEST")
 	newPr := new(PullRequest)
 	*newPr = *pR
 	var newComms []*Commit

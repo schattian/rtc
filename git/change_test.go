@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/sebach1/git-crud/internal/integrity"
 )
 
@@ -200,6 +201,66 @@ func TestChange_validateType(t *testing.T) {
 			t.Parallel()
 			if err := tt.chg.validateType(); (err != nil) != tt.wantErr {
 				t.Errorf("Change.validateType() %v error = %v, wantErr %v", tt.chg.Type, err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestChange_SetOption(t *testing.T) {
+	type args struct {
+		key integrity.OptionKey
+		val interface{}
+	}
+	tests := []struct {
+		name        string
+		chg         *Change
+		args        args
+		wantErr     bool
+		wantOptions Options
+	}{
+		{
+			name:        "ALREADY INITALIZED options",
+			chg:         gChanges.Regular.None.copy(),
+			args:        args{key: "testKey", val: "testVal"},
+			wantErr:     false,
+			wantOptions: gChanges.Regular.None.copy().Options.assignAndReturn("testKey", "testVal"),
+		},
+		{
+			name:        "UNINITALIZED options",
+			chg:         gChanges.Zero.copy(),
+			args:        args{key: "testKey", val: "testVal"},
+			wantErr:     false,
+			wantOptions: Options{"testKey": "testVal"},
+		},
+		{
+			name:    "EMPTY KEY ERROR",
+			chg:     gChanges.Zero.copy(),
+			args:    args{key: "", val: "testVal"},
+			wantErr: true,
+		},
+		{
+			name:        "CHANGE OPTION VALUE",
+			chg:         gChanges.Regular.None.copy(),
+			args:        args{key: gChanges.Regular.None.Options.Keys()[0], val: "testVal"},
+			wantErr:     false,
+			wantOptions: Options{gChanges.Regular.None.Options.Keys()[0]: "testVal"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			oldOptions := tt.chg.Options
+			err := tt.chg.SetOption(tt.args.key, tt.args.val)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Change.SetOption() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if err != nil {
+				if diff := cmp.Diff(oldOptions, tt.chg.Options); diff != "" {
+					t.Errorf("Change.SetOption() mismatch (-want +got): %s", diff)
+				}
+				return
+			}
+			if diff := cmp.Diff(tt.wantOptions, tt.chg.Options); diff != "" {
+				t.Errorf("Change.SetOption() mismatch (-want +got): %s", diff)
 			}
 		})
 	}
