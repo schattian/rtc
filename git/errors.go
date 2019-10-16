@@ -6,6 +6,7 @@ var (
 	// Changes
 	errDuplicatedChg     = errors.New("the change is ALREADY COMMITTED")
 	errUnclassifiableChg = errors.New("the change DOESN'T respect any PATTERN and thus CANNOT be CLASSIFIABLE")
+	errInvalidID         = errors.New("the ID is NOT AN ID TYPE")
 	errNilOptionKey      = errors.New("the given OPTION KEY is NIL")
 
 	// Table

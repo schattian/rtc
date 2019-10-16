@@ -2,12 +2,11 @@ package git
 
 import (
 	"context"
+	"errors"
 	"sync"
 
-	"github.com/sebach1/git-crud/schema"
-
-	"github.com/pkg/errors"
 	"github.com/sebach1/git-crud/internal/integrity"
+	"github.com/sebach1/git-crud/schema"
 )
 
 // Owner is the agent which coordinates any given action
@@ -72,7 +71,7 @@ func (own *Owner) Merge(ctx context.Context, pR *PullRequest) {
 
 		commType, err := comm.Type()
 		if err != nil {
-			own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "merging")}
+			own.Summary <- &Result{CommitID: comm.ID, Error: err}
 			continue
 		}
 
@@ -95,12 +94,12 @@ func (own *Owner) Push(ctx context.Context, comm *Commit) (*Commit, error) {
 	*newComm = *comm
 	err := comm.Reviewer.Init(ctx)
 	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "pushing from owner")}
+		own.Summary <- &Result{CommitID: comm.ID, Error: err}
 		return comm, err
 	}
 	newComm, err = comm.Reviewer.Push(ctx, newComm)
 	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "pushing from owner")}
+		own.Summary <- &Result{CommitID: comm.ID, Error: err}
 		return comm, err
 	}
 	*comm = *newComm
@@ -114,12 +113,12 @@ func (own *Owner) Pull(ctx context.Context, comm *Commit) (*Commit, error) {
 	*newComm = *comm
 	err := comm.Reviewer.Init(ctx)
 	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "pushing from owner")}
+		own.Summary <- &Result{CommitID: comm.ID, Error: err}
 		return comm, err
 	}
 	newComm, err = comm.Reviewer.Pull(ctx, newComm)
 	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "pulling from owner")}
+		own.Summary <- &Result{CommitID: comm.ID, Error: err}
 		return comm, err
 	}
 	*comm = *newComm
@@ -133,12 +132,12 @@ func (own *Owner) Delete(ctx context.Context, comm *Commit) (*Commit, error) {
 	*newComm = *comm
 	err := comm.Reviewer.Init(ctx)
 	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "pushing from owner")}
+		own.Summary <- &Result{CommitID: comm.ID, Error: err}
 		return comm, err
 	}
 	newComm, err = comm.Reviewer.Delete(ctx, newComm)
 	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "deleting from owner")}
+		own.Summary <- &Result{CommitID: comm.ID, Error: err}
 		return comm, err
 	}
 	*comm = *newComm
@@ -165,7 +164,7 @@ func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx in
 	comm := pR.Commits[commIdx]
 	defer func() {
 		if err != nil {
-			own.Summary <- &Result{CommitID: comm.ID, Error: errors.Wrap(err, "reviewing merge")}
+			own.Summary <- &Result{CommitID: comm.ID, Error: err}
 			comm.Errored = true
 		}
 	}()
@@ -177,7 +176,8 @@ func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx in
 		if err != nil {
 			return
 		}
-		go sch.Validate(chg.TableName, chg.ColumnName, chg.Options.Keys(), chg.Value(), own.Project, &reviewWg, schErrCh)
+		go sch.Validate(chg.TableName, chg.ColumnName, chg.Options.Keys(), chg.Value(),
+			own.Project, &reviewWg, schErrCh)
 	}
 
 	tableName, err := comm.TableName()

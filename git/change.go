@@ -96,7 +96,6 @@ func (chg *Change) SetValue(val interface{}) (err error) {
 		chg.ValueType = "bytes"
 		return
 	}
-
 	return errors.New("the given value cannot be safety typed")
 }
 
@@ -127,23 +126,23 @@ func (chg *Change) Equals(otherChg *Change) bool {
 }
 
 // Validate self, wrapping up type validations and table assertion
-func (chg *Change) Validate() error {
+func (chg *Change) Validate() (err error) {
 	if chg.TableName == "" {
-		return errNilTable
+		err = errNilTable
+		return
 	}
-	if chg.Type == "" {
-		newType, err := chg.classifyType()
+	if chg.Type != "" {
+		err = chg.validateType()
 		if err != nil {
-			return err
-		}
-		chg.Type = newType
-	} else {
-		err := chg.validateType()
-		if err != nil {
-			return err
+			return
 		}
 	}
 
+	newType, err := chg.classifyType()
+	if err != nil {
+		return
+	}
+	chg.Type = newType
 	return nil
 }
 
@@ -154,7 +153,7 @@ func (chg *Change) FromMap(Map map[string]interface{}) error {
 		if col == "id" {
 			realVal, ok := val.(integrity.ID)
 			if !ok {
-				return errors.New("the ENTITY_ID is NOT an ID type")
+				return errInvalidID
 			}
 			chg.EntityID = realVal
 			continue
