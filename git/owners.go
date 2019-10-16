@@ -2,7 +2,6 @@ package git
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"github.com/sebach1/git-crud/schema"
@@ -59,15 +58,16 @@ func (own *Owner) Orchestrate(
 	own.wg.Add(1)
 	go own.Merge(ctx, &pR)
 	own.wg.Wait()
-
+	close(own.Summary)
 	return nil
 }
 
 // Merge performs the needed actions in order to merge the pullRequest
 func (own *Owner) Merge(ctx context.Context, pR *PullRequest) {
+	defer own.wg.Done()
 	for _, comm := range pR.Commits {
 		if comm.Errored {
-			continue
+			continue // Skips validation errs
 		}
 
 		commType, err := comm.Type()
@@ -76,15 +76,13 @@ func (own *Owner) Merge(ctx context.Context, pR *PullRequest) {
 			continue
 		}
 
+		own.wg.Add(1)
 		switch commType {
 		case "create", "update":
-			own.wg.Add(1)
 			go own.Push(ctx, comm)
 		case "retrieve":
-			own.wg.Add(1)
 			go own.Pull(ctx, comm)
 		case "delete":
-			own.wg.Add(1)
 			go own.Delete(ctx, comm)
 		}
 	}
@@ -175,6 +173,10 @@ func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx in
 	schErrCh := make(chan error, len(comm.Changes))
 	reviewWg.Add(len(comm.Changes))
 	for _, chg := range comm.Changes {
+		err := chg.Validate() // Performed sync to be strictly before any type assertion of the entire commit
+		if err != nil {
+			return
+		}
 		go sch.Validate(chg.TableName, chg.ColumnName, chg.Options.Keys(), chg.Value(), own.Project, &reviewWg, schErrCh)
 	}
 
@@ -201,7 +203,6 @@ func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx in
 			errs += err.Error()
 			errs += "; "
 		}
-		fmt.Println(errs)
 		err = errors.New(errs)
 		return
 	}

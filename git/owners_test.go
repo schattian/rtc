@@ -1,9 +1,12 @@
 package git
 
 import (
+	"context"
+	"errors"
 	"sync"
 	"testing"
 
+	"github.com/sebach1/git-crud/internal/integrity"
 	"github.com/sebach1/git-crud/schema"
 )
 
@@ -147,7 +150,7 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 			args: args{
 				sch: gSchemas.Basic,
 				pR: gPullRequests.ZeroCommits.copy().addCommit(
-					&Commit{Changes: []*Change{gChanges.Regular.None, gChanges.Regular.TableName}},
+					&Commit{Changes: []*Change{gChanges.Regular.None.copy(), gChanges.Regular.TableName.copy()}},
 				).mock(gTables.Basic.Name, nil),
 			},
 			wantQtErr: 1,
@@ -158,7 +161,7 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 			args: args{
 				sch: gSchemas.Basic,
 				pR: gPullRequests.ZeroCommits.copy().addCommit(
-					&Commit{Changes: []*Change{gChanges.Regular.None, gChanges.Rare.TableName}},
+					&Commit{Changes: []*Change{gChanges.Regular.None.copy(), gChanges.Rare.TableName.copy()}},
 				).mock(gTables.Basic.Name, nil),
 			},
 			wantQtErr: 1,
@@ -169,7 +172,7 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 			args: args{
 				sch: gSchemas.Basic,
 				pR: gPullRequests.ZeroCommits.copy().addCommit(
-					&Commit{Changes: []*Change{gChanges.Regular.Create, gChanges.Regular.Update}},
+					&Commit{Changes: []*Change{gChanges.Regular.Create.copy(), gChanges.Regular.Update.copy()}},
 				).mock(gTables.Basic.Name, nil),
 			},
 			wantQtErr: 1,
@@ -204,6 +207,127 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 			}
 			if gotQtErr != tt.wantQtErr {
 				t.Errorf("Owner.ReviewPRCommit() errorQt mismatch; got: %v wantQtErr %v", gotQtErr, tt.wantQtErr)
+			}
+		})
+	}
+}
+
+func TestOwner_Orchestrate(t *testing.T) {
+	t.Parallel()
+	type args struct {
+		ctx       context.Context
+		community *Community
+		schName   integrity.SchemaName
+		comm      *Commit
+		strategy  changesMatcher
+	}
+	tests := []struct {
+		name          string
+		own           *Owner
+		args          args
+		wantErr       bool
+		wantQtResErrs int // Quantity of results in summary that are errored
+	}{
+		{
+			name: "but NIL PROJECT",
+			own:  &Owner{},
+			args: args{
+				ctx:       context.Background(),
+				community: &Community{gTeams.Basic},
+				schName:   gSchemas.Basic.Name,
+				comm:      &Commit{Changes: []*Change{gChanges.Regular.None.copy()}},
+				strategy:  AreCompatible,
+			},
+			wantErr: true,
+		},
+		{
+			name: "but NO COLLABORATORS",
+			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
+			args: args{
+				ctx:       context.Background(),
+				community: &Community{gTeams.Basic.copy()},
+				schName:   gSchemas.Basic.Name,
+				comm:      &Commit{Changes: []*Change{gChanges.Regular.None.copy()}},
+				strategy:  AreCompatible,
+			},
+			wantErr:       false,
+			wantQtResErrs: 1,
+		},
+		{
+			name: "fully successful",
+			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
+			args: args{
+				ctx:       context.Background(),
+				community: &Community{gTeams.Basic.copy().mock(gChanges.Regular.None.TableName, nil)},
+				schName:   gSchemas.Basic.Name,
+				comm: &Commit{Changes: []*Change{
+					gChanges.Regular.Create.copy(),
+					gChanges.Regular.Retrieve.copy(),
+					gChanges.Regular.Update.copy(),
+					gChanges.Regular.Delete.copy(),
+				}},
+				strategy: AreCompatible,
+			},
+			wantErr:       false,
+			wantQtResErrs: 0,
+		},
+		{
+			name: "but COLLABORATORS MOCK RETURNS ERRS",
+			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
+			args: args{
+				ctx:       context.Background(),
+				community: &Community{gTeams.Basic.copy().mock(gChanges.Regular.None.TableName, errors.New("test"))},
+				schName:   gSchemas.Basic.Name,
+				comm: &Commit{Changes: []*Change{
+					gChanges.Regular.Create.copy(),
+					gChanges.Regular.Retrieve.copy(),
+					gChanges.Regular.Update.copy(),
+					gChanges.Regular.Delete.copy(),
+				}},
+				strategy: AreCompatible,
+			},
+			wantErr:       false,
+			wantQtResErrs: 4,
+		},
+		{
+			name: "given SCHEMA NOT IN PLANISPHERE",
+			own:  &Owner{Project: &schema.Planisphere{gSchemas.Rare}},
+			args: args{
+				ctx:       context.Background(),
+				community: &Community{gTeams.Basic.copy().mock(gChanges.Regular.None.TableName, nil)},
+				schName:   gSchemas.Basic.Name,
+				comm:      &Commit{Changes: []*Change{gChanges.Regular.None.copy()}},
+				strategy:  AreCompatible,
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			err := tt.own.Orchestrate(tt.args.ctx, tt.args.community, tt.args.schName, tt.args.comm, tt.args.strategy)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Owner.Orchestrate() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if tt.own.Summary == nil {
+				return
+			}
+
+			var gotQtResErrs int
+			var gotErrs string
+			for result := range tt.own.Summary {
+				if result.Error != nil {
+					gotErrs += result.Error.Error()
+					gotErrs += "; "
+					gotQtResErrs++
+				}
+			}
+
+			if gotQtResErrs != tt.wantQtResErrs {
+				t.Errorf("Owner.Orchestrate() gotQtResErrs = %v, wantQtResErrs %v", gotQtResErrs, tt.wantQtResErrs)
+				t.Errorf("HINT: Owner.Orchestrate() gotErrs = %v", gotErrs)
 			}
 		})
 	}
