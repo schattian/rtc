@@ -207,6 +207,7 @@ func TestChange_validateType(t *testing.T) {
 }
 
 func TestChange_SetOption(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		key integrity.OptionKey
 		val interface{}
@@ -247,7 +248,9 @@ func TestChange_SetOption(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			oldOptions := tt.chg.Options
 			err := tt.chg.SetOption(tt.args.key, tt.args.val)
 			if (err != nil) != tt.wantErr {
