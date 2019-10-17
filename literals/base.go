@@ -7,24 +7,24 @@ import (
 	"github.com/sebach1/git-crud/git"
 )
 
-// The Base builtin literal provides a standard Collaborator agent, and can be used to prevent
+// The BaseCollab builtin literal provides a standard Collaborator agent, and can be used to prevent
 // creating too much boilerplates
 // Notice that all the Collaborator methods it implements returns errors
-type Base struct{}
+type BaseCollab struct{}
 
-func (b *Base) Push(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
+func (b *BaseCollab) Push(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
 	return nil, errNotImplemented
 }
 
-func (b *Base) Pull(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
+func (b *BaseCollab) Pull(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
 	return nil, errNotImplemented
 }
 
-func (b *Base) Delete(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
+func (b *BaseCollab) Delete(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
 	return nil, errNotImplemented
 }
 
-func (b *Base) Init(ctx context.Context) error {
+func (b *BaseCollab) Init(ctx context.Context) error {
 	return errNotImplemented
 }
 

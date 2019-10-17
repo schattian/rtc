@@ -12,7 +12,7 @@ import (
 )
 
 type repositories struct {
-	literals.Base
+	literals.BaseCollab
 }
 
 func (r *repositories) URL(username string) string {

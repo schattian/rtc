@@ -12,7 +12,7 @@ import (
 )
 
 type organizations struct {
-	literals.Base
+	literals.BaseCollab
 }
 
 func (orgs *organizations) URL(owner string) string {
