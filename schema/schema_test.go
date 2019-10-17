@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/sebach1/git-crud/integrity"
-	"github.com/sebach1/git-crud/valide"
+	"github.com/sebach1/git-crud/schema/valide"
 )
 
 func TestSchema_preciseColErr(t *testing.T) {
