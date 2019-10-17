@@ -3,7 +3,7 @@ package schema
 import (
 	"fmt"
 
-	"github.com/sebach1/git-crud/internal/integrity"
+	"github.com/sebach1/git-crud/integrity"
 )
 
 // A Planisphere describes the scope in which the gSchemas will be searched in

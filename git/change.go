@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/sebach1/git-crud/internal/integrity"
+	"github.com/sebach1/git-crud/integrity"
 )
 
 // A Change represents every purposed/lookup for difference

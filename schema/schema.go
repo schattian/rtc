@@ -4,7 +4,7 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/sebach1/git-crud/internal/integrity"
+	"github.com/sebach1/git-crud/integrity"
 )
 
 // The Schema is the representation of a Database instructive. It uses concepts of SQL.

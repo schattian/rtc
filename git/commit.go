@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/sebach1/git-crud/internal/integrity"
+	"github.com/sebach1/git-crud/integrity"
 )
 
 // Commit is the abstraction that takes the proposed changes to an entity

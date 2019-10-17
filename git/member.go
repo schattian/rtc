@@ -1,6 +1,6 @@
 package git
 
-import "github.com/sebach1/git-crud/internal/integrity"
+import "github.com/sebach1/git-crud/integrity"
 
 // A Member is a Collaborator which has a table assigned
 type Member struct {

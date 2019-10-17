@@ -1,6 +1,6 @@
 package schema
 
-import "github.com/sebach1/git-crud/internal/integrity"
+import "github.com/sebach1/git-crud/integrity"
 
 func (c *Column) copy() *Column {
 	newCol := new(Column)

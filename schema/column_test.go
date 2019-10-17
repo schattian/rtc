@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/sebach1/git-crud/internal/integrity"
+	"github.com/sebach1/git-crud/integrity"
 )
 
 func TestColumn_Validate(t *testing.T) {

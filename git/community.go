@@ -1,7 +1,7 @@
 package git
 
 import (
-	"github.com/sebach1/git-crud/internal/integrity"
+	"github.com/sebach1/git-crud/integrity"
 )
 
 // A Community delimits the teams whose can take a work

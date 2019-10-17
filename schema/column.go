@@ -1,6 +1,6 @@
 package schema
 
-import "github.com/sebach1/git-crud/internal/integrity"
+import "github.com/sebach1/git-crud/integrity"
 
 // A Column is the representation of SQL column which defines the structure of the fields that is contains.
 type Column struct {

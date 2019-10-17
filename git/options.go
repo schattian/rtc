@@ -1,7 +1,7 @@
 package git
 
 import (
-	"github.com/sebach1/git-crud/internal/integrity"
+	"github.com/sebach1/git-crud/integrity"
 )
 
 // Options is a bunch of key-value pairs which must must be in accordance to the OptionKeys

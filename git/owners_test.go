@@ -6,7 +6,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/sebach1/git-crud/internal/integrity"
+	"github.com/sebach1/git-crud/integrity"
 	"github.com/sebach1/git-crud/schema"
 )
 

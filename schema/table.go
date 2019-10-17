@@ -1,7 +1,7 @@
 package schema
 
 import (
-	"github.com/sebach1/git-crud/internal/integrity"
+	"github.com/sebach1/git-crud/integrity"
 )
 
 // A Table is the representation of SQL table (or Mongo/CQL Collections) which acts as a collection of entities.
