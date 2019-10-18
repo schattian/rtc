@@ -1,8 +1,9 @@
 package schema
 
 import (
-	"errors"
 	"testing"
+
+	"github.com/sebach1/git-crud/schema/valide"
 
 	"github.com/sebach1/git-crud/integrity"
 )
@@ -11,18 +12,10 @@ func TestColumn_Validate(t *testing.T) {
 	t.Parallel()
 	type fields struct {
 		Name      integrity.ColumnName
-		Validator func(interface{}) error
+		Validator integrity.Validator
 	}
 	type args struct {
 		val interface{}
-	}
-	neverErr := func(val interface{}) error { return nil }
-	alwaysErr := func(val interface{}) error { return errors.New("err") }
-	validateStr := func(val interface{}) error {
-		if _, ok := val.(string); ok {
-			return nil
-		}
-		return errors.New("err")
 	}
 	tests := []struct {
 		name    string
@@ -31,20 +24,14 @@ func TestColumn_Validate(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "never errs",
-			fields:  fields{Validator: neverErr},
+			name:    "passes the validation",
+			fields:  fields{Validator: &valide.String{}},
 			args:    args{val: "anything"},
 			wantErr: false,
 		},
 		{
-			name:    "str validator",
-			fields:  fields{Validator: validateStr},
-			args:    args{val: "anything"},
-			wantErr: false,
-		},
-		{
-			name:    "always errs",
-			fields:  fields{Validator: alwaysErr},
+			name:    "doesnt passes the validation",
+			fields:  fields{Validator: &valide.Int{}},
 			args:    args{val: "anything"},
 			wantErr: true,
 		},

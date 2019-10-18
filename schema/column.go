@@ -13,7 +13,7 @@ func (c *Column) Validate(val interface{}) error {
 	if c.Validator == nil {
 		return nil
 	}
-	err := c.Validator(val)
+	err := c.Validator.Validate(val)
 	if err != nil {
 		return err
 	}
