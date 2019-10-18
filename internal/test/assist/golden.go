@@ -12,11 +12,11 @@ func DecodeJsonnet(name string, pointer interface{}) {
 	fileName := fmt.Sprintf("testdata/%s.jsonnet", name)
 	out, err := exec.Command("jsonnet", fileName).Output()
 	if err != nil {
-		log.Fatal(fmt.Errorf("Error parsing jsonnet: %v ", err))
+		log.Fatal(fmt.Errorf("Error PARSING JSONNET: %v ", err))
 	}
 
 	err = json.Unmarshal(out, pointer)
 	if err != nil {
-		log.Fatal(fmt.Errorf("Error decoding jsonnet: %v: ", err))
+		log.Fatal(fmt.Errorf("Error DECODING JSONNET: %v: ", err))
 	}
 }
