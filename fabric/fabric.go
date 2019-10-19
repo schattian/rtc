@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"go/format"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -48,7 +49,12 @@ func (f *Fabric) writeStructFromTable(table *schema.Table, marshal string) {
 	tableStruct := structFromTable(table, marshal)
 	structTemplate.Execute(bufio.NewWriter(&out), tableStruct)
 	filename := fmt.Sprintf("%v/%v.go", f.dir, strings.ToLower(string(table.Name)))
-	err := ioutil.WriteFile(filename, out.Bytes(), os.ModePerm)
+	generated := out.Bytes()
+	generated, err := format.Source(generated)
+	if err != nil {
+		panic(err)
+	}
+	err = ioutil.WriteFile(filename, generated, os.ModePerm)
 	if err != nil {
 		panic(err)
 	}
