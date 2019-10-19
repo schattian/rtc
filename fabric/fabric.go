@@ -46,7 +46,7 @@ func (f *Fabric) Produce(marshal string) error {
 func (f *Fabric) writeStructFromTable(table *schema.Table, marshal string) {
 	defer f.wg.Done()
 	var out bytes.Buffer
-	tableStruct := structFromTable(table, marshal)
+	tableStruct := f.structFromTable(table, marshal)
 	structTemplate.Execute(bufio.NewWriter(&out), tableStruct)
 	filename := fmt.Sprintf("%v/%v.go", f.dir, strings.ToLower(string(table.Name)))
 	generated := out.Bytes()
@@ -60,10 +60,11 @@ func (f *Fabric) writeStructFromTable(table *schema.Table, marshal string) {
 	}
 }
 
-func structFromTable(table *schema.Table, marshal string) *tableData {
+func (f *Fabric) structFromTable(table *schema.Table, marshal string) *tableData {
 	tableStruct := &tableData{
-		Name:    table.Name,
-		Marshal: marshal,
+		SchemaName: f.Schema.Name,
+		Name:       table.Name,
+		Marshal:    marshal,
 	}
 	for _, col := range table.Columns {
 		tableStruct.Fields = append(tableStruct.Fields, fieldFromColumn(col))
@@ -89,9 +90,10 @@ func (f *Fabric) validate() error {
 }
 
 type tableData struct {
-	Name    integrity.TableName
-	Fields  []*columnData
-	Marshal string
+	SchemaName integrity.SchemaName
+	Name       integrity.TableName
+	Fields     []*columnData
+	Marshal    string
 }
 
 type columnData struct {
