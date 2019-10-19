@@ -3,13 +3,15 @@ package valide
 import (
 	"encoding/json"
 	"errors"
+
+	"github.com/sebach1/git-crud/integrity"
 )
 
 // String validates string
 type String struct{}
 
 // NativeType returns the stringified native type of any value that can pass the validation
-func (s *String) NativeType() string {
+func (s *String) NativeType() integrity.ValueType {
 	return "string"
 }
 
@@ -25,7 +27,7 @@ func (s *String) Validate(v interface{}) error {
 type Int struct{}
 
 // NativeType returns the stringified native type of any value that can pass the validation
-func (i *Int) NativeType() string {
+func (i *Int) NativeType() integrity.ValueType {
 	return "int"
 }
 
@@ -41,7 +43,7 @@ func (i *Int) Validate(v interface{}) error {
 type Float32 struct{}
 
 // NativeType returns the stringified native type of any value that can pass the validation
-func (f32 *Float32) NativeType() string {
+func (f32 *Float32) NativeType() integrity.ValueType {
 	return "float32"
 }
 
@@ -57,7 +59,7 @@ func (f32 *Float32) Validate(v interface{}) error {
 type Float64 struct{}
 
 // NativeType returns the stringified native type of any value that can pass the validation
-func (f64 *Float64) NativeType() string {
+func (f64 *Float64) NativeType() integrity.ValueType {
 	return "float64"
 }
 
@@ -73,7 +75,7 @@ func (f64 *Float64) Validate(v interface{}) error {
 type JSON struct{}
 
 // NativeType returns the stringified native type of any value that can pass the validation
-func (js *JSON) NativeType() string {
+func (js *JSON) NativeType() integrity.ValueType {
 	return "json"
 }
 
@@ -96,7 +98,7 @@ func (js *JSON) Validate(v interface{}) error {
 type Bytes struct{}
 
 // NativeType returns the stringified native type of any value that can pass the validation
-func (by *Bytes) NativeType() string {
+func (by *Bytes) NativeType() integrity.ValueType {
 	return "bytes"
 }
 
