@@ -19,7 +19,7 @@ func TestChange_SetValue(t *testing.T) {
 		chg           *Change
 		args          args
 		wantErr       bool
-		wantValueType string
+		wantValueType integrity.ValueType
 	}{
 		{
 			name:          "string",

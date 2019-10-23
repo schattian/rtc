@@ -21,7 +21,7 @@ type Change struct {
 
 	EntityID integrity.ID `json:"entity_id,omitempty"`
 
-	ValueType string `json:"value_type,omitempty"`
+	ValueType integrity.ValueType `json:"value_type,omitempty"`
 
 	Type integrity.CRUD `json:"type,omitempty"`
 
