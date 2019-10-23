@@ -25,13 +25,13 @@ func TestColumn_Validate(t *testing.T) {
 	}{
 		{
 			name:    "passes the validation",
-			fields:  fields{Validator: &valide.String{}},
+			fields:  fields{Validator: valide.String},
 			args:    args{val: "anything"},
 			wantErr: false,
 		},
 		{
 			name:    "doesnt passes the validation",
-			fields:  fields{Validator: &valide.Int{}},
+			fields:  fields{Validator: valide.Int},
 			args:    args{val: "anything"},
 			wantErr: true,
 		},

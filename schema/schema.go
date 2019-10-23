@@ -8,7 +8,7 @@ import (
 )
 
 // The Schema is the representation of a Database instructive. It uses concepts of SQL.
-// The Schema provided by the schema gives the validation structure.
+// It provides the validation and construction structure.
 type Schema struct {
 	Name      integrity.SchemaName `json:"name,omitempty"`
 	Blueprint []*Table             `json:"blueprint,omitempty"`
@@ -114,4 +114,17 @@ func (sch *Schema) preciseColErr(colName integrity.ColumnName) (err error) {
 		}
 	}
 	return errNonexistentColumn
+}
+
+// Wraps Column.applyBuiltinValidator() over all cols
+func (sch *Schema) applyBuiltinValidators() (err error) {
+	for _, table := range sch.Blueprint {
+		for _, col := range table.Columns {
+			err = col.applyBuiltinValidator()
+			if err != nil {
+				return
+			}
+		}
+	}
+	return nil
 }
