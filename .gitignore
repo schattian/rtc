@@ -10,7 +10,6 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
-./git-crud
 # Dependency directories (remove the comment below to include it)
 # vendor/
 .vscode/*
@@ -18,3 +17,4 @@
 .vscode/tasks.json
 .vscode/launch.json
 .vscode/extensions.json
+git-crud
