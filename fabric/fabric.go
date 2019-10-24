@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"go/format"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -13,39 +12,48 @@ import (
 
 	"github.com/sebach1/git-crud/integrity"
 	"github.com/sebach1/git-crud/schema"
+	"github.com/spf13/afero"
 )
 
 // Fabric creates native go struct types given a schema
 type Fabric struct {
 	Schema *schema.Schema
+	Dir    string
 
-	Dir string
-	wg  *sync.WaitGroup
+	wg *sync.WaitGroup
+	// FileSystem-related
+	fsWg  *sync.WaitGroup
+	fsSmp chan int // Semaphore
 }
 
 // Produce is the main Fabric wrapper
-func (f *Fabric) Produce(marshal string) error {
+func (f *Fabric) Produce(marshal string, fs afero.Fs) error {
 	err := f.validate()
 	if err != nil {
 		return err
 	}
 	f.Schema.Name = integrity.SchemaName(strings.ToLower(string(f.Schema.Name)))
-	f.Dir = fmt.Sprintf("fabric/%v", f.Schema.Name)
-	err = os.MkdirAll(f.Dir, os.ModePerm)
-	if err != nil {
-		return err
+	if f.Dir == "" {
+		f.Dir = fmt.Sprintf("fabric/%v", f.Schema.Name)
 	}
 
-	f.wg = new(sync.WaitGroup)
+	f.wg = &sync.WaitGroup{}
+	f.fsWg = &sync.WaitGroup{}
+	f.fsSmp = make(chan int, 1)
+
 	for _, table := range f.Schema.Blueprint {
 		f.wg.Add(1)
-		go f.writeStructFromTable(table, marshal)
+		go f.mkStructFileFromTable(table, marshal, fs)
 	}
 	f.wg.Wait()
+
+	f.fsWg.Add(1)
+	f.writeAll(fs)
+	f.fsWg.Wait()
 	return nil
 }
 
-func (f *Fabric) writeStructFromTable(table *schema.Table, marshal string) {
+func (f *Fabric) mkStructFileFromTable(table *schema.Table, marshal string, fs afero.Fs) {
 	defer f.wg.Done()
 	var out bytes.Buffer
 	tableStruct := f.structFromTable(table, marshal)
@@ -56,16 +64,38 @@ func (f *Fabric) writeStructFromTable(table *schema.Table, marshal string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = ioutil.WriteFile(filename, generated, os.ModePerm)
+	f.fsWg.Add(1)
+	go f.writeFile(fs, filename, generated)
+}
+
+func (f *Fabric) writeAll(fs afero.Fs) {
+	defer f.fsWg.Done()
+	err := fs.MkdirAll(f.Dir, os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
+	}
+	f.fsSmp <- 0 // Unblocks any writeFile
+}
+
+func (f *Fabric) writeFile(fs afero.Fs, filename string, generated []byte) {
+	defer f.fsWg.Done()
+	for {
+		select {
+		case <-f.fsSmp:
+			err := afero.WriteFile(fs, filename, generated, os.ModePerm)
+			if err != nil {
+				log.Fatal(err)
+			}
+			f.fsSmp <- 0 // Unblocks the next any writeFile
+			return
+		}
 	}
 }
 
 func (f *Fabric) structFromTable(table *schema.Table, marshal string) *tableData {
 	tableStruct := &tableData{
 		SchemaName: string(f.Schema.Name),
-		Name:       toCamelCase(string(table.Name), true),
+		Name:       toCamelCase(string(table.Name)),
 		Marshal:    toSnakeCase(marshal, '_'),
 	}
 	for _, col := range table.Columns {
@@ -76,7 +106,7 @@ func (f *Fabric) structFromTable(table *schema.Table, marshal string) *tableData
 
 func fieldFromColumn(col *schema.Column) *columnData {
 	return &columnData{
-		Name: toCamelCase(string(col.Name), true),
+		Name: toCamelCase(string(col.Name)),
 		Type: col.Type,
 		Tag:  toSnakeCase(string(col.Name), '_'),
 	}
