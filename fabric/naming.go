@@ -39,11 +39,11 @@ func toSnakeCase(s string, del uint8) string {
 }
 
 // Converts a string to CamelCase
-func toCamelCase(s string, initCase bool) string {
+func toCamelCase(s string) string {
 	s = addWordBoundariesToNumbers(s)
 	s = strings.Trim(s, " ")
 	n := ""
-	capNext := initCase
+	capNext := true
 	for _, v := range s {
 		if v >= 'A' && v <= 'Z' {
 			n += string(v)

@@ -3,6 +3,8 @@ package main
 import (
 	"errors"
 
+	"github.com/spf13/afero"
+
 	"github.com/sebach1/git-crud/fabric"
 	"github.com/sebach1/git-crud/schema"
 	"github.com/urfave/cli"
@@ -33,7 +35,7 @@ func fabricExec(c *cli.Context) error {
 	}
 
 	Fabric := &fabric.Fabric{Schema: decodedSchema}
-	err = Fabric.Produce(marshalType)
+	err = Fabric.Produce(marshalType, afero.NewOsFs())
 	if err != nil {
 		return err
 	}
