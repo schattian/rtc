@@ -2,6 +2,7 @@ package schema
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/sebach1/git-crud/integrity"
 	"github.com/sebach1/git-crud/schema/valide"
@@ -12,6 +13,38 @@ type Column struct {
 	Name      integrity.ColumnName `json:"name,omitempty"`
 	Validator integrity.Validator
 	Type      integrity.ValueType `json:"type,omitempty"`
+}
+
+func (c *Column) validateSelf(wg *sync.WaitGroup, vErrCh chan<- error) {
+	defer wg.Done()
+
+	if c == nil {
+		vErrCh <- c.validationErr(errNilColumn)
+		return
+	}
+	if c.Name == "" {
+		vErrCh <- c.validationErr(errNilColumnName)
+	}
+	if c.Type == "" {
+		vErrCh <- c.validationErr(errNilColumnType)
+	}
+}
+
+func (c *Column) validationErr(err error) *integrity.ValidationError {
+	var name string
+	if c == nil {
+		name = ""
+	} else {
+		name = string(c.Name)
+	}
+	return &integrity.ValidationError{Err: err, Origin: "column", OriginName: name}
+}
+
+// Copy returns a copy of the given column
+func (c *Column) Copy() *Column {
+	newCol := new(Column)
+	*newCol = *c
+	return newCol
 }
 
 // Validate wraps the column validator func and returns its result
