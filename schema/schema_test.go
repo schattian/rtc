@@ -85,7 +85,7 @@ func TestSchema_Validate(t *testing.T) {
 		},
 		{
 			name: "value doesn't pass the column validator func",
-			sch:  gSchemas.Basic.copy().addColValidator(gColumns.Basic.Name, valide.String),
+			sch:  gSchemas.Basic.Copy().addColValidator(gColumns.Basic.Name, valide.String),
 			args: args{
 				tableName:   gTables.Basic.Name,
 				colName:     gColumns.Basic.Name,
