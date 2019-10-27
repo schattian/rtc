@@ -14,6 +14,83 @@ type Schema struct {
 	Blueprint []*Table             `json:"blueprint,omitempty"`
 }
 
+// Copy returns a copy of the given schema, including a deep copy if its blueprint
+func (sch *Schema) Copy() *Schema {
+	newSch := new(Schema)
+	*newSch = *sch
+	var newBlueprint []*Table
+	for _, table := range newSch.Blueprint {
+		newBlueprint = append(newBlueprint, table.Copy())
+	}
+	newSch.Blueprint = newBlueprint
+	return newSch
+}
+
+func (sch *Schema) WrapValidateSelf() (err error) {
+	done := make(chan bool)
+	validationErrs := make(chan error)
+	go sch.ValidateSelf(done, validationErrs)
+
+	var errMsg string
+	for {
+		select {
+		case <-done:
+			if errMsg != "" {
+				err = errors.New(errMsg)
+			}
+			return
+		case vErr := <-validationErrs:
+			errMsg += vErr.Error()
+			errMsg += " ;"
+		}
+	}
+}
+
+// ValidateSelf performs a deep self-validation to check data integrity
+func (sch *Schema) ValidateSelf(done chan<- bool, vErrCh chan<- error) {
+	defer func() {
+		done <- true
+		close(vErrCh)
+	}()
+
+	if sch == nil {
+		vErrCh <- sch.validationErr(errNilSchema)
+		return
+	}
+
+	tablesQt := len(sch.Blueprint)
+	if tablesQt == 0 {
+		vErrCh <- sch.validationErr(errNilBlueprint)
+	}
+
+	var schVWg sync.WaitGroup
+	schVWg.Add(tablesQt)
+	tVErrCh := make(chan error, tablesQt)
+	for _, table := range sch.Blueprint {
+		go table.validateSelf(&schVWg, tVErrCh)
+	}
+
+	if sch.Name == "" {
+		vErrCh <- sch.validationErr(errNilSchemaName)
+	}
+
+	schVWg.Wait()
+	close(tVErrCh)
+	for err := range tVErrCh {
+		vErrCh <- err
+	}
+}
+
+func (sch *Schema) validationErr(err error) *integrity.ValidationError {
+	var name string
+	if sch == nil {
+		name = ""
+	} else {
+		name = string(sch.Name)
+	}
+	return &integrity.ValidationError{Err: err, Origin: "schema", OriginName: name}
+}
+
 // Validate checks if the context of the given tableName and colName is valid
 // Notice that, as well as the wrapper validations should provoke a chained
 // of undesired (and maybe more confusing than clear) errs, the errCh should be buffered w/sz=1
