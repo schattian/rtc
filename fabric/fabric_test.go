@@ -5,10 +5,13 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/sebach1/git-crud/schema"
 	"github.com/spf13/afero"
 )
 
 func TestFabric_Produce(t *testing.T) {
+	t.Parallel()
 	type args struct {
 		marshal string
 	}
@@ -50,7 +53,9 @@ func TestFabric_Produce(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			mFs := afero.NewMemMapFs()
 			err := tt.fabric.Produce(tt.args.marshal, mFs)
 			isCreated, osErr := afero.DirExists(mFs, tt.fabric.Dir)
@@ -70,6 +75,79 @@ func TestFabric_Produce(t *testing.T) {
 
 			if !isCreated {
 				t.Error("Fabric.Produce() did NOT GENERATE the DIRectory. EXPECTed TO generate it")
+			}
+		})
+	}
+}
+
+// func TestFabric_structFromTable(t *testing.T) {
+// 	type fields struct {
+// 		Schema *schema.Schema
+// 		Dir    string
+// 		wg     *sync.WaitGroup
+// 		fsWg   *sync.WaitGroup
+// 		fsSmp  chan int
+// 	}
+// 	type args struct {
+// 		table   *schema.Table
+// 		marshal string
+// 	}
+// 	tests := []struct {
+// 		name   string
+// 		fields fields
+// 		args   args
+// 		want   *tableData
+// 	}{
+// 		// TODO: Add test cases.
+// 	}
+// 	for _, tt := range tests {
+// 		t.Run(tt.name, func(t *testing.T) {
+// 			f := &Fabric{
+// 				Schema: tt.fields.Schema,
+// 				Dir:    tt.fields.Dir,
+// 				wg:     tt.fields.wg,
+// 				fsWg:   tt.fields.fsWg,
+// 				fsSmp:  tt.fields.fsSmp,
+// 			}
+// 			if got := f.structFromTable(tt.args.table, tt.args.marshal); !reflect.DeepEqual(got, tt.want) {
+// 				t.Errorf("Fabric.structFromTable() = %v, want %v", got, tt.want)
+// 			}
+// 		})
+// 	}
+// }
+
+// Locktest
+func Test_fieldFromColumn(t *testing.T) {
+	type args struct {
+		col *schema.Column
+	}
+	// rmType := func(col *schema.Column) *schema.Column { col.Type = ""; return col }
+	// rmName := func(col *schema.Column) *schema.Column { col.Name = ""; return col }
+	tests := []struct {
+		name    string
+		args    args
+		want    *columnData
+		wantErr bool
+	}{
+		{
+			name: "BASIC COLUMN conversion",
+			args: args{col: gColumns.Basic},
+			want: &columnData{
+				Name: toCamelCase(string(gColumns.Basic.Name)),
+				Type: gColumns.Basic.Type,
+				Tag:  toSnakeCase(string(gColumns.Basic.Name), '_'),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := fieldFromColumn(tt.args.col)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("fieldFromColumn() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if diff := cmp.Diff(tt.want, got); diff != "" {
+				t.Errorf("fieldFromColumn() mismatch (-want +got): %s", diff)
 			}
 		})
 	}
