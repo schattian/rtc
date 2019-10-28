@@ -69,7 +69,7 @@ func (f *Fabric) initFsConcurrency() {
 func (f *Fabric) mkStructFileFromTable(table *schema.Table, marshal string, fs afero.Fs) (err error) {
 	defer f.wg.Done()
 	var out bytes.Buffer
-	tableStruct, err := f.structFromTable(table, marshal)
+	tableStruct := f.structFromTable(table, marshal)
 	err = structTemplate.Execute(&out, tableStruct)
 	if err != nil {
 		return err
@@ -109,28 +109,25 @@ func (f *Fabric) writeFile(fs afero.Fs, filename string, generated []byte) {
 	}
 }
 
-func (f *Fabric) structFromTable(table *schema.Table, marshal string) (*tableData, error) {
+func (f *Fabric) structFromTable(table *schema.Table, marshal string) *tableData {
 	tableStruct := &tableData{
 		SchemaName: string(f.Schema.Name),
 		Name:       toCamelCase(string(table.Name)),
 		Marshal:    toSnakeCase(marshal, '_'),
 	}
 	for _, col := range table.Columns {
-		field, err := fieldFromColumn(col)
-		if err != nil {
-			return nil, err
-		}
+		field := fieldFromColumn(col)
 		tableStruct.Fields = append(tableStruct.Fields, field)
 	}
-	return tableStruct, nil
+	return tableStruct
 }
 
-func fieldFromColumn(col *schema.Column) (*columnData, error) {
+func fieldFromColumn(col *schema.Column) *columnData {
 	return &columnData{
 		Name: toCamelCase(string(col.Name)),
 		Type: col.Type,
 		Tag:  toSnakeCase(string(col.Name), '_'),
-	}, nil
+	}
 }
 
 type tableData struct {
