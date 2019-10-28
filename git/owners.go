@@ -12,10 +12,28 @@ import (
 // Owner is the agent which coordinates any given action
 // Notice that an Owner is a Collaborator
 type Owner struct {
-	Project *schema.Planisphere
-	Summary chan *Result
+	Project  *schema.Planisphere
+	Summary  chan *Result
+	AsyncErr error
 
 	wg *sync.WaitGroup
+}
+
+// OrchestrateAsync performs Owner.Orchestrate() but not closing the merge in the same time.
+func (own *Owner) OrchestrateAsync(
+	ctx context.Context,
+	community *Community,
+	schName integrity.SchemaName,
+	comm *Commit,
+	strategy changesMatcher,
+) {
+	pR, err := own.Delegate(ctx, community, schName, comm, strategy)
+	if err != nil {
+		err = own.AsyncErr
+		return
+	}
+	own.wg.Add(1)
+	go own.Merge(ctx, pR)
 }
 
 // Orchestrate sends the order to all the collaborators available to execute
@@ -27,17 +45,36 @@ func (own *Owner) Orchestrate(
 	comm *Commit,
 	strategy changesMatcher,
 ) error {
-	err := own.Validate()
+	pR, err := own.Delegate(ctx, community, schName, comm, strategy)
 	if err != nil {
 		return err
+	}
+	own.wg.Add(1)
+	go own.Merge(ctx, pR)
+	own.Close()
+	return nil
+}
+
+// Delegate creates a PullRequest and assigns reviewers from a given commit
+func (own *Owner) Delegate(
+	ctx context.Context,
+	community *Community,
+	schName integrity.SchemaName,
+	comm *Commit,
+	strategy changesMatcher,
+) (*PullRequest, error) {
+
+	err := own.Validate()
+	if err != nil {
+		return nil, err
 	}
 
 	sch, err := own.Project.GetSchemaFromName(schName)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	own.wg = new(sync.WaitGroup)
+	own.wg = &sync.WaitGroup{}
 	var pR PullRequest
 
 	for _, changes := range comm.GroupBy(strategy) { // Splits incompatibilities onto the pR
@@ -54,11 +91,13 @@ func (own *Owner) Orchestrate(
 	}
 	own.wg.Wait()
 
-	own.wg.Add(1)
-	go own.Merge(ctx, &pR)
+	return &pR, nil
+}
+
+// Close will wait for the Owner WaitGroup to be done and close the Owner.Summary
+func (own *Owner) Close() {
 	own.wg.Wait()
 	close(own.Summary)
-	return nil
 }
 
 // Merge performs the needed actions in order to merge the pullRequest
