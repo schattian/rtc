@@ -22,8 +22,10 @@ Then, and after committing a few changes (see how to commit)[] we orchestrate th
 
 ```go
 import (
+    "encoding/json"
     "context"
 
+    fabghub "my_fabric_dir/github"
     "github.com/sebach1/git-crud/git"
     "github.com/sebach1/git-crud/literals"
     "github.com/sebach1/git-crud/literals/github"
@@ -34,6 +36,11 @@ myOwner := &git.Owner{Project: literals.StdPlanisphere}
 err := myOwner.Orchestrate(context.Background(), github.Community, "github", YOUR_COMMIT, git.AreCompatible())
 // Avoid err checking <is an example>
 
-myOwner.Summary
+for _, result := range myOwner.Summary {
+    comm := CommitByID(result.CommitID)// find the created commit with your DB implementation
+    comm.ToMap()
+    var repo &fabghub.Repository{}
+    json.NewDecoder() // In case u are using json decoder
+}
 
 ```
