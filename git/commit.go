@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/git-crud/msh"
 )
 
 // Commit is the abstraction that takes the proposed changes to an entity
@@ -58,7 +59,7 @@ func (comm *Commit) Rm(chg *Change) error {
 func (comm *Commit) Unmarshal(data interface{}, format string) error {
 	switch format {
 	case "json":
-		rawJSON, err := integrity.ToJSON(comm)
+		rawJSON, err := msh.ToJSON(comm)
 		if err != nil {
 			return err
 		}

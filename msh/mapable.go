@@ -1,4 +1,4 @@
-package integrity
+package msh
 
 import "encoding/json"
 

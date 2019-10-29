@@ -22,7 +22,7 @@ func (orgs *organizations) URL(owner string) string {
 func (orgs *organizations) Push(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
 	commType, _ := comm.Type()
 
-	body, err := integrity.ToJSON(comm)
+	body, err := msh.ToJSON(comm)
 	if err != nil {
 		return nil, err
 	}
