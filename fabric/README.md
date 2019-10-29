@@ -1,6 +1,6 @@
 # Fabric
 
-This subpkg generates structs used to decode the `JSON` or `map[string]interface{}` formats of a **git.Commit to a native go struct** (friendlier that managing commit changes and better than using safe bodies).
+This subpkg generates structs used to decode the formats of a **git.Commit to a native go struct** (friendlier that managing commit changes and better than using unsafe maps).
 
 > Notice that _every generation needs a valid schema to be performed_.
 
@@ -11,8 +11,8 @@ An alternative to this could be using [gojson](https://github.com/ChimeraCoder/g
 The standard usage of this module would be:
 
 1. Fabric the structs with `git-crud fabric <SCHEMA_PATH>`.
-2. Convert the obtained git.Commit to `map[string]interface{}` using `.ToMap()`.
-3. Decode the obtained map to the struct you generated in the first step.
+2. Marshal the git.Commit using any utility provided in the msh pkg or use the `Mapable` provided abstraction to create your own marshaler.
+3. Unmarshal the obtained map to the struct you generated in the first step.
 
 Example:
 
@@ -21,26 +21,29 @@ Using the github literal, first we are going to create the native structs for th
 Then, and after committing a few changes (see how to commit)[] we orchestrate the changes:
 
 ```go
+// Notice it avoids err checking <is an example>
+
 import (
     "encoding/json"
     "context"
 
-    fabghub "my_fabric_dir/github"
+    fabric "my_fabric_dir/github"
     "github.com/sebach1/git-crud/git"
     "github.com/sebach1/git-crud/literals"
     "github.com/sebach1/git-crud/literals/github"
+    "github.com/sebach1/git-crud/msh"
 )
 
-myOwner := &git.Owner{Project: literals.StdPlanisphere}
+myOwner := git.NewOwner(literals.StdPlanisphere)
 
-err := myOwner.Orchestrate(context.Background(), github.Community, "github", YOUR_COMMIT, git.AreCompatible())
-// Avoid err checking <is an example>
+myOwner.Orchestrate(context.Background(), github.Community, "github", YOUR_COMMIT, git.AreCompatible())
+myOwner.Close()
 
 for _, result := range myOwner.Summary {
     comm := CommitByID(result.CommitID)// find the created commit with your DB implementation
-    comm.ToMap()
-    var repo &fabghub.Repository{}
-    json.NewDecoder() // In case u are using json decoder
+    jsComm := msh.ToJSON(comm)
+    var repo fabric.Repository{})
+    json.Unmarshal(jsComm, &repo) // In case u are using json decoder
 }
 
 ```
