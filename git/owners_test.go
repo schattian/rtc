@@ -203,13 +203,12 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			tt.own.Summary = make(chan *Result, len(tt.args.pR.Commits))
-			tt.own.wg = new(sync.WaitGroup)
-
-			tt.own.wg.Add(len(tt.args.pR.Commits))
+			wg := &sync.WaitGroup{}
+			wg.Add(len(tt.args.pR.Commits))
 			for commIdx := range tt.args.pR.Commits {
-				go tt.own.ReviewPRCommit(tt.args.sch, tt.args.pR, commIdx)
+				go tt.own.ReviewPRCommit(tt.args.sch, tt.args.pR, commIdx, wg)
 			}
-			tt.own.wg.Wait()
+			wg.Wait()
 			var gotQtErr int
 			for _, comm := range tt.args.pR.Commits {
 				if comm.Errored {
@@ -241,7 +240,7 @@ func TestOwner_Orchestrate(t *testing.T) {
 	}{
 		{
 			name: "fully successful",
-			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
+			own:  NewOwnerUnsafe(&schema.Planisphere{gSchemas.Basic}),
 			args: args{
 				ctx:       context.Background(),
 				community: &Community{gTeams.Basic.copy().mock(gChanges.Regular.None.TableName, nil)},
@@ -259,7 +258,7 @@ func TestOwner_Orchestrate(t *testing.T) {
 		},
 		{
 			name: "but NIL PROJECT",
-			own:  &Owner{},
+			own:  NewOwnerUnsafe(nil),
 			args: args{
 				ctx:       context.Background(),
 				community: &Community{gTeams.Basic},
@@ -271,7 +270,7 @@ func TestOwner_Orchestrate(t *testing.T) {
 		},
 		{
 			name: "but NO COLLABORATORS",
-			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
+			own:  NewOwnerUnsafe(&schema.Planisphere{gSchemas.Basic}),
 			args: args{
 				ctx:       context.Background(),
 				community: &Community{gTeams.Basic.copy()},
@@ -284,7 +283,7 @@ func TestOwner_Orchestrate(t *testing.T) {
 		},
 		{
 			name: "but COLLABORATORS MOCK RETURNS ERRS",
-			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
+			own:  NewOwnerUnsafe(&schema.Planisphere{gSchemas.Basic}),
 			args: args{
 				ctx:       context.Background(),
 				community: &Community{gTeams.Basic.copy().mock(gChanges.Regular.None.TableName, errors.New("test"))},
@@ -302,7 +301,7 @@ func TestOwner_Orchestrate(t *testing.T) {
 		},
 		{
 			name: "given SCHEMA NOT IN PLANISPHERE",
-			own:  &Owner{Project: &schema.Planisphere{gSchemas.Rare}},
+			own:  NewOwnerUnsafe(&schema.Planisphere{gSchemas.Rare}),
 			args: args{
 				ctx:       context.Background(),
 				community: &Community{gTeams.Basic.copy().mock(gChanges.Regular.None.TableName, nil)},
@@ -317,12 +316,14 @@ func TestOwner_Orchestrate(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			err := tt.own.Orchestrate(tt.args.ctx, tt.args.community, tt.args.schName, tt.args.comm, tt.args.strategy)
+			tt.own.Waiter.Add(1) // Prevent a line of the boilerplate when calling orchestra
+			go tt.own.Orchestrate(tt.args.ctx, tt.args.community, tt.args.schName, tt.args.comm, tt.args.strategy)
+			err := tt.own.Close()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Owner.Orchestrate() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if tt.own.Summary == nil {
+			if err != nil {
 				return
 			}
 

@@ -12,28 +12,26 @@ import (
 // Owner is the agent which coordinates any given action
 // Notice that an Owner is a Collaborator
 type Owner struct {
-	Project  *schema.Planisphere
-	Summary  chan *Result
-	AsyncErr error
+	Project *schema.Planisphere
+	Summary chan *Result
 
-	wg *sync.WaitGroup
+	Waiter *sync.WaitGroup
+	err    error
 }
 
-// OrchestrateAsync performs Owner.Orchestrate() but not closing the merge in the same time.
-func (own *Owner) OrchestrateAsync(
-	ctx context.Context,
-	community *Community,
-	schName integrity.SchemaName,
-	comm *Commit,
-	strategy changesMatcher,
-) {
-	pR, err := own.Delegate(ctx, community, schName, comm, strategy)
-	if err != nil {
-		err = own.AsyncErr
-		return
+// NewOwner returns a new instance of Owner, with needed initialization and validation
+func NewOwner(project *schema.Planisphere) (*Owner, error) {
+	if project == nil || len(*project) == 0 {
+		return nil, errors.New("The PROJECT cannot be NIL")
 	}
-	own.wg.Add(1)
-	go own.Merge(ctx, pR)
+	return NewOwnerUnsafe(project), nil
+}
+
+// NewOwnerUnsafe returns a new instance of Owner, with needed initialization
+func NewOwnerUnsafe(project *schema.Planisphere) *Owner {
+	own := &Owner{Project: project}
+	own.Waiter = &sync.WaitGroup{}
+	return own
 }
 
 // Orchestrate sends the order to all the collaborators available to execute
@@ -44,15 +42,15 @@ func (own *Owner) Orchestrate(
 	schName integrity.SchemaName,
 	comm *Commit,
 	strategy changesMatcher,
-) error {
+) {
+	defer own.Waiter.Done()
 	pR, err := own.Delegate(ctx, community, schName, comm, strategy)
 	if err != nil {
-		return err
+		own.err = err
+		return
 	}
-	own.wg.Add(1)
+	own.Waiter.Add(1)
 	go own.Merge(ctx, pR)
-	own.Close()
-	return nil
 }
 
 // Delegate creates a PullRequest and assigns reviewers from a given commit
@@ -74,8 +72,8 @@ func (own *Owner) Delegate(
 		return nil, err
 	}
 
-	own.wg = &sync.WaitGroup{}
 	var pR PullRequest
+	var wg sync.WaitGroup
 
 	for _, changes := range comm.GroupBy(strategy) { // Splits incompatibilities onto the pR
 		comm := &Commit{Changes: changes}
@@ -85,24 +83,30 @@ func (own *Owner) Delegate(
 
 	own.Summary = make(chan *Result, len(pR.Commits))
 
-	own.wg.Add(len(pR.Commits))
+	wg.Add(len(pR.Commits))
 	for commIdx := range pR.Commits {
-		go own.ReviewPRCommit(sch, &pR, commIdx)
+		go own.ReviewPRCommit(sch, &pR, commIdx, &wg)
 	}
-	own.wg.Wait()
+	wg.Wait()
 
 	return &pR, nil
 }
 
 // Close will wait for the Owner WaitGroup to be done and close the Owner.Summary
-func (own *Owner) Close() {
-	own.wg.Wait()
-	close(own.Summary)
+// It closes an orchestration (Owner.Orchestrate())
+func (own *Owner) Close() error {
+	own.Waiter.Wait()
+	if own.Summary != nil {
+		// The channel can be nil if the owner was errored before
+		// a merge / review
+		close(own.Summary)
+	}
+	return own.err
 }
 
 // Merge performs the needed actions in order to merge the pullRequest
 func (own *Owner) Merge(ctx context.Context, pR *PullRequest) {
-	defer own.wg.Done()
+	defer own.Waiter.Done()
 	for _, comm := range pR.Commits {
 		if comm.Errored {
 			continue // Skips validation errs
@@ -114,7 +118,7 @@ func (own *Owner) Merge(ctx context.Context, pR *PullRequest) {
 			continue
 		}
 
-		own.wg.Add(1)
+		own.Waiter.Add(1)
 		switch commType {
 		case "create", "update":
 			go own.Push(ctx, comm)
@@ -128,7 +132,7 @@ func (own *Owner) Merge(ctx context.Context, pR *PullRequest) {
 
 // Push will orchestrate the pushes of any collaborator
 func (own *Owner) Push(ctx context.Context, comm *Commit) (*Commit, error) {
-	defer own.wg.Done()
+	defer own.Waiter.Done()
 	newComm := new(Commit)
 	*newComm = *comm
 	err := comm.Reviewer.Init(ctx)
@@ -147,7 +151,7 @@ func (own *Owner) Push(ctx context.Context, comm *Commit) (*Commit, error) {
 
 // Pull will orchestrate the pulls of any collaborator
 func (own *Owner) Pull(ctx context.Context, comm *Commit) (*Commit, error) {
-	defer own.wg.Done()
+	defer own.Waiter.Done()
 	newComm := new(Commit)
 	*newComm = *comm
 	err := comm.Reviewer.Init(ctx)
@@ -166,7 +170,7 @@ func (own *Owner) Pull(ctx context.Context, comm *Commit) (*Commit, error) {
 
 // Delete will orchestrate the deletions of any collaborator
 func (own *Owner) Delete(ctx context.Context, comm *Commit) (*Commit, error) {
-	defer own.wg.Done()
+	defer own.Waiter.Done()
 	newComm := new(Commit)
 	*newComm = *comm
 	err := comm.Reviewer.Init(ctx)
@@ -195,9 +199,9 @@ func (own *Owner) Validate() error {
 }
 
 // ReviewPRCommit wraps schema validations to a specified commit of the given PullRequest
-func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx int) {
+func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx int, delegationWg *sync.WaitGroup) {
 	var err error
-	defer own.wg.Done()
+	defer delegationWg.Done()
 	var reviewWg sync.WaitGroup
 
 	comm := pR.Commits[commIdx]
