@@ -49,7 +49,7 @@ func (c *Column) Copy() *Column {
 
 // Validate wraps the column validator func and returns its result
 func (c *Column) Validate(val interface{}) error {
-	if c.Validator == nil {
+	if c.Validator == nil || val == nil {
 		return nil
 	}
 	err := c.Validator(val)

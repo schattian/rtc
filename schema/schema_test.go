@@ -56,6 +56,7 @@ func TestSchema_Validate(t *testing.T) {
 		val         interface{}
 		helperScope *Planisphere
 	}
+	schRmName := func(sch *Schema) *Schema { sch.Name = ""; return sch }
 	tests := []struct {
 		name    string
 		sch     *Schema
@@ -72,6 +73,17 @@ func TestSchema_Validate(t *testing.T) {
 				helperScope: &Planisphere{gSchemas.Basic},
 			},
 			wantErr: false,
+		},
+		{
+			name: "schema ITSELF is NOT VALID",
+			sch:  schRmName(gSchemas.Basic.Copy()),
+			args: args{
+				tableName:   gTables.Basic.Name,
+				colName:     gColumns.Basic.Name,
+				optionKeys:  []integrity.OptionKey{gTables.Basic.OptionKeys[0]},
+				helperScope: &Planisphere{gSchemas.Basic},
+			},
+			wantErr: true,
 		},
 		{
 			name: "optionKey nonexistant",

@@ -100,11 +100,11 @@ func (sch *Schema) Validate(
 	errCh chan<- error,
 ) {
 	defer wg.Done()
-	defer func() {
-		if r := recover(); r != nil {
-			errCh <- errors.New("schema.Validate() unhandled PANIC")
-		}
-	}()
+
+	err := sch.ValidateSelf()
+	if err != nil {
+		errCh <- err
+	}
 
 	table, err := sch.tableByName(tableName, helperScope)
 	if err != nil {
@@ -119,20 +119,14 @@ func (sch *Schema) Validate(
 		}
 	}
 
-	if colName == "" { // Skip column validation (before the change MUST BE TYPE VALIDATED)
-		return
-	}
-
 	for _, col := range table.Columns {
 		if colName == col.Name {
-			if val == nil {
-				return
-			}
 			err = col.Validate(val)
 			if err != nil {
 				errCh <- err
 				return
 			}
+
 			return
 		}
 	}
@@ -149,9 +143,6 @@ func (t *Table) optionKeyIsValid(key integrity.OptionKey) bool {
 }
 
 func (sch *Schema) tableByName(tableName integrity.TableName, helperScope *Planisphere) (*Table, error) {
-	if len(sch.Blueprint) == 0 {
-		return nil, errNilBlueprint
-	}
 	for _, table := range sch.Blueprint {
 		if tableName == table.Name {
 			return table, nil
