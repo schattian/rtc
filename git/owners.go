@@ -244,7 +244,7 @@ func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx in
 		var errs string
 		for err := range schErrCh {
 			errs += err.Error()
-			errs += "; "
+			errs += integrity.ErrorsSeparator
 		}
 		err = errors.New(errs)
 		return

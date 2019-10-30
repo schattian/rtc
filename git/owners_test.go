@@ -332,7 +332,7 @@ func TestOwner_Orchestrate(t *testing.T) {
 			for result := range tt.own.Summary {
 				if result.Error != nil {
 					gotErrs += result.Error.Error()
-					gotErrs += "; "
+					gotErrs += integrity.ErrorsSeparator
 					gotQtResErrs++
 				}
 			}
