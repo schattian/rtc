@@ -140,12 +140,6 @@ func TestSchema_Validate(t *testing.T) {
 	}
 }
 
-type schemaVary struct {
-	name     string
-	function func(sch *Schema) *Schema
-	err      error
-}
-
 func TestSchema_WrapValidateSelf(t *testing.T) {
 	t.Parallel()
 	fuzzyTests := []*schemaVary{
@@ -232,6 +226,13 @@ func TestSchema_WrapValidateSelf(t *testing.T) {
 		})
 	}
 }
+
+type schemaVary struct {
+	name     string
+	function func(sch *Schema) *Schema
+	err      error
+}
+
 func fuzzyFactorial(set []*schemaVary) (subsets [][]*schemaVary) {
 	length := uint(len(set))
 	for subsetBits := 1; subsetBits < (1 << length); subsetBits++ {

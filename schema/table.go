@@ -14,7 +14,10 @@ type Table struct {
 }
 
 func (t *Table) validateSelf(wg *sync.WaitGroup, vErrCh chan<- error) {
-	defer wg.Done()
+	defer func() {
+		wg.Done()
+	}()
+
 	if t == nil {
 		vErrCh <- t.validationErr(errNilTable)
 		return
@@ -27,9 +30,8 @@ func (t *Table) validateSelf(wg *sync.WaitGroup, vErrCh chan<- error) {
 
 	var tVWg sync.WaitGroup
 	tVWg.Add(colsQt)
-	cVErrCh := make(chan error, colsQt)
 	for _, col := range t.Columns {
-		go col.validateSelf(&tVWg, cVErrCh)
+		go col.validateSelf(&tVWg, vErrCh)
 	}
 
 	if t.Name == "" {
@@ -37,10 +39,6 @@ func (t *Table) validateSelf(wg *sync.WaitGroup, vErrCh chan<- error) {
 	}
 
 	tVWg.Wait()
-	close(cVErrCh)
-	for err := range cVErrCh {
-		vErrCh <- err
-	}
 }
 
 func (t *Table) validationErr(err error) *integrity.ValidationError {

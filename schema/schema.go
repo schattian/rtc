@@ -65,9 +65,8 @@ func (sch *Schema) ValidateSelf(done chan<- bool, vErrCh chan<- error) {
 
 	var schVWg sync.WaitGroup
 	schVWg.Add(tablesQt)
-	tVErrCh := make(chan error, tablesQt)
 	for _, table := range sch.Blueprint {
-		go table.validateSelf(&schVWg, tVErrCh)
+		go table.validateSelf(&schVWg, vErrCh)
 	}
 
 	if sch.Name == "" {
@@ -75,10 +74,6 @@ func (sch *Schema) ValidateSelf(done chan<- bool, vErrCh chan<- error) {
 	}
 
 	schVWg.Wait()
-	close(tVErrCh)
-	for err := range tVErrCh {
-		vErrCh <- err
-	}
 }
 
 func (sch *Schema) validationErr(err error) *integrity.ValidationError {
