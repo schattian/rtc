@@ -41,7 +41,7 @@ func (sch *Schema) WrapValidateSelf() (err error) {
 			return
 		case vErr := <-validationErrs:
 			errMsg += vErr.Error()
-			errMsg += " ;"
+			errMsg += integrity.ErrorsSeparator
 		}
 	}
 }
