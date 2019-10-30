@@ -26,10 +26,12 @@ func (sch *Schema) Copy() *Schema {
 	return newSch
 }
 
-func (sch *Schema) WrapValidateSelf() (err error) {
+// ValidateSelf performs a deep self-validation to check data integrity
+// It wraps internal method validateSelf
+func (sch *Schema) ValidateSelf() (err error) {
 	done := make(chan bool)
 	validationErrs := make(chan error)
-	go sch.ValidateSelf(done, validationErrs)
+	go sch.validateSelf(done, validationErrs)
 
 	var errMsg string
 	for {
@@ -46,8 +48,7 @@ func (sch *Schema) WrapValidateSelf() (err error) {
 	}
 }
 
-// ValidateSelf performs a deep self-validation to check data integrity
-func (sch *Schema) ValidateSelf(done chan<- bool, vErrCh chan<- error) {
+func (sch *Schema) validateSelf(done chan<- bool, vErrCh chan<- error) {
 	defer func() {
 		done <- true
 		close(vErrCh)

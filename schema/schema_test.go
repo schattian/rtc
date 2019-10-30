@@ -193,7 +193,7 @@ func TestSchema_WrapValidateSelf(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			sch := tt.function(gSchemas.Basic.Copy())
-			err := sch.WrapValidateSelf()
+			err := sch.ValidateSelf()
 			unwrappedVErr := integrity.UnwrapValidationError(err, false)
 			diffGot, diffWant := diffBetweenErrs(unwrappedVErr, []error{tt.err})
 			if diffGot != nil {
@@ -214,7 +214,7 @@ func TestSchema_WrapValidateSelf(t *testing.T) {
 		}
 		t.Run(strconv.Itoa(k), func(t *testing.T) {
 			t.Parallel()
-			err := sch.WrapValidateSelf()
+			err := sch.ValidateSelf()
 			unwrappedVErr := integrity.UnwrapValidationError(err, false)
 			diffGot, diffWant := diffBetweenErrs(unwrappedVErr, wantErrs)
 			if diffGot != nil {
