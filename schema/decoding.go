@@ -3,16 +3,15 @@ package schema
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"path/filepath"
 
+	"github.com/spf13/afero"
 	"gopkg.in/yaml.v2"
 )
 
 // FromFilename retrieves a schema with the decoded data of the given filename
-func FromFilename(filename string) (*Schema, error) {
-	body, err := ioutil.ReadFile(filename)
+func FromFilename(filename string, Fs afero.Fs) (*Schema, error) {
+	body, err := afero.ReadFile(Fs, filename)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +24,7 @@ func FromFilename(filename string) (*Schema, error) {
 	case ".yaml":
 		err = yaml.NewDecoder(bytes.NewReader(body)).Decode(sch)
 	default:
-		err = fmt.Errorf("the extension %v is not allowed", ext)
+		err = errUnallowedExt
 	}
 	if err != nil {
 		return nil, err

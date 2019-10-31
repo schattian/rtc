@@ -8,6 +8,9 @@ var (
 	errNilSchema     = errors.New("the SCHEMA cannot be NIL")
 	errNilSchemaName = errors.New("the SCHEMA NAME cannot be NIL")
 
+	// Decoding
+	errUnallowedExt = errors.New("the EXTension is NOT ALLOWED")
+
 	// Table errs
 	errNonexistentTable = errors.New("the TABLE given does NOT EXISTS")
 	errForeignTable     = errors.New("the TABLE given does NOT BELONGS to the given SCHEMA")

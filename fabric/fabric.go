@@ -27,7 +27,7 @@ type Fabric struct {
 
 // Produce is the main Fabric wrapper
 func (f *Fabric) Produce(marshal string, fs afero.Fs) (err error) {
-	err = f.Schema.WrapValidateSelf()
+	err = f.Schema.ValidateSelf()
 	if err != nil {
 		return
 	}

@@ -29,13 +29,15 @@ func fabricExec(c *cli.Context) error {
 		marshalType = "json"
 	}
 
-	decodedSchema, err := schema.FromFilename(schemaName)
+	osFs := afero.NewOsFs()
+
+	decodedSchema, err := schema.FromFilename(schemaName, osFs)
 	if err != nil {
 		panic(err)
 	}
 
 	Fabric := &fabric.Fabric{Schema: decodedSchema}
-	err = Fabric.Produce(marshalType, afero.NewOsFs())
+	err = Fabric.Produce(marshalType, osFs)
 	if err != nil {
 		return err
 	}
