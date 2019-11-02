@@ -5,6 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/sebach1/git-crud/internal/test/thelpers"
+
 	"github.com/spf13/afero"
 )
 
@@ -49,10 +51,7 @@ func TestFabric_Produce(t *testing.T) {
 			t.Parallel()
 			mFs := afero.NewMemMapFs()
 			err := tt.fabric.Produce(tt.args.marshal, mFs)
-			isCreated, osErr := afero.DirExists(mFs, tt.fabric.Dir)
-			if osErr != nil {
-				t.Errorf("Fabric.Produce() got UNEXPECTED ERR when trying to fetch dir on aferos' MemMapFs: %v", err)
-			}
+			isCreated := thelpers.IOutil(t, mFs, tt.fabric.Dir, afero.DirExists)
 			if tt.fabric.Dir != tt.wantDir {
 				t.Errorf("Fabric.Produce() DIFF DIR than expected; want: %v, got: %v", tt.wantDir, tt.fabric.Dir)
 			}
