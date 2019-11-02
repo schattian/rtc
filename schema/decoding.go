@@ -19,7 +19,7 @@ func FromFilename(filename string, Fs afero.Fs) (*Schema, error) {
 	sch := &Schema{}
 	ext := filepath.Ext(filename)
 	switch ext {
-	case ".json":
+	case ".json", ".jsonnet":
 		err = json.NewDecoder(bytes.NewReader(body)).Decode(sch)
 	case ".yaml":
 		err = yaml.NewDecoder(bytes.NewReader(body)).Decode(sch)
