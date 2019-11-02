@@ -9,14 +9,17 @@ import (
 
 // DecodeJsonnet will load the specified fixture and decode onto the given pointer
 func DecodeJsonnet(name string, pointer interface{}) {
-	fileName := fmt.Sprintf("testdata/%s.jsonnet", name)
-	out, err := exec.Command("jsonnet", fileName).Output()
+	err := json.Unmarshal(ReadJsonnet(name), pointer)
 	if err != nil {
-		log.Fatal(fmt.Errorf("Error PARSING JSONNET: %v ", err))
+		log.Fatalf("Error DECODING JSONNET: %v: ", err)
 	}
+}
 
-	err = json.Unmarshal(out, pointer)
+func ReadJsonnet(name string) []byte {
+	filename := fmt.Sprintf("testdata/%s.jsonnet", name)
+	out, err := exec.Command("jsonnet", filename).Output()
 	if err != nil {
-		log.Fatal(fmt.Errorf("Error DECODING JSONNET: %v: ", err))
+		log.Fatalf("Error PARSING JSONNET: %v ", err)
 	}
+	return out
 }
