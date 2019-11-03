@@ -26,13 +26,7 @@ jobs:
       - checkout
       - run:
           name: "install external software deps"
-          command: |
-            sudo apt-get install build-essential
-            git clone git@github.com:google/jsonnet.git ~/jsonnet
-            cd ~/jsonnet
-            make
-            sudo mv ./jsonnet* /usr/bin
-            cd $WORKDIR
+          command: go get github.com/google/go-jsonnet/cmd/jsonnet
       - run:
           name: "install internal project deps & run tests"
           command: |
