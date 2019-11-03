@@ -21,7 +21,7 @@ type Fabric struct {
 	wg *sync.WaitGroup
 	// FileSystem-related
 	fsWg    *sync.WaitGroup
-	fsSmp   chan int // Semaphore
+	fsSmp   chan int
 	fsErrCh chan error
 }
 
