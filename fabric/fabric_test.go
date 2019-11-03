@@ -5,6 +5,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/sebach1/git-crud/integrity"
+
 	"github.com/sebach1/git-crud/internal/test/thelpers"
 
 	"github.com/spf13/afero"
@@ -22,20 +24,31 @@ func TestFabric_Produce(t *testing.T) {
 		args    args
 		wantDir string
 		wantErr bool
+		product map[integrity.TableName]string // Maps the golden filenames to created goldenFiles
 	}{
 		{
 			name:    "correct usage",
-			fabric:  &Fabric{Schema: gSchemas.Basic},
+			fabric:  &Fabric{Schema: gSchemas.BasicRare},
 			args:    args{marshal: "json"},
-			wantDir: fmt.Sprintf("fabric/%v", strings.ToLower(string(gSchemas.Basic.Name))),
+			wantDir: fmt.Sprintf("fabric/%v", strings.ToLower(string(gSchemas.BasicRare.Name))),
 			wantErr: false,
+			product: map[integrity.TableName]string{
+				gTables.Basic.Name:     "basic.go",
+				gTables.Rare.Name:      "rare.go",
+				gTables.BasicRare.Name: "basic_rare.go",
+			},
 		},
 		{
 			name:    "but w/PRESET DIR",
-			fabric:  &Fabric{Schema: gSchemas.Basic, Dir: customDir},
+			fabric:  &Fabric{Schema: gSchemas.BasicRare, Dir: customDir},
 			args:    args{marshal: "json"},
 			wantDir: customDir,
 			wantErr: false,
+			product: map[integrity.TableName]string{
+				gTables.Basic.Name:     "basic.go",
+				gTables.Rare.Name:      "rare.go",
+				gTables.BasicRare.Name: "basic_rare.go",
+			},
 		},
 		{
 			name:    "SCHEMA does NOT PASS THE VALIDATIONS (is nil)",
@@ -51,7 +64,7 @@ func TestFabric_Produce(t *testing.T) {
 			t.Parallel()
 			mFs := afero.NewMemMapFs()
 			err := tt.fabric.Produce(tt.args.marshal, mFs)
-			isCreated := thelpers.IOutil(t, mFs, tt.fabric.Dir, afero.DirExists)
+			isCreated := thelpers.IOExist(t, mFs, tt.fabric.Dir, afero.DirExists)
 			if tt.fabric.Dir != tt.wantDir {
 				t.Errorf("Fabric.Produce() DIFF DIR than expected; want: %v, got: %v", tt.wantDir, tt.fabric.Dir)
 			}
@@ -65,6 +78,12 @@ func TestFabric_Produce(t *testing.T) {
 
 			if !isCreated {
 				t.Error("Fabric.Produce() did NOT GENERATE the DIRectory. EXPECTed TO generate it")
+				return
+			}
+			for _, table := range tt.fabric.Schema.Blueprint {
+				generatedFilename := strings.ToLower(string(table.Name)) + ".go"
+				got := thelpers.IORead(t, mFs, tt.fabric.Dir+"/"+generatedFilename, afero.ReadFile)
+				thelpers.CmpWithGoldenFile(t, got, fmt.Sprintf("fabric/%s", tt.product[table.Name]), "Fabric.Produce()")
 			}
 		})
 	}
