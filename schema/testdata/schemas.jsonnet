@@ -1,11 +1,11 @@
 local tables = import 'tables.jsonnet';
-local regularName = 'basicSchemaName';
+local basicName = 'basicSchemaName';
 local rareName = 'rareSchemaName';
 local basicRareName = 'basicRareSchemaName';
 
 {
   basic: {
-    name: regularName,
+    name: basicName,
     blueprint: [tables.basic],
   },
 
