@@ -18,10 +18,22 @@ jobs:
     #### expecting it in the form of
     ####   /go/src/github.com/circleci/go-tool
     ####   /go/src/bitbucket.org/circleci/go-tool
-    working_directory: /go/src/github.com/sebach1/git-crud
+    environment:
+      WORKDIR: /go/src/github.com/sebach1/git-crud 
+    working_directory: $WORKDIR
+
     steps:
       - checkout
-
-      # specify any bash command here prefixed with `run: `
-      - run: go get -v -t -d ./...
+      - run:
+          name: "install external software deps"
+          command: |
+            sudo apt-get install build-essential
+            git clone git@github.com:google/jsonnet.git ~/jsonnet
+            cd ~/jsonnet
+            make
+            sudo mv ./jsonnet* /usr/bin
+            cd $WORKDIR
+      - run:
+          name: "install internal project deps"
+          command: go get -v -t -d ./... 
       - run: go test -v --race ./...
