@@ -22,6 +22,9 @@ jobs:
 
     steps:
       - run:
+          name: "create dir for artifacts"
+          command: mkdir -p /tmp/artifacts
+      - run:
           name: "install external software deps"
           command: go get github.com/google/go-jsonnet/cmd/jsonnet
       - checkout
@@ -29,4 +32,6 @@ jobs:
           name: "install internal project deps & run tests"
           command: |
             go get -v -t -d ./...
-            go test -v --race ./...
+            go test -v --race -coverprofile=c.out ./...
+            go tool cover -html=c.out -o coverage.html
+            mv coverage.html /tmp/artifacts
