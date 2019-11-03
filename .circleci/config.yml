@@ -21,10 +21,10 @@ jobs:
     working_directory: /go/src/github.com/sebach1/git-crud 
 
     steps:
-      - checkout
       - run:
           name: "install external software deps"
           command: go get github.com/google/go-jsonnet/cmd/jsonnet
+      - checkout
       - run:
           name: "install internal project deps & run tests"
           command: |
