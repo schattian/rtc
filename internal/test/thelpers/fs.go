@@ -57,7 +57,16 @@ func AddFileToFsByName(t *testing.T, filename string, subset string, baseFs afer
 	return AddFileToFs(t, filename, content, baseFs)
 }
 
-func IOutil(t *testing.T, Fs afero.Fs, sth string, utilFunc func(afero.Fs, string) (bool, error)) bool {
+func IOExist(t *testing.T, Fs afero.Fs, sth string, existFunc func(afero.Fs, string) (bool, error)) bool {
+	t.Helper()
+	res, osErr := existFunc(Fs, sth)
+	if osErr != nil {
+		t.Fatalf("got UNEXPECTED ERR when trying to use aferos' util: %v", osErr)
+	}
+	return res
+}
+
+func IORead(t *testing.T, Fs afero.Fs, sth string, utilFunc func(afero.Fs, string) ([]byte, error)) []byte {
 	t.Helper()
 	res, osErr := utilFunc(Fs, sth)
 	if osErr != nil {
