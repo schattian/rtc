@@ -1,12 +1,12 @@
 local columns = import 'columns.jsonnet';
 local tables = import 'tables.jsonnet';
 
-//  Notice that regular & rare types are all from UPDATE operation type
+//  Notice that basic & rare types are all from UPDATE operation type
 //  due to perform exhaustive fields analysis, and being UPDATE which takes all the fields
-local regularID = 1;
+local basicID = 1;
 local rareID = 101;
 
-local regularEntityID = '01EntityID';
+local basicEntityID = '01EntityID';
 local rareEntityID = '001EntityID';
 
 local strType = 'string';
@@ -16,28 +16,29 @@ local bytesType = 'bytes';
 local float32Type = 'float32';
 local float64Type = 'float64';
 
-local regularType = strType;
+local basicType = strType;
 local rareType = intType;
 
-local regularStringValue = 'regularValue';
+local basicStringValue = 'basicValue';
 local rareStringValue = 'rareValue';
-
-local regularIntValue = 1001;
-local regularFloat32Value = regularIntValue;
-local regularFloat64Value = regularIntValue;
+local basicIntValue = 1001;
+local basicFloat32Value = basicIntValue;
+local basicFloat64Value = basicIntValue;
 local rareIntValue = 9001;
-
-local regularJSONValue = { embedded_value: { another_embedding: 'regularValue' } };
+local basicJSONValue = { embedded_value: { another_embedding: 'basicValue' } };
 local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
+
+// oK
+local basicOptionKey = tables.basicOptionKey;
+local rareOptionKey = tables.rareOptionKey;
+local basicOptionValue = 'basicOptionValue';
+local rareOptionValue = 'rareOptionValue';
+
+// CRUD
 local toCreate(x) = x { entity_id: '', type: 'create' };
 local toRetrieve(x) = x { value_type: '', str_value: '', type: 'retrieve' };
 local toUpdate(x) = x { type: 'update' };
 local toDelete(x) = x { value_type: '', str_value: '', column_name: '', type: 'delete' };
-
-local regularOptionKey = tables.regularOptionKey;
-local rareOptionKey = tables.rareOptionKey;
-local regularOptionValue = 'regularOptionValue';
-local rareOptionValue = 'rareOptionValue';
 local createCRUD(x) = {
   create: toCreate(x),
   retrieve: toRetrieve(x),
@@ -46,32 +47,21 @@ local createCRUD(x) = {
 };
 
 {
-  local regular = self.regular,
-
-  inconsistent: {
-    crud: {
-      create: regular.crud.create { column_name: '' },
-      retrieve: regular.crud.retrieve { column_name: '' },
-      update: regular.crud.update { column_name: '' },
-      delete: regular.crud.delete { value_type: regular.none.value_type },
-    },
-    table_name: regular.none { table_name: '' },
-    column_name: regular.none { column_name: '', entity_id: '' },  // Contains entity to avoid unclassifiable handlings
-  },
+  local basic = self.basic,
 
 
-  regular: {
+  basic: {
     local base = self.none,
 
     none: {
       table_name: tables.basic.name,
       column_name: columns.basic.name,
-      str_value: regularStringValue,
-      value_type: regularType,
-      id: regularID,
-      entity_id: regularEntityID,
+      str_value: basicStringValue,
+      value_type: basicType,
+      id: basicID,
+      entity_id: basicEntityID,
       options: {
-        regularOptionKey: regularOptionValue,
+        basicOptionKey: basicOptionValue,
       },
     },
 
@@ -83,17 +73,17 @@ local createCRUD(x) = {
 
     str_value: base { str_value: rareStringValue, value_type: strType },
 
-    int_value: base { int_value: regularIntValue, value_type: intType, str_value: '' },
+    int_value: base { int_value: basicIntValue, value_type: intType, str_value: '' },
 
-    float32_value: base { float32_value: regularFloat32Value, value_type: float32Type },
+    float32_value: base { float32_value: basicFloat32Value, value_type: float32Type },
 
-    float64_value: base { float64_value: regularFloat64Value, value_type: float64Type },
+    float64_value: base { float64_value: basicFloat64Value, value_type: float64Type },
 
     id: base { id: rareID },
 
     entity_id: base { entity_id: rareEntityID },
 
-    json_value: base { json_value: regularJSONValue, value_type: jsonType, str_value: '' },
+    json_value: base { json_value: basicJSONValue, value_type: jsonType, str_value: '' },
 
     clean_value: base { str_value: '', value_type: '' },
 
@@ -120,17 +110,28 @@ local createCRUD(x) = {
 
     column_name: base { column_name: columns.basic.name },
 
-    int_value: base { int_value: regularIntValue },
+    int_value: base { int_value: basicIntValue },
 
     str_value: base { str_value: rareStringValue, value_type: strType, int_value: 0 },
 
-    id: base { id: regularID },
+    id: base { id: basicID },
 
     json_value: base { json_value: rareJSONValue, value_type: jsonType, int_value: 0 },
 
-    entity_id: base { entity_id: regularEntityID },
+    entity_id: base { entity_id: basicEntityID },
 
     clean_value: base { int_value: 0, value_type: '' },
+  },
+
+  inconsistent: {
+    crud: {
+      create: basic.crud.create { column_name: '' },
+      retrieve: basic.crud.retrieve { column_name: '' },
+      update: basic.crud.update { column_name: '' },
+      delete: basic.crud.delete { value_type: basic.none.value_type },
+    },
+    table_name: basic.none { table_name: '' },
+    column_name: basic.none { column_name: '', entity_id: '' },  // Contains entity to avoid unclassifiable handlings
   },
 
   zero: {},

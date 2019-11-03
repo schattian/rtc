@@ -24,11 +24,11 @@ func NewOwner(project *schema.Planisphere) (*Owner, error) {
 	if project == nil || len(*project) == 0 {
 		return nil, errors.New("The PROJECT cannot be NIL")
 	}
-	return NewOwnerUnsafe(project), nil
+	return newOwnerUnsafe(project), nil
 }
 
-// NewOwnerUnsafe returns a new instance of Owner, with needed initialization
-func NewOwnerUnsafe(project *schema.Planisphere) *Owner {
+// newOwnerUnsafe returns a new instance of Owner, with needed initialization
+func newOwnerUnsafe(project *schema.Planisphere) *Owner {
 	own := &Owner{Project: project}
 	own.Waiter = &sync.WaitGroup{}
 	return own
@@ -219,7 +219,7 @@ func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx in
 		if err != nil {
 			return
 		}
-		go sch.Validate(chg.TableName, chg.ColumnName, chg.Options.Keys(), chg.Value(),
+		go sch.ValidateCtx(chg.TableName, chg.ColumnName, chg.Options.Keys(), chg.Value(),
 			own.Project, &reviewWg, schErrCh)
 	}
 

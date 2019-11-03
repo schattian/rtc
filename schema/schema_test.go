@@ -47,7 +47,7 @@ func TestSchema_preciseColErr(t *testing.T) {
 	}
 }
 
-func TestSchema_Validate(t *testing.T) {
+func TestSchema_ValidateCtx(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		tableName   integrity.TableName
@@ -56,7 +56,6 @@ func TestSchema_Validate(t *testing.T) {
 		val         interface{}
 		helperScope *Planisphere
 	}
-	schRmName := func(sch *Schema) *Schema { sch.Name = ""; return sch }
 	tests := []struct {
 		name    string
 		sch     *Schema
@@ -73,17 +72,6 @@ func TestSchema_Validate(t *testing.T) {
 				helperScope: &Planisphere{gSchemas.Basic},
 			},
 			wantErr: false,
-		},
-		{
-			name: "schema ITSELF is NOT VALID",
-			sch:  schRmName(gSchemas.Basic.Copy()),
-			args: args{
-				tableName:   gTables.Basic.Name,
-				colName:     gColumns.Basic.Name,
-				optionKeys:  []integrity.OptionKey{gTables.Basic.OptionKeys[0]},
-				helperScope: &Planisphere{gSchemas.Basic},
-			},
-			wantErr: true,
 		},
 		{
 			name: "optionKey nonexistant",
@@ -138,15 +126,15 @@ func TestSchema_Validate(t *testing.T) {
 			wg := new(sync.WaitGroup)
 			errCh := make(chan error, 1)
 			wg.Add(1)
-			go tt.sch.Validate(tt.args.tableName, tt.args.colName, tt.args.optionKeys, tt.args.val, tt.args.helperScope, wg, errCh)
+			go tt.sch.ValidateCtx(tt.args.tableName, tt.args.colName, tt.args.optionKeys, tt.args.val, tt.args.helperScope, wg, errCh)
 			wg.Wait()
 			isErrored := len(errCh) == 1
 			if isErrored && !tt.wantErr {
 				err := <-errCh
-				t.Errorf("Schema.Validate() error: %v; wantErr %v", err, tt.wantErr)
+				t.Errorf("Schema.ValidateCtx() error: %v; wantErr %v", err, tt.wantErr)
 			}
 			if !isErrored && tt.wantErr {
-				t.Errorf("Schema.Validate() error: %v; wantErr %v", nil, tt.wantErr)
+				t.Errorf("Schema.ValidateCtx() error: %v; wantErr %v", nil, tt.wantErr)
 			}
 		})
 	}

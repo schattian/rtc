@@ -13,7 +13,7 @@ func TestChange_SetValue(t *testing.T) {
 	type args struct {
 		val interface{}
 	}
-	cleansedChgs := []*Change{gChanges.Regular.CleanValue, gChanges.Rare.CleanValue}
+	cleansedChgs := []*Change{gChanges.Basic.CleanValue, gChanges.Rare.CleanValue}
 	tests := []struct {
 		name          string
 		chg           *Change
@@ -24,35 +24,35 @@ func TestChange_SetValue(t *testing.T) {
 		{
 			name:          "string",
 			chg:           randChg(cleansedChgs...),
-			args:          args{val: gChanges.Regular.StrValue.StrValue},
+			args:          args{val: gChanges.Basic.StrValue.StrValue},
 			wantErr:       false,
 			wantValueType: "string",
 		},
 		{
 			name:          "json",
 			chg:           randChg(cleansedChgs...),
-			args:          args{val: gChanges.Regular.JSONValue.JSONValue},
+			args:          args{val: gChanges.Basic.JSONValue.JSONValue},
 			wantErr:       false,
 			wantValueType: "json",
 		},
 		{
 			name:          "int",
 			chg:           randChg(cleansedChgs...),
-			args:          args{val: gChanges.Regular.IntValue.IntValue},
+			args:          args{val: gChanges.Basic.IntValue.IntValue},
 			wantErr:       false,
 			wantValueType: "int",
 		},
 		{
 			name:          "float32",
 			chg:           randChg(cleansedChgs...),
-			args:          args{val: gChanges.Regular.Float32Value.Float32Value},
+			args:          args{val: gChanges.Basic.Float32Value.Float32Value},
 			wantErr:       false,
 			wantValueType: "float32",
 		},
 		{
 			name:          "float64",
 			chg:           randChg(cleansedChgs...),
-			args:          args{val: gChanges.Regular.Float64Value.Float64Value},
+			args:          args{val: gChanges.Basic.Float64Value.Float64Value},
 			wantErr:       false,
 			wantValueType: "float64",
 		},
@@ -85,33 +85,33 @@ func TestChange_Value(t *testing.T) {
 	}{
 		{
 			name: "json",
-			chg:  gChanges.Regular.JSONValue,
-			want: gChanges.Regular.JSONValue.JSONValue,
+			chg:  gChanges.Basic.JSONValue,
+			want: gChanges.Basic.JSONValue.JSONValue,
 		},
 		{
 			name: "str",
-			chg:  gChanges.Regular.None,
-			want: gChanges.Regular.None.StrValue,
+			chg:  gChanges.Basic.None,
+			want: gChanges.Basic.None.StrValue,
 		},
 		{
 			name: "float32",
-			chg:  gChanges.Regular.Float32Value,
-			want: gChanges.Regular.Float32Value.Float32Value,
+			chg:  gChanges.Basic.Float32Value,
+			want: gChanges.Basic.Float32Value.Float32Value,
 		},
 		{
 			name: "int",
-			chg:  gChanges.Regular.IntValue,
-			want: gChanges.Regular.IntValue.IntValue,
+			chg:  gChanges.Basic.IntValue,
+			want: gChanges.Basic.IntValue.IntValue,
 		},
 		{
 			name: "float64",
-			chg:  gChanges.Regular.Float64Value,
-			want: gChanges.Regular.Float64Value.Float64Value,
+			chg:  gChanges.Basic.Float64Value,
+			want: gChanges.Basic.Float64Value.Float64Value,
 		},
 		{
 			name: "str",
-			chg:  gChanges.Regular.None,
-			want: gChanges.Regular.None.StrValue,
+			chg:  gChanges.Basic.None,
+			want: gChanges.Basic.None.StrValue,
 		},
 	}
 	for _, tt := range tests {
@@ -135,25 +135,25 @@ func TestChange_classifyType(t *testing.T) {
 	}{
 		{
 			name:    "correctly typed CREATE",
-			chg:     gChanges.Regular.Create,
+			chg:     gChanges.Basic.Create,
 			want:    "create",
 			wantErr: false,
 		},
 		{
 			name:    "correctly typed RETRIEVE",
-			chg:     gChanges.Regular.Retrieve,
+			chg:     gChanges.Basic.Retrieve,
 			want:    "retrieve",
 			wantErr: false,
 		},
 		{
 			name:    "correctly typed UPDATE",
-			chg:     gChanges.Regular.Update,
+			chg:     gChanges.Basic.Update,
 			want:    "update",
 			wantErr: false,
 		},
 		{
 			name:    "correctly typed DELETE",
-			chg:     gChanges.Regular.Delete,
+			chg:     gChanges.Basic.Delete,
 			want:    "delete",
 			wantErr: false,
 		},
@@ -221,10 +221,10 @@ func TestChange_SetOption(t *testing.T) {
 	}{
 		{
 			name:        "ALREADY INITALIZED options",
-			chg:         gChanges.Regular.None.copy(),
+			chg:         gChanges.Basic.None.copy(),
 			args:        args{key: "testKey", val: "testVal"},
 			wantErr:     false,
-			wantOptions: gChanges.Regular.None.copy().Options.assignAndReturn("testKey", "testVal"),
+			wantOptions: gChanges.Basic.None.copy().Options.assignAndReturn("testKey", "testVal"),
 		},
 		{
 			name:        "UNINITALIZED options",
@@ -241,10 +241,10 @@ func TestChange_SetOption(t *testing.T) {
 		},
 		{
 			name:        "CHANGE OPTION VALUE",
-			chg:         gChanges.Regular.None.copy(),
-			args:        args{key: gChanges.Regular.None.Options.Keys()[0], val: "testVal"},
+			chg:         gChanges.Basic.None.copy(),
+			args:        args{key: gChanges.Basic.None.Options.Keys()[0], val: "testVal"},
 			wantErr:     false,
-			wantOptions: Options{gChanges.Regular.None.Options.Keys()[0]: "testVal"},
+			wantOptions: Options{gChanges.Basic.None.Options.Keys()[0]: "testVal"},
 		},
 	}
 	for _, tt := range tests {

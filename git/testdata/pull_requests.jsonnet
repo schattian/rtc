@@ -2,10 +2,10 @@ local schemas = import './schemas.jsonnet';
 local changes = import './changes.jsonnet';
 local teams = import './teams.jsonnet';
 local CRUD = {
-  create: changes.regular.crud.create,
-  retrieve: changes.regular.crud.retrieve,
-  update: changes.regular.crud.update,
-  delete: changes.regular.crud.delete,
+  create: changes.basic.crud.create,
+  retrieve: changes.basic.crud.retrieve,
+  update: changes.basic.crud.update,
+  delete: changes.basic.crud.delete,
 };
 local chgToComm(x) = { changes: [x] };
 
@@ -15,7 +15,7 @@ local chgToComm(x) = { changes: [x] };
   basic: {
     team: teams.basic,
     commits: [
-      chgToComm(changes.regular.none),
+      chgToComm(changes.basic.none),
     ],
   },
 

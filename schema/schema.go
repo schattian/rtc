@@ -87,10 +87,10 @@ func (sch *Schema) validationErr(err error) *integrity.ValidationError {
 	return &integrity.ValidationError{Err: err, Origin: "schema", OriginName: name}
 }
 
-// Validate checks if the context of the given tableName and colName is valid
+// ValidateCtx checks if the context of the given tableName and colName is valid
 // Notice that, as well as the wrapper validations should provoke a chained
 // of undesired (and maybe more confusing than clear) errs, the errCh should be buffered w/sz=1
-func (sch *Schema) Validate(
+func (sch *Schema) ValidateCtx(
 	tableName integrity.TableName,
 	colName integrity.ColumnName,
 	optionKeys []integrity.OptionKey,
@@ -100,11 +100,6 @@ func (sch *Schema) Validate(
 	errCh chan<- error,
 ) {
 	defer wg.Done()
-
-	err := sch.ValidateSelf()
-	if err != nil {
-		errCh <- err
-	}
 
 	table, err := sch.tableByName(tableName, helperScope)
 	if err != nil {
@@ -117,6 +112,10 @@ func (sch *Schema) Validate(
 			errCh <- errInvalidOptionKey
 			return
 		}
+	}
+
+	if colName == "" {
+		return
 	}
 
 	for _, col := range table.Columns {

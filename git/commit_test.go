@@ -31,7 +31,7 @@ func TestCommit_GroupBy(t *testing.T) {
 		{
 			name: "all changes are groupable",
 			fields: fields{Changes: []*Change{
-				gChanges.Zero, gChanges.Regular.None, gChanges.Regular.EntityID,
+				gChanges.Zero, gChanges.Basic.None, gChanges.Basic.EntityID,
 			}},
 			args:       args{comparator: alwaysYes},
 			wantQtGrps: 1,
@@ -39,7 +39,7 @@ func TestCommit_GroupBy(t *testing.T) {
 		{
 			name: "all changes are UNgroupable",
 			fields: fields{Changes: []*Change{
-				gChanges.Zero, gChanges.Regular.None, gChanges.Regular.EntityID,
+				gChanges.Zero, gChanges.Basic.None, gChanges.Basic.EntityID,
 			}},
 			args:       args{comparator: alwaysNo},
 			wantQtGrps: 3,
@@ -47,8 +47,8 @@ func TestCommit_GroupBy(t *testing.T) {
 		{
 			name: "changes are groupable if with same tableName",
 			fields: fields{Changes: []*Change{
-				gChanges.Regular.None, gChanges.Regular.Create, gChanges.Regular.None, gChanges.Rare.TableName,
-				gChanges.Regular.TableName,
+				gChanges.Basic.None, gChanges.Basic.Create, gChanges.Basic.None, gChanges.Rare.TableName,
+				gChanges.Basic.TableName,
 			}},
 			args:       args{comparator: areSameTable},
 			wantQtGrps: 2,
@@ -56,10 +56,10 @@ func TestCommit_GroupBy(t *testing.T) {
 		{
 			name: "changes are groupable if are compatible",
 			fields: fields{Changes: []*Change{
-				gChanges.Regular.None, gChanges.Regular.ColumnName,
+				gChanges.Basic.None, gChanges.Basic.ColumnName,
 				gChanges.Rare.None,
 				gChanges.Zero,
-				gChanges.Regular.TableName,
+				gChanges.Basic.TableName,
 			}},
 			args:       args{comparator: AreCompatible},
 			wantQtGrps: 4,
@@ -121,33 +121,33 @@ func TestCommit_Add(t *testing.T) {
 	}{
 		{
 			name: "change was already added",
-			comm: &Commit{Changes: []*Change{gChanges.Regular.Update.copy()}},
-			args: args{chg: gChanges.Regular.None.copy()},
+			comm: &Commit{Changes: []*Change{gChanges.Basic.Update.copy()}},
+			args: args{chg: gChanges.Basic.None.copy()},
 			want: errDuplicatedChg,
 		},
 		{
 			name:    "both identical untracked commits",
-			comm:    &Commit{Changes: []*Change{gChanges.Regular.Create.copy()}},
-			args:    args{chg: gChanges.Regular.Create.copy()},
-			newComm: &Commit{Changes: []*Change{gChanges.Regular.Create, gChanges.Regular.Create}},
+			comm:    &Commit{Changes: []*Change{gChanges.Basic.Create.copy()}},
+			args:    args{chg: gChanges.Basic.Create.copy()},
+			newComm: &Commit{Changes: []*Change{gChanges.Basic.Create, gChanges.Basic.Create}},
 		},
 		{
 			name: "table inconsistency",
-			comm: &Commit{Changes: []*Change{gChanges.Regular.Update}},
+			comm: &Commit{Changes: []*Change{gChanges.Basic.Update}},
 			args: args{chg: gChanges.Inconsistent.TableName.copy()},
 			want: errNilTable,
 		},
 		{
 			name:    "change modifies the value of a change already in the commit",
-			comm:    &Commit{Changes: []*Change{gChanges.Regular.Update}},
-			args:    args{chg: gChanges.Regular.StrValue.copy()},
-			newComm: &Commit{Changes: []*Change{gChanges.Regular.StrValue.copy().changeType("update")}},
+			comm:    &Commit{Changes: []*Change{gChanges.Basic.Update}},
+			args:    args{chg: gChanges.Basic.StrValue.copy()},
+			newComm: &Commit{Changes: []*Change{gChanges.Basic.StrValue.copy().changeType("update")}},
 		},
 		{
 			name:    "change modifies different col of same schema",
-			comm:    &Commit{Changes: []*Change{gChanges.Regular.Update}},
-			args:    args{chg: gChanges.Regular.ColumnName.copy()},
-			newComm: &Commit{Changes: []*Change{gChanges.Regular.Update, gChanges.Regular.ColumnName.copy().changeType("update")}},
+			comm:    &Commit{Changes: []*Change{gChanges.Basic.Update}},
+			args:    args{chg: gChanges.Basic.ColumnName.copy()},
+			newComm: &Commit{Changes: []*Change{gChanges.Basic.Update, gChanges.Basic.ColumnName.copy().changeType("update")}},
 		},
 	}
 	for _, tt := range tests {
@@ -185,14 +185,14 @@ func TestCommit_Rm(t *testing.T) {
 	}{
 		{
 			name:    "given change doesn't belongs to the commit",
-			comm:    &Commit{Changes: []*Change{gChanges.Regular.None.copy()}},
+			comm:    &Commit{Changes: []*Change{gChanges.Basic.None.copy()}},
 			args:    args{chg: gChanges.Rare.None.copy()},
 			wantErr: true,
 		},
 		{
 			name:    "successfully remove",
-			comm:    &Commit{Changes: []*Change{gChanges.Regular.None.copy()}},
-			args:    args{chg: gChanges.Regular.None.copy()},
+			comm:    &Commit{Changes: []*Change{gChanges.Basic.None.copy()}},
+			args:    args{chg: gChanges.Basic.None.copy()},
 			wantErr: false,
 		},
 	}
@@ -216,32 +216,32 @@ func TestCommit_ToMap(t *testing.T) {
 	}{
 		{
 			name: "CREATE commit with multiple columns",
-			comm: &Commit{Changes: []*Change{gChanges.Regular.Create}},
+			comm: &Commit{Changes: []*Change{gChanges.Basic.Create}},
 			want: map[string]interface{}{
-				string(gChanges.Regular.Create.ColumnName): gChanges.Regular.Create.StrValue,
+				string(gChanges.Basic.Create.ColumnName): gChanges.Basic.Create.StrValue,
 			},
 		},
 		{
 			name: "RETRIEVE commit",
-			comm: &Commit{Changes: []*Change{gChanges.Regular.Delete}},
+			comm: &Commit{Changes: []*Change{gChanges.Basic.Delete}},
 			want: map[string]interface{}{
-				"id": gChanges.Regular.None.EntityID,
+				"id": gChanges.Basic.None.EntityID,
 			},
 		},
 		{
 			name: "UPDATE commit with multiple column changes",
-			comm: &Commit{Changes: []*Change{gChanges.Regular.None, gChanges.Regular.ColumnName}},
+			comm: &Commit{Changes: []*Change{gChanges.Basic.None, gChanges.Basic.ColumnName}},
 			want: map[string]interface{}{
-				"id":                                     gChanges.Regular.None.EntityID,
-				string(gChanges.Regular.None.ColumnName): gChanges.Regular.None.StrValue,
-				string(gChanges.Regular.ColumnName.ColumnName): gChanges.Regular.ColumnName.StrValue,
+				"id":                                     gChanges.Basic.None.EntityID,
+				string(gChanges.Basic.None.ColumnName): gChanges.Basic.None.StrValue,
+				string(gChanges.Basic.ColumnName.ColumnName): gChanges.Basic.ColumnName.StrValue,
 			},
 		},
 		{
 			name: "DELETE commit",
-			comm: &Commit{Changes: []*Change{gChanges.Regular.Delete}},
+			comm: &Commit{Changes: []*Change{gChanges.Basic.Delete}},
 			want: map[string]interface{}{
-				"id": gChanges.Regular.None.EntityID,
+				"id": gChanges.Basic.None.EntityID,
 			},
 		},
 	}
@@ -268,15 +268,15 @@ func TestCommit_TableName(t *testing.T) {
 		{
 			name: "changes contains the same single table",
 			comm: &Commit{Changes: []*Change{
-				gChanges.Regular.None, gChanges.Rare.TableName,
+				gChanges.Basic.None, gChanges.Rare.TableName,
 			}},
-			wantTableName: gChanges.Regular.None.TableName,
+			wantTableName: gChanges.Basic.None.TableName,
 			wantErr:       false,
 		},
 		{
 			name: "changes contains mixed tables",
 			comm: &Commit{Changes: []*Change{
-				gChanges.Regular.None, gChanges.Rare.None,
+				gChanges.Basic.None, gChanges.Rare.None,
 			}},
 			wantErr: true,
 		},
@@ -308,15 +308,15 @@ func TestCommit_Type(t *testing.T) {
 		{
 			name: "changes contains the same single table",
 			comm: &Commit{Changes: []*Change{
-				gChanges.Regular.Create, gChanges.Regular.Create,
+				gChanges.Basic.Create, gChanges.Basic.Create,
 			}},
-			wantCommType: gChanges.Regular.Create.Type,
+			wantCommType: gChanges.Basic.Create.Type,
 			wantErr:      false,
 		},
 		{
 			name: "changes contains mixed types",
 			comm: &Commit{Changes: []*Change{
-				gChanges.Regular.Delete, gChanges.Regular.Create,
+				gChanges.Basic.Delete, gChanges.Basic.Create,
 			}},
 			wantErr: true,
 		},

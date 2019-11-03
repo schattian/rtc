@@ -4,8 +4,8 @@ local basicName = 'basicTableName';
 local rareName = 'rareTableName';
 local basicRareName = 'basicRareTableName';
 
-local basicOptionKey = "basicOptionKey";
-local rareOptionKey = "rareOptionKey";
+local basicOptionKey = 'basicOptionKey';
+local rareOptionKey = 'rareOptionKey';
 
 {
   basic: {
@@ -26,7 +26,10 @@ local rareOptionKey = "rareOptionKey";
       columns.basic,
       columns.rare,
     ],
-    option_keys: [basicOptionKey, rareOptionKey],
+    option_keys: [
+      basicOptionKey,
+      rareOptionKey,
+    ],
   },
 
   zero: {},

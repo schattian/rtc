@@ -28,7 +28,7 @@ func init() {
 }
 
 type goldenChanges struct {
-	Regular      variadicChanges `json:"regular,omitempty"`
+	Basic      variadicChanges `json:"basic,omitempty"`
 	Rare         variadicChanges `json:"rare,omitempty"`
 	Inconsistent variadicChanges `json:"inconsistent,omitempty"`
 

@@ -1,4 +1,5 @@
 local tables = import 'tables.jsonnet';
+
 local basicName = 'basicSchemaName';
 local rareName = 'rareSchemaName';
 local basicRareName = 'basicRareSchemaName';

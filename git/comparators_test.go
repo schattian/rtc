@@ -20,7 +20,7 @@ func TestAreCompatible(t *testing.T) {
 		{
 			name: "different entities but same tableName",
 			args: args{
-				chg:      gChanges.Regular.None,
+				chg:      gChanges.Basic.None,
 				otherChg: gChanges.Rare.TableName,
 			},
 			want: false,
@@ -29,47 +29,47 @@ func TestAreCompatible(t *testing.T) {
 			name: "all different",
 			args: args{
 				chg:      gChanges.Rare.None,
-				otherChg: gChanges.Regular.None,
+				otherChg: gChanges.Basic.None,
 			},
 			want: false,
 		},
 		{
 			name: "diff tableName and same entity",
 			args: args{
-				chg:      gChanges.Regular.None,
-				otherChg: gChanges.Regular.TableName,
+				chg:      gChanges.Basic.None,
+				otherChg: gChanges.Basic.TableName,
 			},
 			want: false,
 		},
 		{
 			name: "both nil entities_id and same tableName",
 			args: args{
-				chg:      gChanges.Regular.Create,
-				otherChg: gChanges.Regular.Create,
+				chg:      gChanges.Basic.Create,
+				otherChg: gChanges.Basic.Create,
 			},
 			want: false,
 		},
 		{
 			name: "is mirrored",
 			args: args{
-				chg:      gChanges.Regular.None,
-				otherChg: gChanges.Regular.None,
+				chg:      gChanges.Basic.None,
+				otherChg: gChanges.Basic.None,
 			},
 			want: true,
 		},
 		{
 			name: "is mirrored but with diff colName",
 			args: args{
-				chg:      gChanges.Regular.None,
-				otherChg: gChanges.Regular.ColumnName,
+				chg:      gChanges.Basic.None,
+				otherChg: gChanges.Basic.ColumnName,
 			},
 			want: true,
 		},
 		{
 			name: "is diff type",
 			args: args{
-				chg:      gChanges.Regular.Update,
-				otherChg: randChg(gChanges.Regular.Retrieve, gChanges.Regular.Delete, gChanges.Regular.Create),
+				chg:      gChanges.Basic.Update,
+				otherChg: randChg(gChanges.Basic.Retrieve, gChanges.Basic.Delete, gChanges.Basic.Create),
 			},
 			want: false,
 		},
