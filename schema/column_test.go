@@ -53,6 +53,7 @@ func TestColumn_Validate(t *testing.T) {
 }
 
 func TestColumn_applyBuiltinValidator(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name          string
 		Type          integrity.ValueType
@@ -111,7 +112,9 @@ func TestColumn_applyBuiltinValidator(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			c := &Column{Type: tt.Type}
 			err := c.applyBuiltinValidator()
 			if (err != nil) != tt.wantErr {
