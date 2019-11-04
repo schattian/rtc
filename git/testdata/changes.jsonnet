@@ -9,16 +9,6 @@ local rareID = 101;
 local basicEntityID = '01EntityID';
 local rareEntityID = '001EntityID';
 
-local strType = 'string';
-local intType = 'int';
-local jsonType = 'json';
-local bytesType = 'bytes';
-local float32Type = 'float32';
-local float64Type = 'float64';
-
-local basicType = strType;
-local rareType = intType;
-
 local basicStringValue = 'basicValue';
 local rareStringValue = 'rareValue';
 local basicIntValue = 1001;
@@ -57,7 +47,7 @@ local createCRUD(x) = {
       table_name: tables.basic.name,
       column_name: columns.basic.name,
       str_value: basicStringValue,
-      value_type: basicType,
+      value_type: columns.basic.type,
       id: basicID,
       entity_id: basicEntityID,
       options: {
@@ -71,19 +61,19 @@ local createCRUD(x) = {
 
     column_name: base { column_name: columns.rare.name },
 
-    str_value: base { str_value: rareStringValue, value_type: strType },
+    str_value: base { str_value: rareStringValue, value_type: "string" },
 
-    int_value: base { int_value: basicIntValue, value_type: intType, str_value: '' },
+    int_value: base { int_value: basicIntValue, value_type: "int", str_value: '' },
 
-    float32_value: base { float32_value: basicFloat32Value, value_type: float32Type },
+    float32_value: base { float32_value: basicFloat32Value, value_type: "float32" },
 
-    float64_value: base { float64_value: basicFloat64Value, value_type: float64Type },
+    float64_value: base { float64_value: basicFloat64Value, value_type: "float64" },
 
     id: base { id: rareID },
 
     entity_id: base { entity_id: rareEntityID },
 
-    json_value: base { json_value: basicJSONValue, value_type: jsonType, str_value: '' },
+    json_value: base { json_value: basicJSONValue, value_type: "json", str_value: '' },
 
     clean_value: base { str_value: '', value_type: '' },
 
@@ -96,7 +86,7 @@ local createCRUD(x) = {
       table_name: tables.rare.name,
       column_name: columns.rare.name,
       int_value: rareIntValue,
-      value_type: rareType,
+      value_type: columns.rare.type,
       id: rareID,
       entity_id: rareEntityID,
       options: {
@@ -112,11 +102,11 @@ local createCRUD(x) = {
 
     int_value: base { int_value: basicIntValue },
 
-    str_value: base { str_value: rareStringValue, value_type: strType, int_value: 0 },
+    str_value: base { str_value: rareStringValue, value_type: "string", int_value: 0 },
 
     id: base { id: basicID },
 
-    json_value: base { json_value: rareJSONValue, value_type: jsonType, int_value: 0 },
+    json_value: base { json_value: rareJSONValue, value_type: "json", int_value: 0 },
 
     entity_id: base { entity_id: basicEntityID },
 

@@ -1,6 +1,7 @@
 local basicName = 'basicColumnName';
 local rareName = 'rareColumnName';
 
+
 {
   basic: {
     name: basicName,
