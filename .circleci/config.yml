@@ -21,9 +21,9 @@ jobs:
     working_directory: /go/src/github.com/sebach1/git-crud 
 
     steps:
-      # - run:
-      #     name: "create dir for artifacts"
-      #     command: mkdir -p /tmp/artifacts
+      - run:
+          name: "create dir for artifacts"
+          command: mkdir -p /tmp/artifacts
       - run:
           name: "install external software deps"
           command: go get github.com/google/go-jsonnet/cmd/jsonnet
@@ -34,5 +34,6 @@ jobs:
             go get -v -t -d ./...
             go test -v --race -coverprofile=c.out ./...
             go tool cover -html=c.out -o coverage.html
+            mv coverage.html /tmp/artifacts
       - store_artifacts:
-          path: coverage.html
+          path: /tmp/artifacts
