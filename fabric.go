@@ -15,7 +15,11 @@ var fabricCmd = cli.Command{
 	Aliases:     []string{"f"},
 	Description: "Create structs from the given schema tagging fields with the given marshal type",
 	Flags: []cli.Flag{
-		cli.StringFlag{Name: "marshal, msh"},
+		cli.StringFlag{
+			Name:  "marshal, msh",
+			Value: "json",
+			Usage: "marshal format of the fabricated fields",
+		},
 	},
 	Usage:  "[schema-path]",
 	Before: fabricValidate,
@@ -25,9 +29,6 @@ var fabricCmd = cli.Command{
 func fabricExec(c *cli.Context) error {
 	schemaName := c.Args().First()
 	marshalType := c.String("marshal, msh")
-	if marshalType == "" {
-		marshalType = "json"
-	}
 
 	osFs := afero.NewOsFs()
 
