@@ -107,106 +107,6 @@ func Test_checkIntInSlice(t *testing.T) {
 	}
 }
 
-func TestCommit_Add(t *testing.T) {
-	t.Parallel()
-	type args struct {
-		chg *Change
-	}
-	tests := []struct {
-		name    string
-		comm    *Commit
-		args    args
-		want    error
-		newComm *Commit
-	}{
-		{
-			name: "change was already added",
-			comm: &Commit{Changes: []*Change{gChanges.Basic.Update.copy()}},
-			args: args{chg: gChanges.Basic.None.copy()},
-			want: errDuplicatedChg,
-		},
-		{
-			name:    "both identical untracked commits",
-			comm:    &Commit{Changes: []*Change{gChanges.Basic.Create.copy()}},
-			args:    args{chg: gChanges.Basic.Create.copy()},
-			newComm: &Commit{Changes: []*Change{gChanges.Basic.Create, gChanges.Basic.Create}},
-		},
-		{
-			name: "table inconsistency",
-			comm: &Commit{Changes: []*Change{gChanges.Basic.Update}},
-			args: args{chg: gChanges.Inconsistent.TableName.copy()},
-			want: errNilTable,
-		},
-		{
-			name:    "change modifies the value of a change already in the commit",
-			comm:    &Commit{Changes: []*Change{gChanges.Basic.Update}},
-			args:    args{chg: gChanges.Basic.StrValue.copy()},
-			newComm: &Commit{Changes: []*Change{gChanges.Basic.StrValue.copy().changeType("update")}},
-		},
-		{
-			name:    "change modifies different col of same schema",
-			comm:    &Commit{Changes: []*Change{gChanges.Basic.Update}},
-			args:    args{chg: gChanges.Basic.ColumnName.copy()},
-			newComm: &Commit{Changes: []*Change{gChanges.Basic.Update, gChanges.Basic.ColumnName.copy().changeType("update")}},
-		},
-	}
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			oldComm := tt.comm
-			err := tt.comm.Add(tt.args.chg)
-			if err != tt.want {
-				t.Errorf("Commit.Add() error = %v, wantErr %v", err, tt.want)
-			}
-			if err != nil {
-				if diff := cmp.Diff(oldComm, tt.comm); diff != "" {
-					t.Errorf("Commit.Add() mismatch (-want +got): %s", diff)
-				}
-				return
-			}
-			if diff := cmp.Diff(tt.newComm, tt.comm); diff != "" {
-				t.Errorf("Commit.Add() mismatch (-want +got): %s", diff)
-			}
-		})
-	}
-}
-
-func TestCommit_Rm(t *testing.T) {
-	t.Parallel()
-	type args struct {
-		chg *Change
-	}
-	tests := []struct {
-		name    string
-		comm    *Commit
-		args    args
-		wantErr bool
-	}{
-		{
-			name:    "given change doesn't belongs to the commit",
-			comm:    &Commit{Changes: []*Change{gChanges.Basic.None.copy()}},
-			args:    args{chg: gChanges.Rare.None.copy()},
-			wantErr: true,
-		},
-		{
-			name:    "successfully remove",
-			comm:    &Commit{Changes: []*Change{gChanges.Basic.None.copy()}},
-			args:    args{chg: gChanges.Basic.None.copy()},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-			if err := tt.comm.Rm(tt.args.chg); (err != nil) != tt.wantErr {
-				t.Errorf("Commit.Rm() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestCommit_ToMap(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -232,7 +132,7 @@ func TestCommit_ToMap(t *testing.T) {
 			name: "UPDATE commit with multiple column changes",
 			comm: &Commit{Changes: []*Change{gChanges.Basic.None, gChanges.Basic.ColumnName}},
 			want: map[string]interface{}{
-				"id":                                     gChanges.Basic.None.EntityID,
+				"id":                                   gChanges.Basic.None.EntityID,
 				string(gChanges.Basic.None.ColumnName): gChanges.Basic.None.StrValue,
 				string(gChanges.Basic.ColumnName.ColumnName): gChanges.Basic.ColumnName.StrValue,
 			},
