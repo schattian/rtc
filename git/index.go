@@ -7,7 +7,10 @@ import (
 
 // Index is the git-like representation of a group of a NON-ready-to-deliver changes
 type Index struct {
+	ID      int
 	Changes []*Change
+
+	BranchID int
 }
 
 // Add will attach the given change to the commit changes
@@ -21,7 +24,7 @@ func (idx *Index) Add(chg *Change) error {
 		return errDuplicatedChg
 	}
 
-	for i, otherChg := range idx.Changes { // Then check for overrides
+	for i, otherChg := range idx.Changes {
 		if Overrides(chg, otherChg) {
 			idx.rmChangeByIndex(i)
 		}
