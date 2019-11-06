@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"os"
 
@@ -17,3 +18,5 @@ func main() {
 		log.Fatal(err)
 	}
 }
+
+var errNotEnoughArgs = errors.New("there are NOT ENOUGH ARGS present")

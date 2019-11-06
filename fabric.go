@@ -1,8 +1,6 @@
 package main
 
 import (
-	"errors"
-
 	"github.com/spf13/afero"
 
 	"github.com/sebach1/git-crud/fabric"
@@ -14,6 +12,9 @@ var fabricCmd = cli.Command{
 	Name:        "fabric",
 	Aliases:     []string{"f"},
 	Description: "Create structs from the given schema tagging fields with the given marshal type",
+	Usage:       "[schema-path]",
+	Before:      fabricValidate,
+	Action:      fabricExec,
 	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name:  "marshal, msh",
@@ -21,9 +22,6 @@ var fabricCmd = cli.Command{
 			Usage: "marshal format of the fabricated fields",
 		},
 	},
-	Usage:  "[schema-path]",
-	Before: fabricValidate,
-	Action: fabricExec,
 }
 
 func fabricExec(c *cli.Context) error {
@@ -34,7 +32,7 @@ func fabricExec(c *cli.Context) error {
 
 	decodedSchema, err := schema.FromFilename(schemaName, osFs)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	Fabric := &fabric.Fabric{Schema: decodedSchema}
@@ -47,7 +45,7 @@ func fabricExec(c *cli.Context) error {
 
 func fabricValidate(c *cli.Context) error {
 	if !c.Args().Present() {
-		return errors.New("there are NOT ENOUGH ARGS present")
+		return errNotEnoughArgs
 	}
 	return nil
 }
