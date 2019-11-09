@@ -1,6 +1,8 @@
 package schema
 
 import (
+	"context"
+	"database/sql"
 	"errors"
 	"sync"
 
@@ -10,13 +12,36 @@ import (
 // The Schema is the representation of a Database instructive. It uses concepts of SQL.
 // It provides the validation and construction structure.
 type Schema struct {
+	ID        int64                `json:"id,omitempty"`
 	Name      integrity.SchemaName `json:"name,omitempty"`
 	Blueprint []*Table             `json:"blueprint,omitempty"`
 }
 
+func (sch *Schema) All(ctx context.Context, DB *sql.DB) (*Planisphere, error) {
+	rows, err := DB.QueryContext(ctx, `SELECT * FROM schemas`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var psph Planisphere
+	for rows.Next() {
+		sch := &Schema{}
+		err = rows.Scan(sch)
+		if err != nil {
+			return nil, err
+		}
+		psph = append(psph, sch)
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+	return &psph, nil
+}
+
 // Copy returns a copy of the given schema, including a deep copy if its blueprint
 func (sch *Schema) Copy() *Schema {
-	newSch := new(Schema)
+	newSch := &Schema{}
 	*newSch = *sch
 	var newBlueprint []*Table
 	for _, table := range newSch.Blueprint {
