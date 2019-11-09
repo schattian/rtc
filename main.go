@@ -9,14 +9,12 @@ import (
 	"github.com/sebach1/git-crud/server"
 
 	"github.com/valyala/fasthttp"
-
-	"github.com/sebach1/git-crud/config"
 )
 
 func main() {
 	Port := os.Getenv("PORT")
 	if Port == "" {
-		Port = config.DefaultPort
+		Port = "8888"
 	}
 	Port = fmt.Sprintf(":%s", Port)
 
