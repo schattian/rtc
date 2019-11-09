@@ -1,0 +1,23 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    volumes:
+     - postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER:'pq'
+      - POSTGRES_PASSWORD:'sql'
+      - POSTGRES_DB:'gitcrud'
+  api:
+    build: .
+    command: ./git-crud
+    ports:
+      - 8888:8888
+    volumes:
+      - .:/app
+    depends_on:
+     - db
+
+volumes:
+  postgres:
+
