@@ -1,22 +1,25 @@
 package main
 
 import (
-	"errors"
+	"fmt"
 	"log"
 	"os"
 
-	"github.com/urfave/cli"
+	_ "github.com/lib/pq"
+	"github.com/sebach1/git-crud/server"
+
+	"github.com/valyala/fasthttp"
+
+	"github.com/sebach1/git-crud/config"
 )
 
 func main() {
-	app := cli.NewApp()
-	app.Commands = []cli.Command{
-		fabricCmd,
+	Port := os.Getenv("PORT")
+	if Port == "" {
+		Port = config.DefaultPort
 	}
-	err := app.Run(os.Args)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
+	Port = fmt.Sprintf(":%s", Port)
 
-var errNotEnoughArgs = errors.New("there are NOT ENOUGH ARGS present")
+	log.Println(fmt.Sprintf("Accepting connections at: %s", Port))
+	log.Fatal(fasthttp.ListenAndServe(Port, server.Router))
+}
