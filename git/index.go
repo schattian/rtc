@@ -9,8 +9,6 @@ import (
 type Index struct {
 	ID      int
 	Changes []*Change
-
-	BranchID int
 }
 
 // Add will attach the given change to the commit changes
