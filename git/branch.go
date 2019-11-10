@@ -2,20 +2,10 @@ package git
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/sebach1/git-crud/integrity"
 )
-
-type credentials map[integrity.SchemaName]string
-
-func (creds *credentials) Encrypt(schName integrity.SchemaName, cred string) {
-}
-
-func (creds *credentials) Decrypt(schName integrity.SchemaName, cred string) {
-
-}
 
 // Branch is the state-manager around indeces
 type Branch struct {
@@ -27,8 +17,24 @@ type Branch struct {
 	IndexID int64
 }
 
-func NewBranch(ctx context.Context, DB *sql.DB, name integrity.BranchName) (*Branch, error) {
-	res, err := DB.Exec(`INSERT INTO indeces (changes) VALUES ([])`)
+func (b *Branch) SetID(id int64) {
+	b.ID = id
+}
+
+func (b *Branch) Table() string {
+	return "branches"
+}
+
+func (b *Branch) Columns() []string {
+	return []string{
+		"id",
+		"name",
+		"index_id",
+	}
+}
+
+func NewBranch(ctx context.Context, db *sqlx.DB, name integrity.BranchName) (*Branch, error) {
+	res, err := db.Exec(`INSERT INTO indeces (changes) VALUES ([])`)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +43,7 @@ func NewBranch(ctx context.Context, DB *sql.DB, name integrity.BranchName) (*Bra
 		return nil, err
 	}
 	branch := &Branch{Name: string(name), IndexID: idxID}
-	res, err = DB.Exec(`INSERT INTO branches (name, index_id) VALUES ($1, $2)`, branch.Name, branch.IndexID)
+	res, err = db.Exec(`INSERT INTO branches (name, index_id) VALUES ($1, $2)`, branch.Name, branch.IndexID)
 	if err != nil {
 		return nil, err
 	}
@@ -48,10 +54,10 @@ func NewBranch(ctx context.Context, DB *sql.DB, name integrity.BranchName) (*Bra
 	return branch, nil
 }
 
-func (b *Branch) Index(ctx context.Context, DB *sql.DB) (*Index, error) {
+func (b *Branch) Index(ctx context.Context, db *sqlx.DB) (*Index, error) {
 	idx := &Index{}
-	row := DB.QueryRowContext(ctx, fmt.Sprintf("SELECT * FROM indeces WHERE id = %v", b.IndexID))
-	err := row.Scan(idx)
+	row := db.QueryRowxContext(ctx, `SELECT * FROM indeces WHERE id=?`, b.IndexID)
+	err := row.StructScan(idx)
 	if err != nil {
 		return nil, err
 	}
