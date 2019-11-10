@@ -2,18 +2,17 @@ package schema
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
+
+	"github.com/jmoiron/sqlx"
 
 	"github.com/sebach1/git-crud/integrity"
 )
 
-func ByName(ctx context.Context, DB *sql.DB, schName integrity.SchemaName) (*Schema, error) {
-	sch := &Schema{}
-	row := DB.QueryRowContext(ctx, fmt.Sprintf("SELECT * FROM schemas WHERE Name = %s", schName))
-	err := row.Scan(sch)
+func ByName(ctx context.Context, db *sqlx.DB, schName integrity.SchemaName) (*Schema, error) {
+	sch := Schema{}
+	err := db.GetContext(ctx, &sch, `SELECT * FROM schemas WHERE name=?`, schName)
 	if err != nil {
 		return nil, err
 	}
-	return sch, nil
+	return &sch, nil
 }
