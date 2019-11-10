@@ -1,4 +1,4 @@
-package fabric
+package name
 
 import "testing"
 
@@ -25,7 +25,7 @@ func Test_toSnakeCase(t *testing.T) {
 	for _, i := range cases {
 		in := i[0]
 		out := i[1]
-		result := toSnakeCase(in, '_')
+		result := ToSnakeCase(in)
 		if result != out {
 			t.Error("'" + in + "'('" + result + "' != '" + out + "')")
 		}
@@ -46,7 +46,7 @@ func TestToCamel(t *testing.T) {
 	for _, i := range cases {
 		in := i[0]
 		out := i[1]
-		result := toCamelCase(in)
+		result := ToCamelCase(in)
 		if result != out {
 			t.Error("'" + result + "' != '" + out + "'")
 		}

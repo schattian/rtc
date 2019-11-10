@@ -9,6 +9,7 @@ import (
 	"sync"
 
 	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/git-crud/internal/name"
 	"github.com/sebach1/git-crud/schema"
 	"github.com/spf13/afero"
 )
@@ -112,8 +113,8 @@ func (f *Fabric) writeFile(fs afero.Fs, filename string, generated []byte) {
 func (f *Fabric) structFromTable(table *schema.Table, marshal string) *tableData {
 	tableStruct := &tableData{
 		SchemaName: string(f.Schema.Name),
-		Name:       toCamelCase(string(table.Name)),
-		Marshal:    toSnakeCase(marshal, '_'),
+		Name:       name.ToCamelCase(string(table.Name)),
+		Marshal:    name.ToSnakeCase(marshal),
 	}
 	for _, col := range table.Columns {
 		field := fieldFromColumn(col)
@@ -124,9 +125,9 @@ func (f *Fabric) structFromTable(table *schema.Table, marshal string) *tableData
 
 func fieldFromColumn(col *schema.Column) *columnData {
 	return &columnData{
-		Name: toCamelCase(string(col.Name)),
+		Name: name.ToCamelCase(string(col.Name)),
 		Type: col.Type,
-		Tag:  toSnakeCase(string(col.Name), '_'),
+		Tag:  name.ToSnakeCase(string(col.Name)),
 	}
 }
 

@@ -1,11 +1,19 @@
-package fabric
+package name
 
 import (
 	"regexp"
 	"strings"
 )
 
-func toSnakeCase(s string, del uint8) string {
+func Parenthize(s string) string {
+	return `(` + s + `)`
+}
+
+func ToSnakeCase(s string) string {
+	return ToDelimitedLowerCase(s, '_')
+}
+
+func ToDelimitedLowerCase(s string, del uint8) string {
 	s = addWordBoundariesToNumbers(s)
 	s = strings.Trim(s, " ")
 	n := ""
@@ -39,7 +47,7 @@ func toSnakeCase(s string, del uint8) string {
 }
 
 // Converts a string to CamelCase
-func toCamelCase(s string) string {
+func ToCamelCase(s string) string {
 	s = addWordBoundariesToNumbers(s)
 	s = strings.Trim(s, " ")
 	n := ""
