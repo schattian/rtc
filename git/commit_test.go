@@ -11,7 +11,7 @@ import (
 func TestCommit_GroupBy(t *testing.T) {
 	t.Parallel()
 	type fields struct {
-		ID      int
+		ID      int64
 		Changes []*Change
 	}
 	type args struct {

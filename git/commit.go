@@ -1,25 +1,66 @@
 package git
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"io"
 	"reflect"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/sebach1/git-crud/integrity"
 	"github.com/sebach1/git-crud/msh"
 )
 
 // Commit is the git-like representation of a group of a ready-to-deliver signed changes
 type Commit struct {
-	ID      int       `json:"id,omitempty"`
+	ID      int64     `json:"id,omitempty"`
 	Changes []*Change `json:"changes,omitempty"`
 
-	Reviewer Collaborator `json:"reviewer,omitempty"`
-	Errored  bool
+	ChangeIDs []int        `json:"change_ids,omitempty"`
+	Reviewer  Collaborator `json:"reviewer,omitempty"`
+	Errored   bool
 }
 
-// GroupBy splits the commit changes by the given comparator criteria
+func (comm *Commit) SetID(id int64) {
+	comm.ID = id
+}
+
+func (comm *Commit) Table() string {
+	return "commits"
+}
+
+func (comm *Commit) Columns() []string {
+	return []string{
+		"id",
+		"errored",
+		"change_ids",
+	}
+}
+
+func (comm *Commit) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
+	rows, err := db.QueryxContext(ctx, `SELECT * FROM changes WHERE id=ANY($1)`, comm.ChangeIDs)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		chg := Change{}
+		err = rows.StructScan(chg)
+		if err != nil {
+			return
+		}
+		comm.Changes = append(comm.Changes, &chg)
+	}
+	err = rows.Err()
+	if err != nil {
+		return err
+	}
+
+	return
+}
+
+// GroupBy splits the commit's changes by the given comparator criteria
 // See that strategy MUST define an equivalence relation (reflexive, transitive, symmetric)
 func (comm *Commit) GroupBy(strategy changesMatcher) (grpChanges [][]*Change) {
 	var omitTrans []int // Omits the transitivity of the comparisons storing the <j> element
@@ -96,7 +137,7 @@ func (comm *Commit) FromMap(Map map[string]interface{}) error {
 	}
 
 	for col, val := range Map {
-		chg := new(Change)
+		chg := &Change{}
 		chg.FromMap(map[string]interface{}{col: val})
 		comm.Changes = append(comm.Changes, chg)
 	}
