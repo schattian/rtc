@@ -4,12 +4,13 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/sebach1/git-crud/integrity"
 )
 
 func Add(
 	ctx context.Context,
-	DB *sql.DB,
+	db *sqlx.DB,
 	entityID integrity.ID,
 	tableName integrity.TableName,
 	columnName integrity.ColumnName,
@@ -18,15 +19,15 @@ func Add(
 	Type integrity.CRUD,
 	opts Options,
 ) error {
-	branch, err := BranchByName(ctx, DB, branchName)
+	branch, err := BranchByName(ctx, db, branchName)
 	if err == sql.ErrNoRows {
-		branch, err = NewBranch(ctx, DB, branchName)
+		branch, err = NewBranch(ctx, db, branchName)
 	}
 	if err != nil {
 		return err
 	}
 
-	idx, err := branch.Index(ctx, DB)
+	idx, err := branch.Index(ctx, db)
 	if err != nil {
 		return err
 	}
@@ -46,7 +47,7 @@ func Add(
 
 func Rm(
 	ctx context.Context,
-	DB *sql.DB,
+	db *sqlx.DB,
 	entityID integrity.ID,
 	tableName integrity.TableName,
 	columnName integrity.ColumnName,
@@ -55,12 +56,12 @@ func Rm(
 	Type integrity.CRUD,
 	opts Options,
 ) error {
-	branch, err := BranchByName(ctx, DB, branchName)
+	branch, err := BranchByName(ctx, db, branchName)
 	if err != nil {
 		return err
 	}
 
-	idx, err := branch.Index(ctx, DB)
+	idx, err := branch.Index(ctx, db)
 	if err != nil {
 		return err
 	}
