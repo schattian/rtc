@@ -2,13 +2,14 @@ package git
 
 import (
 	"encoding/json"
-	"errors"
 
 	"github.com/sebach1/git-crud/integrity"
 )
 
 // A Change represents every purposed/lookup for difference
 type Change struct {
+	ID int64 `json:"id,omitempty"`
+
 	TableName  integrity.TableName  `json:"table_name,omitempty"`
 	ColumnName integrity.ColumnName `json:"column_name,omitempty"`
 
@@ -26,6 +27,48 @@ type Change struct {
 	Type integrity.CRUD `json:"type,omitempty"`
 
 	Options Options
+}
+
+func (chg *Change) SetID(id int64) {
+	chg.ID = id
+}
+
+func (chg *Change) Table() string {
+	return "changes"
+}
+
+func (chg *Change) Columns() []string {
+	return []string{
+		"id",
+		"table_name",
+		"column_name",
+		"str_value",
+		"int_value",
+		"float32_value",
+		"float64_value",
+		"json_value",
+		"bytes_value",
+		"entity_id",
+		"type",
+		"options",
+	}
+}
+
+func NewChange(
+	entityID integrity.ID,
+	tableName integrity.TableName,
+	columnName integrity.ColumnName,
+	val interface{},
+	Type integrity.CRUD,
+	opts Options,
+) (*Change, error) {
+	chg := &Change{EntityID: entityID, TableName: tableName, ColumnName: columnName, Type: Type, Options: opts}
+	chg.SetValue(val)
+	err := chg.Validate()
+	if err != nil {
+		return nil, err
+	}
+	return chg, nil
 }
 
 // SetOption assigns the given key to the given value. Returns an error if the key is not allowed for any option
@@ -96,7 +139,7 @@ func (chg *Change) SetValue(val interface{}) (err error) {
 		chg.ValueType = "bytes"
 		return
 	}
-	return errors.New("the given value cannot be safety typed")
+	return errUnsafeValueType
 }
 
 // Overrides check if changes are overridable by each other
@@ -120,6 +163,14 @@ func (chg *Change) Equals(otherChg *Change) bool {
 	}
 	if chg.Value() != otherChg.Value() {
 		return false
+	}
+	if len(chg.Options) != len(otherChg.Options) {
+		return false
+	}
+	for k, v := range chg.Options {
+		if otherChg.Options[k] != v {
+			return false
+		}
 	}
 
 	return true
