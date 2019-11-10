@@ -2,10 +2,10 @@ package schema
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"sync"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/sebach1/git-crud/integrity"
 )
 
@@ -17,20 +17,20 @@ type Schema struct {
 	Blueprint []*Table             `json:"blueprint,omitempty"`
 }
 
-func (sch *Schema) All(ctx context.Context, DB *sql.DB) (*Planisphere, error) {
-	rows, err := DB.QueryContext(ctx, `SELECT * FROM schemas`)
+func (sch *Schema) All(ctx context.Context, db *sqlx.DB) (*Planisphere, error) {
+	rows, err := db.QueryxContext(ctx, `SELECT * FROM schemas`)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	var psph Planisphere
 	for rows.Next() {
-		sch := &Schema{}
-		err = rows.Scan(sch)
+		sch := Schema{}
+		err = rows.StructScan(&sch)
 		if err != nil {
 			return nil, err
 		}
-		psph = append(psph, sch)
+		psph = append(psph, &sch)
 	}
 	err = rows.Err()
 	if err != nil {
