@@ -7,6 +7,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
+	"github.com/sebach1/git-crud/config"
 	"github.com/sebach1/git-crud/git"
 	"github.com/sebach1/git-crud/internal/name"
 	"github.com/valyala/fasthttp"
@@ -28,7 +29,7 @@ func Router(reqCtx *fasthttp.RequestCtx) {
 func databaseHandler(reqCtx *fasthttp.RequestCtx) *sqlx.DB {
 	dataSource := os.Getenv("db")
 	if dataSource == "" {
-		dataSource = config.DefaultDataSource
+		dataSource = config.DefaultDBSrc
 	}
 	db, err := sqlx.Open("postgres", dataSource)
 	if err != nil {
