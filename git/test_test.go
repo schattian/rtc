@@ -28,7 +28,7 @@ func init() {
 }
 
 type goldenChanges struct {
-	Basic      variadicChanges `json:"basic,omitempty"`
+	Basic        variadicChanges `json:"basic,omitempty"`
 	Rare         variadicChanges `json:"rare,omitempty"`
 	Inconsistent variadicChanges `json:"inconsistent,omitempty"`
 
@@ -36,6 +36,8 @@ type goldenChanges struct {
 }
 type variadicChanges struct {
 	None       *Change `json:"none,omitempty"`
+	ID         *Change `json:"id,omitempty"`
+	EntityID   *Change `json:"entity_id,omitempty"`
 	TableName  *Change `json:"table_name,omitempty"`
 	ColumnName *Change `json:"column_name,omitempty"`
 
@@ -46,10 +48,9 @@ type variadicChanges struct {
 	JSONValue    *Change `json:"json_value,omitempty"`
 	CleanValue   *Change `json:"clean_value,omitempty"`
 
-	ChgCRUD `json:"crud,omitempty"`
+	Options *Change `json:"change,omitempty"`
 
-	ID       *Change `json:"id,omitempty"`
-	EntityID *Change `json:"entity_id,omitempty"`
+	ChgCRUD `json:"crud,omitempty"`
 }
 
 func randChg(chgs ...*Change) *Change {

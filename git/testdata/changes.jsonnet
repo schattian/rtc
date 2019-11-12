@@ -38,6 +38,7 @@ local createCRUD(x) = {
 
 {
   local basic = self.basic,
+  local rare = self.rare,
 
 
   basic: {
@@ -76,6 +77,8 @@ local createCRUD(x) = {
     json_value: base { json_value: basicJSONValue, value_type: "json", str_value: '' },
 
     clean_value: base { str_value: '', value_type: '' },
+    
+    options: base { options: rare.none.options },
 
   },
 
@@ -111,6 +114,8 @@ local createCRUD(x) = {
     entity_id: base { entity_id: basicEntityID },
 
     clean_value: base { int_value: 0, value_type: '' },
+    
+    options: base { options: basic.none.options },
   },
 
   inconsistent: {
