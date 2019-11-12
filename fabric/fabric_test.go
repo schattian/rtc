@@ -33,8 +33,8 @@ func TestFabric_Produce(t *testing.T) {
 			wantDir: fmt.Sprintf("fabric/%v", strings.ToLower(string(gSchemas.FooBar.Name))),
 			wantErr: false,
 			product: map[integrity.TableName]string{
-				gTables.Foo.Name:     "foo.go",
-				gTables.Bar.Name:      "bar.go",
+				gTables.Foo.Name:    "foo.go",
+				gTables.Bar.Name:    "bar.go",
 				gTables.FooBar.Name: "foo_bar.go",
 			},
 		},
@@ -45,8 +45,8 @@ func TestFabric_Produce(t *testing.T) {
 			wantDir: customDir,
 			wantErr: false,
 			product: map[integrity.TableName]string{
-				gTables.Foo.Name:     "foo.go",
-				gTables.Bar.Name:      "bar.go",
+				gTables.Foo.Name:    "foo.go",
+				gTables.Bar.Name:    "bar.go",
 				gTables.FooBar.Name: "foo_bar.go",
 			},
 		},

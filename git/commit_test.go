@@ -132,7 +132,7 @@ func TestCommit_ToMap(t *testing.T) {
 			name: "UPDATE commit with multiple column changes",
 			comm: &Commit{Changes: []*Change{gChanges.Foo.None, gChanges.Foo.ColumnName}},
 			want: map[string]interface{}{
-				"id":                                   gChanges.Foo.None.EntityID,
+				"id":                                 gChanges.Foo.None.EntityID,
 				string(gChanges.Foo.None.ColumnName): gChanges.Foo.None.StrValue,
 				string(gChanges.Foo.ColumnName.ColumnName): gChanges.Foo.ColumnName.StrValue,
 			},
