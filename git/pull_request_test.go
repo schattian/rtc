@@ -24,18 +24,18 @@ func TestPullRequest_AssignTeam(t *testing.T) {
 			name: "correctly assigns the team",
 			pR:   gPullRequests.ZeroTeam.copy(),
 			args: args{
-				community: &Community{gTeams.Basic},
-				schName:   gTeams.Basic.AssignedSchema,
+				community: &Community{gTeams.Foo},
+				schName:   gTeams.Foo.AssignedSchema,
 			},
 			wantErr:  false,
-			wantTeam: gTeams.Basic,
+			wantTeam: gTeams.Foo,
 		},
 		{
 			name: "team not in the community",
 			pR:   gPullRequests.ZeroTeam.copy(),
 			args: args{
-				community: &Community{gTeams.Rare},
-				schName:   gTeams.Basic.AssignedSchema,
+				community: &Community{gTeams.Bar},
+				schName:   gTeams.Foo.AssignedSchema,
 			},
 			wantErr: true,
 		},
@@ -44,7 +44,7 @@ func TestPullRequest_AssignTeam(t *testing.T) {
 			pR:   gPullRequests.ZeroTeam.copy(),
 			args: args{
 				community: nil,
-				schName:   gTeams.Basic.AssignedSchema,
+				schName:   gTeams.Foo.AssignedSchema,
 			},
 			wantErr: true,
 		},

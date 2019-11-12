@@ -2,25 +2,25 @@ local schemas = import './schemas.jsonnet';
 local changes = import './changes.jsonnet';
 local teams = import './teams.jsonnet';
 local CRUD = {
-  create: changes.basic.crud.create,
-  retrieve: changes.basic.crud.retrieve,
-  update: changes.basic.crud.update,
-  delete: changes.basic.crud.delete,
+  create: changes.foo.crud.create,
+  retrieve: changes.foo.crud.retrieve,
+  update: changes.foo.crud.update,
+  delete: changes.foo.crud.delete,
 };
 local chgToComm(x) = { changes: [x] };
 
 {
-  local basic = self.basic,
+  local foo = self.foo,
 
-  basic: {
-    team: teams.basic,
+  foo: {
+    team: teams.foo,
     commits: [
-      chgToComm(changes.basic.none),
+      chgToComm(changes.foo.none),
     ],
   },
 
-  full: basic {
-    team: teams.basic,
+  full: foo {
+    team: teams.foo,
     commits:
       [
         chgToComm(CRUD.create),
@@ -31,40 +31,40 @@ local chgToComm(x) = { changes: [x] };
   },
 
   crud: {
-    create: basic {
-      team: teams.basic,
+    create: foo {
+      team: teams.foo,
       commits: [
         chgToComm(CRUD.create),
       ],
     },
 
-    retrieve: basic {
-      team: teams.basic,
+    retrieve: foo {
+      team: teams.foo,
       commits: [
         chgToComm(CRUD.retrieve),
       ],
     },
 
-    update: basic {
-      team: teams.basic,
+    update: foo {
+      team: teams.foo,
       commits: [
         chgToComm(CRUD.update),
       ],
     },
 
-    delete: basic {
-      team: teams.basic,
+    delete: foo {
+      team: teams.foo,
       commits: [
         chgToComm(CRUD.delete),
       ],
     },
   },
 
-  zero_commits: basic {
+  zero_commits: foo {
     commits: [],
   },
 
-  zero_team: basic {
+  zero_team: foo {
     team: {},
   },
 

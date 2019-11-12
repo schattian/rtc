@@ -1,15 +1,15 @@
-local basicName = 'basicColumnName';
-local rareName = 'rareColumnName';
+local fooName = 'fooColumnName';
+local barName = 'barColumnName';
 
 
 {
-  basic: {
-    name: basicName,
+  foo: {
+    name: fooName,
     type: "string",
   },
 
-  rare: {
-    name: rareName,
+  bar: {
+    name: barName,
     type: "int",
   },
   

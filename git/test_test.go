@@ -28,8 +28,8 @@ func init() {
 }
 
 type goldenChanges struct {
-	Basic        variadicChanges `json:"basic,omitempty"`
-	Rare         variadicChanges `json:"rare,omitempty"`
+	Foo        variadicChanges `json:"foo,omitempty"`
+	Bar         variadicChanges `json:"bar,omitempty"`
 	Inconsistent variadicChanges `json:"inconsistent,omitempty"`
 
 	Zero *Change `json:"zero,omitempty"`
@@ -58,7 +58,7 @@ func randChg(chgs ...*Change) *Change {
 }
 
 type goldenPullRequests struct {
-	Basic *PullRequest `json:"basic,omitempty"`
+	Foo *PullRequest `json:"foo,omitempty"`
 
 	Full *PullRequest `json:"full,omitempty"`
 
@@ -85,9 +85,9 @@ type PrCRUD struct {
 }
 
 type goldenTeams struct {
-	Basic     *Team `json:"basic,omitempty"`
-	Rare      *Team `json:"rare,omitempty"`
-	BasicRare *Team `json:"basic_rare,omitempty"`
+	Foo     *Team `json:"foo,omitempty"`
+	Bar      *Team `json:"bar,omitempty"`
+	FooBar *Team `json:"foo_bar,omitempty"`
 
 	Inconsistent *Team `json:"inconsistent,omitempty"`
 

@@ -23,7 +23,7 @@ func TestFromFilename(t *testing.T) {
 		{
 			name:           "CORRECT USAGE",
 			goldenFilename: "schemas.jsonnet",
-			want:           decodeValidators(gSchemas.Basic.Copy()),
+			want:           decodeValidators(gSchemas.Foo.Copy()),
 		},
 		{
 			name:           "the schema contains a COLUMN WITH INCONSISTENT VALUE TYPE", // Ensure err checking in applyBuiltinValidators
@@ -45,7 +45,7 @@ func TestFromFilename(t *testing.T) {
 			if tt.fake {
 				Fs = thelpers.AddFileToFs(t, tt.goldenFilename, []byte{}, Fs)
 			} else {
-				Fs = thelpers.AddFileToFsByName(t, tt.goldenFilename, "basic", Fs)
+				Fs = thelpers.AddFileToFsByName(t, tt.goldenFilename, "foo", Fs)
 			}
 			got, err := FromFilename(tt.goldenFilename, Fs)
 			if (err != nil) != tt.wantErr {

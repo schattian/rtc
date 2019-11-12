@@ -25,31 +25,31 @@ import (
 // 		{
 // 			name:      "successfull FULL CRUD",
 // 			own:       new(Owner),
-// 			args:      args{pR: gPullRequests.Full.copy().mock(gChanges.Basic.None.TableName, nil), ctx: context.Background()},
+// 			args:      args{pR: gPullRequests.Full.copy().mock(gChanges.Foo.None.TableName, nil), ctx: context.Background()},
 // 			wantQtErr: 0,
 // 		},
 // 		{
 // 			name:      "successfull ONLY one CREATE",
 // 			own:       new(Owner),
-// 			args:      args{pR: gPullRequests.Create.copy().mock(gChanges.Basic.None.TableName, nil), ctx: context.Background()},
+// 			args:      args{pR: gPullRequests.Create.copy().mock(gChanges.Foo.None.TableName, nil), ctx: context.Background()},
 // 			wantQtErr: 0,
 // 		},
 // 		{
 // 			name:      "successfull ONLY one RETRIEVE",
 // 			own:       new(Owner),
-// 			args:      args{pR: gPullRequests.Retrieve.copy().mock(gChanges.Basic.None.TableName, nil), ctx: context.Background()},
+// 			args:      args{pR: gPullRequests.Retrieve.copy().mock(gChanges.Foo.None.TableName, nil), ctx: context.Background()},
 // 			wantQtErr: 0,
 // 		},
 // 		{
 // 			name:      "successfull ONLY one UPDATE",
 // 			own:       new(Owner),
-// 			args:      args{pR: gPullRequests.Update.copy().mock(gChanges.Basic.None.TableName, nil), ctx: context.Background()},
+// 			args:      args{pR: gPullRequests.Update.copy().mock(gChanges.Foo.None.TableName, nil), ctx: context.Background()},
 // 			wantQtErr: 0,
 // 		},
 // 		{
 // 			name:      "successfull ONLY one DELETE",
 // 			own:       new(Owner),
-// 			args:      args{pR: gPullRequests.Delete.copy().mock(gChanges.Basic.None.TableName, nil), ctx: context.Background()},
+// 			args:      args{pR: gPullRequests.Delete.copy().mock(gChanges.Foo.None.TableName, nil), ctx: context.Background()},
 // 			wantQtErr: 0,
 // 		},
 
@@ -62,13 +62,13 @@ import (
 // 		{
 // 			name:      "ERRORED COLLABORATORS",
 // 			own:       new(Owner),
-// 			args:      args{pR: gPullRequests.Full.copy().mock(gChanges.Basic.None.TableName, errors.New("mock")), ctx: context.Background()},
+// 			args:      args{pR: gPullRequests.Full.copy().mock(gChanges.Foo.None.TableName, errors.New("mock")), ctx: context.Background()},
 // 			wantQtErr: len(gPullRequests.Full.Commits),
 // 		},
 // 		{
 // 			name:      "ERRORED COLLABORATORS",
 // 			own:       new(Owner),
-// 			args:      args{pR: gPullRequests.Full.copy().mock(gChanges.Basic.None.TableName, errors.New("mock")), ctx: context.Background()},
+// 			args:      args{pR: gPullRequests.Full.copy().mock(gChanges.Foo.None.TableName, errors.New("mock")), ctx: context.Background()},
 // 			wantQtErr: len(gPullRequests.Full.Commits),
 // 		},
 // 		{
@@ -76,9 +76,9 @@ import (
 // 			own:  new(Owner),
 // 			args: args{
 // 				pR: gPullRequests.Delete.copy().addCommit(
-// 					&Commit{Changes: []*Change{gChanges.Basic.None, gChanges.Basic.TableName}},
+// 					&Commit{Changes: []*Change{gChanges.Foo.None, gChanges.Foo.TableName}},
 // 				).mock(
-// 					gChanges.Basic.None.TableName, nil,
+// 					gChanges.Foo.None.TableName, nil,
 // 				),
 // 				ctx: context.Background(),
 // 			},
@@ -89,9 +89,9 @@ import (
 // 			own:  new(Owner),
 // 			args: args{
 // 				pR: gPullRequests.Delete.copy().addCommit(
-// 					&Commit{Changes: []*Change{gChanges.Basic.Create, gChanges.Basic.Update}},
+// 					&Commit{Changes: []*Change{gChanges.Foo.Create, gChanges.Foo.Update}},
 // 				).mock(
-// 					gChanges.Basic.None.TableName, nil,
+// 					gChanges.Foo.None.TableName, nil,
 // 				),
 // 				ctx: context.Background(),
 // 			},
@@ -128,72 +128,72 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 	}{
 		{
 			name: "successfull FULL CRUD",
-			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
+			own:  &Owner{Project: &schema.Planisphere{gSchemas.Foo}},
 			args: args{
-				sch: gSchemas.Basic,
-				pR:  gPullRequests.Full.copy().mock(gTables.Basic.Name, nil),
+				sch: gSchemas.Foo,
+				pR:  gPullRequests.Full.copy().mock(gTables.Foo.Name, nil),
 			},
 			wantQtErr: 0,
 		},
 		{
 			name: "NO COLLABORATORS",
-			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
+			own:  &Owner{Project: &schema.Planisphere{gSchemas.Foo}},
 			args: args{
-				sch: gSchemas.Basic,
+				sch: gSchemas.Foo,
 				pR:  gPullRequests.Full.copy(),
 			},
 			wantQtErr: len(gPullRequests.Full.Commits),
 		},
 		{
 			name: "commit is MIXED TABLES",
-			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
+			own:  &Owner{Project: &schema.Planisphere{gSchemas.Foo}},
 			args: args{
-				sch: gSchemas.Basic,
+				sch: gSchemas.Foo,
 				pR: gPullRequests.ZeroCommits.copy().addCommit(
-					&Commit{Changes: []*Change{gChanges.Basic.None.copy(), gChanges.Basic.TableName.copy()}},
-				).mock(gTables.Basic.Name, nil),
+					&Commit{Changes: []*Change{gChanges.Foo.None.copy(), gChanges.Foo.TableName.copy()}},
+				).mock(gTables.Foo.Name, nil),
 			},
 			wantQtErr: 1,
 		},
 		{
 			name: "commit CHANGE IS INCONSISTENT",
-			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
+			own:  &Owner{Project: &schema.Planisphere{gSchemas.Foo}},
 			args: args{
-				sch: gSchemas.Basic,
+				sch: gSchemas.Foo,
 				pR: gPullRequests.ZeroCommits.copy().addCommit(
 					&Commit{Changes: []*Change{gChanges.Inconsistent.Delete}},
-				).mock(gTables.Basic.Name, nil),
+				).mock(gTables.Foo.Name, nil),
 			},
 			wantQtErr: 1,
 		},
 		{
 			name: "commit is MIXED OPTIONS",
-			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
+			own:  &Owner{Project: &schema.Planisphere{gSchemas.Foo}},
 			args: args{
-				sch: gSchemas.Basic,
+				sch: gSchemas.Foo,
 				pR: gPullRequests.ZeroCommits.copy().addCommit(
-					&Commit{Changes: []*Change{gChanges.Basic.None.copy(), gChanges.Rare.TableName.copy()}},
-				).mock(gTables.Basic.Name, nil),
+					&Commit{Changes: []*Change{gChanges.Foo.None.copy(), gChanges.Bar.TableName.copy()}},
+				).mock(gTables.Foo.Name, nil),
 			},
 			wantQtErr: 1,
 		},
 		{
 			name: "commit is MIXED TYPES",
-			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic}},
+			own:  &Owner{Project: &schema.Planisphere{gSchemas.Foo}},
 			args: args{
-				sch: gSchemas.Basic,
+				sch: gSchemas.Foo,
 				pR: gPullRequests.ZeroCommits.copy().addCommit(
-					&Commit{Changes: []*Change{gChanges.Basic.Create.copy(), gChanges.Basic.Update.copy()}},
-				).mock(gTables.Basic.Name, nil),
+					&Commit{Changes: []*Change{gChanges.Foo.Create.copy(), gChanges.Foo.Update.copy()}},
+				).mock(gTables.Foo.Name, nil),
 			},
 			wantQtErr: 1,
 		},
 		{
 			name: "commit does NOT PASSES the SCHEMA VALIDATION",
-			own:  &Owner{Project: &schema.Planisphere{gSchemas.Basic, gSchemas.Rare}},
+			own:  &Owner{Project: &schema.Planisphere{gSchemas.Foo, gSchemas.Bar}},
 			args: args{
-				sch: gSchemas.Rare,
-				pR:  gPullRequests.Basic.copy().mock(gTables.Basic.Name, nil),
+				sch: gSchemas.Bar,
+				pR:  gPullRequests.Foo.copy().mock(gTables.Foo.Name, nil),
 			},
 			wantQtErr: 1,
 		},
@@ -240,16 +240,16 @@ func TestOwner_Orchestrate(t *testing.T) {
 	}{
 		{
 			name: "fully successful",
-			own:  newOwnerUnsafe(&schema.Planisphere{gSchemas.Basic}),
+			own:  newOwnerUnsafe(&schema.Planisphere{gSchemas.Foo}),
 			args: args{
 				ctx:       context.Background(),
-				community: &Community{gTeams.Basic.copy().mock(gChanges.Basic.None.TableName, nil)},
-				schName:   gSchemas.Basic.Name,
+				community: &Community{gTeams.Foo.copy().mock(gChanges.Foo.None.TableName, nil)},
+				schName:   gSchemas.Foo.Name,
 				comm: &Commit{Changes: []*Change{
-					gChanges.Basic.Create.copy(),
-					gChanges.Basic.Retrieve.copy(),
-					gChanges.Basic.Update.copy(),
-					gChanges.Basic.Delete.copy(),
+					gChanges.Foo.Create.copy(),
+					gChanges.Foo.Retrieve.copy(),
+					gChanges.Foo.Update.copy(),
+					gChanges.Foo.Delete.copy(),
 				}},
 				strategy: AreCompatible,
 			},
@@ -261,21 +261,21 @@ func TestOwner_Orchestrate(t *testing.T) {
 			own:  newOwnerUnsafe(nil),
 			args: args{
 				ctx:       context.Background(),
-				community: &Community{gTeams.Basic},
-				schName:   gSchemas.Basic.Name,
-				comm:      &Commit{Changes: []*Change{gChanges.Basic.None.copy()}},
+				community: &Community{gTeams.Foo},
+				schName:   gSchemas.Foo.Name,
+				comm:      &Commit{Changes: []*Change{gChanges.Foo.None.copy()}},
 				strategy:  AreCompatible,
 			},
 			wantErr: true,
 		},
 		{
 			name: "but NO COLLABORATORS",
-			own:  newOwnerUnsafe(&schema.Planisphere{gSchemas.Basic}),
+			own:  newOwnerUnsafe(&schema.Planisphere{gSchemas.Foo}),
 			args: args{
 				ctx:       context.Background(),
-				community: &Community{gTeams.Basic.copy()},
-				schName:   gSchemas.Basic.Name,
-				comm:      &Commit{Changes: []*Change{gChanges.Basic.None.copy()}},
+				community: &Community{gTeams.Foo.copy()},
+				schName:   gSchemas.Foo.Name,
+				comm:      &Commit{Changes: []*Change{gChanges.Foo.None.copy()}},
 				strategy:  AreCompatible,
 			},
 			wantErr:       false,
@@ -283,16 +283,16 @@ func TestOwner_Orchestrate(t *testing.T) {
 		},
 		{
 			name: "but COLLABORATORS MOCK RETURNS ERRS",
-			own:  newOwnerUnsafe(&schema.Planisphere{gSchemas.Basic}),
+			own:  newOwnerUnsafe(&schema.Planisphere{gSchemas.Foo}),
 			args: args{
 				ctx:       context.Background(),
-				community: &Community{gTeams.Basic.copy().mock(gChanges.Basic.None.TableName, errors.New("test"))},
-				schName:   gSchemas.Basic.Name,
+				community: &Community{gTeams.Foo.copy().mock(gChanges.Foo.None.TableName, errors.New("test"))},
+				schName:   gSchemas.Foo.Name,
 				comm: &Commit{Changes: []*Change{
-					gChanges.Basic.Create.copy(),
-					gChanges.Basic.Retrieve.copy(),
-					gChanges.Basic.Update.copy(),
-					gChanges.Basic.Delete.copy(),
+					gChanges.Foo.Create.copy(),
+					gChanges.Foo.Retrieve.copy(),
+					gChanges.Foo.Update.copy(),
+					gChanges.Foo.Delete.copy(),
 				}},
 				strategy: AreCompatible,
 			},
@@ -301,12 +301,12 @@ func TestOwner_Orchestrate(t *testing.T) {
 		},
 		{
 			name: "given SCHEMA NOT IN PLANISPHERE",
-			own:  newOwnerUnsafe(&schema.Planisphere{gSchemas.Rare}),
+			own:  newOwnerUnsafe(&schema.Planisphere{gSchemas.Bar}),
 			args: args{
 				ctx:       context.Background(),
-				community: &Community{gTeams.Basic.copy().mock(gChanges.Basic.None.TableName, nil)},
-				schName:   gSchemas.Basic.Name,
-				comm:      &Commit{Changes: []*Change{gChanges.Basic.None.copy()}},
+				community: &Community{gTeams.Foo.copy().mock(gChanges.Foo.None.TableName, nil)},
+				schName:   gSchemas.Foo.Name,
+				comm:      &Commit{Changes: []*Change{gChanges.Foo.None.copy()}},
 				strategy:  AreCompatible,
 			},
 			wantErr: true,

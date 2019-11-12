@@ -1,26 +1,26 @@
 local tables = import 'tables.jsonnet';
 
-local basicName = 'basicSchemaName';
-local rareName = 'rareSchemaName';
-local basicRareName = 'basicRareSchemaName';
+local fooName = 'fooSchemaName';
+local barName = 'barSchemaName';
+local fooBarName = 'fooBarSchemaName';
 
 {
-  basic: {
-    name: basicName,
-    blueprint: [tables.basic],
+  foo: {
+    name: fooName,
+    blueprint: [tables.foo],
   },
 
-  rare: {
-    name: rareName,
-    blueprint: [tables.rare],
+  bar: {
+    name: barName,
+    blueprint: [tables.bar],
   },
 
-  basic_rare: {
-    name: basicRareName,
+  foo_bar: {
+    name: fooBarName,
     blueprint: [
-      tables.basic_rare,
-      tables.basic,
-      tables.rare,
+      tables.foo_bar,
+      tables.foo,
+      tables.bar,
     ],
   },
  

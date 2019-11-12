@@ -28,26 +28,26 @@ func TestFabric_Produce(t *testing.T) {
 	}{
 		{
 			name:    "correct usage",
-			fabric:  &Fabric{Schema: gSchemas.BasicRare},
+			fabric:  &Fabric{Schema: gSchemas.FooBar},
 			args:    args{marshal: "json"},
-			wantDir: fmt.Sprintf("fabric/%v", strings.ToLower(string(gSchemas.BasicRare.Name))),
+			wantDir: fmt.Sprintf("fabric/%v", strings.ToLower(string(gSchemas.FooBar.Name))),
 			wantErr: false,
 			product: map[integrity.TableName]string{
-				gTables.Basic.Name:     "basic.go",
-				gTables.Rare.Name:      "rare.go",
-				gTables.BasicRare.Name: "basic_rare.go",
+				gTables.Foo.Name:     "foo.go",
+				gTables.Bar.Name:      "bar.go",
+				gTables.FooBar.Name: "foo_bar.go",
 			},
 		},
 		{
 			name:    "but w/PRESET DIR",
-			fabric:  &Fabric{Schema: gSchemas.BasicRare, Dir: customDir},
+			fabric:  &Fabric{Schema: gSchemas.FooBar, Dir: customDir},
 			args:    args{marshal: "json"},
 			wantDir: customDir,
 			wantErr: false,
 			product: map[integrity.TableName]string{
-				gTables.Basic.Name:     "basic.go",
-				gTables.Rare.Name:      "rare.go",
-				gTables.BasicRare.Name: "basic_rare.go",
+				gTables.Foo.Name:     "foo.go",
+				gTables.Bar.Name:      "bar.go",
+				gTables.FooBar.Name: "foo_bar.go",
 			},
 		},
 		{

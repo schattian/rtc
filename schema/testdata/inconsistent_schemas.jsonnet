@@ -3,13 +3,13 @@ local schemas = import 'schemas.jsonnet';
 local tables = import 'tables.jsonnet';
 
 {
-  basic: {
-    name: schemas.basic.name,
+  foo: {
+    name: schemas.foo.name,
     blueprint: [
       {
-        name: tables.basic.name,
-        columns: [{ name: columns.basic.name, type: "inconsistent" }],
-        option_keys: tables.basic.option_keys,
+        name: tables.foo.name,
+        columns: [{ name: columns.foo.name, type: "inconsistent" }],
+        option_keys: tables.foo.option_keys,
       },
     ],
   },

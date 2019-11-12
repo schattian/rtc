@@ -1,34 +1,34 @@
 local columns = import 'columns.jsonnet';
 
-local basicName = 'basicTableName';
-local rareName = 'rareTableName';
-local basicRareName = 'basicRareTableName';
+local fooName = 'fooTableName';
+local barName = 'barTableName';
+local fooBarName = 'fooBarTableName';
 
-local basicOptionKey = 'basicOptionKey';
-local rareOptionKey = 'rareOptionKey';
+local fooOptionKey = 'fooOptionKey';
+local barOptionKey = 'barOptionKey';
 
 {
-  basic: {
-    name: basicName,
-    columns: [columns.basic],
-    option_keys: [basicOptionKey],
+  foo: {
+    name: fooName,
+    columns: [columns.foo],
+    option_keys: [fooOptionKey],
   },
 
-  rare: {
-    name: rareName,
-    columns: [columns.rare],
-    option_keys: [rareOptionKey],
+  bar: {
+    name: barName,
+    columns: [columns.bar],
+    option_keys: [barOptionKey],
   },
 
-  basic_rare: {
-    name: basicRareName,
+  foo_bar: {
+    name: fooBarName,
     columns: [
-      columns.basic,
-      columns.rare,
+      columns.foo,
+      columns.bar,
     ],
     option_keys: [
-      basicOptionKey,
-      rareOptionKey,
+      fooOptionKey,
+      barOptionKey,
     ],
   },
 
