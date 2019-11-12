@@ -27,6 +27,8 @@ type Change struct {
 	Type integrity.CRUD `json:"type,omitempty"`
 
 	Options Options
+
+	Commited bool `json:"commited,omitempty"`
 }
 
 func (chg *Change) SetID(id int64) {
@@ -51,6 +53,7 @@ func (chg *Change) Columns() []string {
 		"entity_id",
 		"type",
 		"options",
+		"commited",
 	}
 }
 
