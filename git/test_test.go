@@ -28,8 +28,8 @@ func init() {
 }
 
 type goldenChanges struct {
-	Foo        variadicChanges `json:"foo,omitempty"`
-	Bar         variadicChanges `json:"bar,omitempty"`
+	Foo          variadicChanges `json:"foo,omitempty"`
+	Bar          variadicChanges `json:"bar,omitempty"`
 	Inconsistent variadicChanges `json:"inconsistent,omitempty"`
 
 	Zero *Change `json:"zero,omitempty"`
@@ -48,7 +48,7 @@ type variadicChanges struct {
 	JSONValue    *Change `json:"json_value,omitempty"`
 	CleanValue   *Change `json:"clean_value,omitempty"`
 
-	Options *Change `json:"change,omitempty"`
+	Options *Change `json:"options,omitempty"`
 
 	ChgCRUD `json:"crud,omitempty"`
 }
@@ -85,8 +85,8 @@ type PrCRUD struct {
 }
 
 type goldenTeams struct {
-	Foo     *Team `json:"foo,omitempty"`
-	Bar      *Team `json:"bar,omitempty"`
+	Foo    *Team `json:"foo,omitempty"`
+	Bar    *Team `json:"bar,omitempty"`
 	FooBar *Team `json:"foo_bar,omitempty"`
 
 	Inconsistent *Team `json:"inconsistent,omitempty"`
