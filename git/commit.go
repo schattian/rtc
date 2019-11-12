@@ -3,7 +3,6 @@ package git
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"io"
 	"reflect"
 
@@ -130,7 +129,7 @@ func (comm *Commit) FromMap(Map map[string]interface{}) error {
 	maybeID := Map["id"]
 	ID, ok := maybeID.(integrity.ID)
 	if !ok && maybeID != nil {
-		return errors.New("the ENTITY_ID is NOT an ID type")
+		return integrity.ErrInvalidID
 	}
 	if maybeID != nil {
 		delete(Map, "id")
