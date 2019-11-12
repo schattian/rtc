@@ -6,12 +6,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/sebach1/git-crud/internal/name"
-
-	"github.com/sebach1/git-crud/internal/field"
 )
 
 type Storable interface {
-	field.Store
 	SetID(int64)
 	Table() string
 	Columns() []string
