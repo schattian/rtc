@@ -16,9 +16,10 @@ type Commit struct {
 	ID      int64     `json:"id,omitempty"`
 	Changes []*Change `json:"changes,omitempty"`
 
-	ChangeIDs []int        `json:"change_ids,omitempty"`
+	ChangeIDs []int64      `json:"change_ids,omitempty"`
 	Reviewer  Collaborator `json:"reviewer,omitempty"`
-	Errored   bool
+
+	Errored bool `json:"emrrored,omitempty"`
 }
 
 func (comm *Commit) SetID(id int64) {
@@ -38,7 +39,7 @@ func (comm *Commit) Columns() []string {
 }
 
 func (comm *Commit) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
-	rows, err := db.QueryxContext(ctx, `SELECT * FROM changes WHERE id=ANY($1)`, comm.ChangeIDs)
+	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE id=ANY(:change_ids)`, comm)
 	if err != nil {
 		return
 	}
