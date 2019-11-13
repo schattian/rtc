@@ -13,8 +13,8 @@ var (
 	errNilTable = errors.New("change's TABLE cannot be NIL")
 
 	// Column
-	errNotNilColumn = errors.New("change's COLUMN cannot be NOT NIL")
 	errNilColumn    = errors.New("change's COLUMN cannot be NIL")
+	errNotNilColumn = errors.New("change's COLUMN cannot be NOT NIL")
 
 	// EntityID
 	errNilEntityID    = errors.New("the ENTITY_ID is NIL")

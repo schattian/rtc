@@ -1,7 +1,5 @@
 package integrity
 
-import "fmt"
-
 // CRUD is any string which preserves any state of Create Retrieve Update or Delete
 type CRUD string
 
@@ -12,7 +10,7 @@ func (crud CRUD) Validate() error {
 			return nil
 		}
 	}
-	return fmt.Errorf("INVALID CRUD operation: %v", crud)
+	return errInvalidCRUD
 }
 
 // ToHTTPVerb retrieves the CRUD synonym by REST HTTP convention
