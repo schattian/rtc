@@ -17,22 +17,6 @@ type Branch struct {
 	IndexID int64
 }
 
-func (b *Branch) SetID(id int64) {
-	b.ID = id
-}
-
-func (b *Branch) Table() string {
-	return "branches"
-}
-
-func (b *Branch) Columns() []string {
-	return []string{
-		"id",
-		"name",
-		"index_id",
-	}
-}
-
 func NewBranch(ctx context.Context, db *sqlx.DB, name integrity.BranchName) (*Branch, error) {
 	res, err := db.Exec(`INSERT INTO indeces (changes) VALUES ([])`)
 	if err != nil {

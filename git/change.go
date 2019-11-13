@@ -31,32 +31,8 @@ type Change struct {
 	Commited bool `json:"commited,omitempty"`
 }
 
-func (chg *Change) SetID(id int64) {
-	chg.ID = id
-}
-
-func (chg *Change) Table() string {
-	return "changes"
-}
-
-func (chg *Change) Columns() []string {
-	return []string{
-		"id",
-		"table_name",
-		"column_name",
-		"str_value",
-		"int_value",
-		"float32_value",
-		"float64_value",
-		"json_value",
-		"bytes_value",
-		"entity_id",
-		"type",
-		"options",
-		"commited",
-	}
-}
-
+// NewChange safety creates a new Change entity
+// Notice it doesn't saves it on the db
 func NewChange(
 	entityID integrity.ID,
 	tableName integrity.TableName,

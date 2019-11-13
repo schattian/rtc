@@ -22,22 +22,6 @@ type Commit struct {
 	Errored bool `json:"emrrored,omitempty"`
 }
 
-func (comm *Commit) SetID(id int64) {
-	comm.ID = id
-}
-
-func (comm *Commit) Table() string {
-	return "commits"
-}
-
-func (comm *Commit) Columns() []string {
-	return []string{
-		"id",
-		"errored",
-		"change_ids",
-	}
-}
-
 func (comm *Commit) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
 	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE id=ANY(:change_ids)`, comm)
 	if err != nil {
