@@ -107,8 +107,8 @@ func (comm *Commit) Unmarshal(data interface{}, format string) error {
 	return nil
 }
 
-// FromCloser takes a io.ReadCloser as the guideline of a new commit
-func FromCloser(body io.ReadCloser) (comm *Commit, err error) {
+// CommitFromCloser takes a io.ReadCloser as the guideline of a new commit
+func CommitFromCloser(body io.ReadCloser) (comm *Commit, err error) {
 	var bodyMap map[string]interface{}
 
 	err = json.NewDecoder(body).Decode(&bodyMap)
@@ -116,7 +116,7 @@ func FromCloser(body io.ReadCloser) (comm *Commit, err error) {
 		return nil, err
 	}
 
-	err = comm.FromMap(bodyMap)
+	comm, err = CommitFromMap(bodyMap)
 	if err != nil {
 		return nil, err
 	}
@@ -124,13 +124,13 @@ func FromCloser(body io.ReadCloser) (comm *Commit, err error) {
 	return
 }
 
-// FromMap decodes the commit from its map version
-// Notice that FromMap() is reciprocal to ToMap(), so it doesn't assign a table
-func (comm *Commit) FromMap(Map map[string]interface{}) error {
+// CommitFromMap decodes the commit from its map version
+// Notice that Commit.FromMap() is reciprocal to ToMap(), so it doesn't assign a table
+func CommitFromMap(Map map[string]interface{}) (comm *Commit, err error) {
 	maybeID := Map["id"]
 	ID, ok := maybeID.(integrity.ID)
 	if !ok && maybeID != nil {
-		return integrity.ErrInvalidID
+		return nil, integrity.ErrInvalidID
 	}
 	if maybeID != nil {
 		delete(Map, "id")
@@ -147,7 +147,7 @@ func (comm *Commit) FromMap(Map map[string]interface{}) error {
 			chg.EntityID = ID
 		}
 	}
-	return nil
+	return
 }
 
 // ToMap returns a map with the content of the commit, omitting unnecessary fields
