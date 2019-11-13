@@ -14,9 +14,13 @@ type Branch struct {
 
 	Credentials credentials
 
+	Index *Index
+
 	IndexID int64
 }
 
+// NewBranch safety creates a new Branch entity
+// Notice it doesn't saves it on the db
 func NewBranch(ctx context.Context, db *sqlx.DB, name integrity.BranchName) (*Branch, error) {
 	res, err := db.Exec(`INSERT INTO indeces (changes) VALUES ([])`)
 	if err != nil {
@@ -38,12 +42,12 @@ func NewBranch(ctx context.Context, db *sqlx.DB, name integrity.BranchName) (*Br
 	return branch, nil
 }
 
-func (b *Branch) Index(ctx context.Context, db *sqlx.DB) (*Index, error) {
-	idx := &Index{}
+// FetchIndex retrieves the Index by .IndexID and assigns it to .Index field
+func (b *Branch) FetchIndex(ctx context.Context, db *sqlx.DB) error {
 	row := db.QueryRowxContext(ctx, `SELECT * FROM indeces WHERE id=?`, b.IndexID)
-	err := row.StructScan(idx)
+	err := row.StructScan(b.Index)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return idx, nil
+	return nil
 }

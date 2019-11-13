@@ -22,6 +22,7 @@ type Commit struct {
 	Errored bool `json:"emrrored,omitempty"`
 }
 
+// FetchChanges retrieves the changes from DB by its .ChangeIDs and assigns them to .Changes field
 func (comm *Commit) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
 	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE id=ANY(:change_ids)`, comm)
 	if err != nil {

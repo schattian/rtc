@@ -8,6 +8,7 @@ import (
 	"github.com/sebach1/git-crud/integrity"
 )
 
+// Add wraps change adding from the inferred index
 func Add(
 	ctx context.Context,
 	db *sqlx.DB,
@@ -27,7 +28,7 @@ func Add(
 		return err
 	}
 
-	idx, err := branch.Index(ctx, db)
+	err = branch.FetchIndex(ctx, db)
 	if err != nil {
 		return err
 	}
@@ -37,7 +38,7 @@ func Add(
 		return err
 	}
 
-	err = idx.Add(chg)
+	err = branch.Index.Add(chg)
 	if err != nil {
 		return err
 	}
@@ -45,6 +46,7 @@ func Add(
 	return nil
 }
 
+// Rm wraps change removing from the inferred index
 func Rm(
 	ctx context.Context,
 	db *sqlx.DB,
@@ -61,7 +63,7 @@ func Rm(
 		return err
 	}
 
-	idx, err := branch.Index(ctx, db)
+	err = branch.FetchIndex(ctx, db)
 	if err != nil {
 		return err
 	}
@@ -71,7 +73,7 @@ func Rm(
 		return err
 	}
 
-	err = idx.Rm(chg)
+	err = branch.Index.Rm(chg)
 	if err != nil {
 		return err
 	}

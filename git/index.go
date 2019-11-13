@@ -16,6 +16,7 @@ type Index struct {
 	ChangeIDs []int64 `json:"change_ids,omitempty"`
 }
 
+// FetchChanges retrieves the changes from DB by its .ChangeIDs and assigns them to .Changes field
 func (idx *Index) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
 	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE commited=FALSE AND id=ANY(:change_ids)`, idx)
 	if err != nil {
