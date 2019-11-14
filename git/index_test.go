@@ -15,38 +15,41 @@ func TestIdx_Add(t *testing.T) {
 		name    string
 		idx     *Index
 		args    args
-		want    error
+		wantErr error
 		newComm *Index
 	}{
 		{
-			name: "change was already added",
-			idx:  &Index{Changes: []*Change{gChanges.Foo.Update.copy()}},
-			args: args{chg: gChanges.Foo.None.copy()},
-			want: errDuplicatedChg,
+			name:    "change was already added",
+			idx:     &Index{Changes: []*Change{gChanges.Foo.Update.copy()}},
+			args:    args{chg: gChanges.Foo.None.copy()},
+			wantErr: errDuplicatedChg,
 		},
 		{
 			name:    "both identical untracked changes",
 			idx:     &Index{Changes: []*Change{gChanges.Foo.Create.copy()}},
 			args:    args{chg: gChanges.Foo.Create.copy()},
 			newComm: &Index{Changes: []*Change{gChanges.Foo.Create, gChanges.Foo.Create}},
+			wantErr: nil,
 		},
 		{
-			name: "table inconsistency",
-			idx:  &Index{Changes: []*Change{gChanges.Foo.Update}},
-			args: args{chg: gChanges.Inconsistent.TableName.copy()},
-			want: errNilTable,
+			name:    "table inconsistency",
+			idx:     &Index{Changes: []*Change{gChanges.Foo.Update}},
+			args:    args{chg: gChanges.Inconsistent.TableName.copy()},
+			wantErr: errNilTable,
 		},
 		{
 			name:    "change modifies the value of a change already in the index",
 			idx:     &Index{Changes: []*Change{gChanges.Foo.Update}},
 			args:    args{chg: gChanges.Foo.StrValue.copy()},
 			newComm: &Index{Changes: []*Change{gChanges.Foo.StrValue.copy().changeType("update")}},
+			wantErr: nil,
 		},
 		{
 			name:    "change modifies different col of same schema",
 			idx:     &Index{Changes: []*Change{gChanges.Foo.Update}},
 			args:    args{chg: gChanges.Foo.ColumnName.copy()},
 			newComm: &Index{Changes: []*Change{gChanges.Foo.Update, gChanges.Foo.ColumnName.copy().changeType("update")}},
+			wantErr: nil,
 		},
 	}
 	for _, tt := range tests {
@@ -55,8 +58,8 @@ func TestIdx_Add(t *testing.T) {
 			t.Parallel()
 			oldComm := tt.idx
 			err := tt.idx.Add(tt.args.chg)
-			if err != tt.want {
-				t.Errorf("Index.Add() error = %v, wantErr %v", err, tt.want)
+			if err != tt.wantErr {
+				t.Errorf("Index.Add() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if err != nil {
 				if diff := cmp.Diff(oldComm, tt.idx); diff != "" {

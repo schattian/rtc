@@ -16,32 +16,32 @@ func TestSchema_preciseColErr(t *testing.T) {
 		colName integrity.ColumnName
 	}
 	tests := []struct {
-		name string
-		args args
-		want error
+		name    string
+		args    args
+		wantErr error
 	}{
 		{
-			name: "column is in the schema",
-			args: args{sch: gSchemas.Foo, colName: gColumns.Foo.Name},
-			want: errForeignColumn,
+			name:    "column is in the schema",
+			args:    args{sch: gSchemas.Foo, colName: gColumns.Foo.Name},
+			wantErr: errForeignColumn,
 		},
 		{
-			name: "column doesn't exists in the schema",
-			args: args{sch: gSchemas.Foo, colName: gColumns.Bar.Name},
-			want: errNonexistentColumn,
+			name:    "column doesn't exists in the schema",
+			args:    args{sch: gSchemas.Foo, colName: gColumns.Bar.Name},
+			wantErr: errNonexistentColumn,
 		},
 		{
-			name: "schema caller is zero-valued",
-			args: args{sch: gSchemas.Zero, colName: gColumns.Foo.Name},
-			want: errNonexistentColumn,
+			name:    "schema caller is zero-valued",
+			args:    args{sch: gSchemas.Zero, colName: gColumns.Foo.Name},
+			wantErr: errNonexistentColumn,
 		},
 	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			if err := tt.args.sch.preciseColErr(tt.args.colName); err != tt.want {
-				t.Errorf("Schema.preciseColErr() error = %v, want %v", err, tt.want)
+			if err := tt.args.sch.preciseColErr(tt.args.colName); err != tt.wantErr {
+				t.Errorf("Schema.preciseColErr() error = %v, want %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -57,10 +57,10 @@ func TestSchema_ValidateCtx(t *testing.T) {
 		helperScope *Planisphere
 	}
 	tests := []struct {
-		name    string
-		sch     *Schema
-		args    args
-		wantErr bool
+		name     string
+		sch      *Schema
+		args     args
+		wantsErr bool
 	}{
 		{
 			name: "passes the validations",
@@ -71,7 +71,7 @@ func TestSchema_ValidateCtx(t *testing.T) {
 				optionKeys:  []integrity.OptionKey{gTables.Foo.OptionKeys[0]},
 				helperScope: &Planisphere{gSchemas.Foo},
 			},
-			wantErr: false,
+			wantsErr: false,
 		},
 		{
 			name: "optionKey nonexistant",
@@ -82,7 +82,7 @@ func TestSchema_ValidateCtx(t *testing.T) {
 				optionKeys:  []integrity.OptionKey{gTables.Bar.OptionKeys[0]},
 				helperScope: &Planisphere{gSchemas.Foo},
 			},
-			wantErr: true,
+			wantsErr: true,
 		},
 		{
 			name: "value doesn't pass the column validator func",
@@ -94,7 +94,7 @@ func TestSchema_ValidateCtx(t *testing.T) {
 				optionKeys:  []integrity.OptionKey{},
 				helperScope: &Planisphere{gSchemas.Foo},
 			},
-			wantErr: true,
+			wantsErr: true,
 		},
 		{
 			name: "column not inside any table",
@@ -105,7 +105,7 @@ func TestSchema_ValidateCtx(t *testing.T) {
 				optionKeys:  []integrity.OptionKey{gTables.Foo.OptionKeys[0]},
 				helperScope: &Planisphere{gSchemas.Foo},
 			},
-			wantErr: true,
+			wantsErr: true,
 		},
 		{
 			name: "table nonexistant",
@@ -116,7 +116,7 @@ func TestSchema_ValidateCtx(t *testing.T) {
 				optionKeys:  []integrity.OptionKey{},
 				helperScope: &Planisphere{gSchemas.Foo},
 			},
-			wantErr: true,
+			wantsErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -129,12 +129,12 @@ func TestSchema_ValidateCtx(t *testing.T) {
 			go tt.sch.ValidateCtx(tt.args.tableName, tt.args.colName, tt.args.optionKeys, tt.args.val, tt.args.helperScope, wg, errCh)
 			wg.Wait()
 			isErrored := len(errCh) == 1
-			if isErrored && !tt.wantErr {
+			if isErrored && !tt.wantsErr {
 				err := <-errCh
-				t.Errorf("Schema.ValidateCtx() error: %v; wantErr %v", err, tt.wantErr)
+				t.Errorf("Schema.ValidateCtx() error: %v; wantErr %v", err, tt.wantsErr)
 			}
-			if !isErrored && tt.wantErr {
-				t.Errorf("Schema.ValidateCtx() error: %v; wantErr %v", nil, tt.wantErr)
+			if !isErrored && tt.wantsErr {
+				t.Errorf("Schema.ValidateCtx() error: %v; wantErr %v", nil, tt.wantsErr)
 			}
 		})
 	}

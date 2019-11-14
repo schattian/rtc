@@ -16,25 +16,26 @@ func TestFromFilename(t *testing.T) {
 	tests := []struct {
 		name           string
 		goldenFilename string
-		fake           bool
+		fake           bool // Fake the goldenFile (w/ empty content)
 		want           *Schema
-		wantErr        bool
+		wantErr        error
 	}{
 		{
 			name:           "CORRECT USAGE",
 			goldenFilename: "schemas.jsonnet",
 			want:           decodeValidators(gSchemas.Foo.Copy()),
+			wantErr:        nil,
 		},
 		{
 			name:           "the schema contains a COLUMN WITH INCONSISTENT VALUE TYPE", // Ensure err checking in applyBuiltinValidators
 			goldenFilename: "inconsistent_schemas.jsonnet",
-			wantErr:        true,
+			wantErr:        errUnallowedColumnType,
 		},
 		{
 			name:           "the EXT is NOT ALLOWED",
 			goldenFilename: "schemas.matlab", // (?)
 			fake:           true,
-			wantErr:        true,
+			wantErr:        errUnallowedExt,
 		},
 	}
 	for _, tt := range tests {
@@ -48,7 +49,7 @@ func TestFromFilename(t *testing.T) {
 				Fs = thelpers.AddFileToFsByName(t, tt.goldenFilename, "foo", Fs)
 			}
 			got, err := FromFilename(tt.goldenFilename, Fs)
-			if (err != nil) != tt.wantErr {
+			if err != tt.wantErr {
 				t.Errorf("FromFilename() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if err == nil {

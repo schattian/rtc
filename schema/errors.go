@@ -20,9 +20,13 @@ var (
 	errNilTable         = errors.New("the TABLE is NIL")
 
 	// Column errs
-	errNonexistentColumn = errors.New("the COLUMN given does NOT EXISTS")
-	errForeignColumn     = errors.New("the COLUMNS given does NOT BELONGS to the given TABLE")
-	errNilColumnName     = errors.New("the COLUMN NAME is NIL")
-	errNilColumn         = errors.New("the COLUMN is NIL")
-	errNilColumnType     = errors.New("the COLUMN TYPE is NIL")
+	errNonexistentColumn   = errors.New("the COLUMN given does NOT EXISTS")
+	errForeignColumn       = errors.New("the COLUMNS given does NOT BELONGS to the given TABLE")
+	errNilColumnName       = errors.New("the COLUMN NAME is NIL")
+	errNilColumn           = errors.New("the COLUMN is NIL")
+	errUnallowedColumnType = errors.New("the COLUMN TYPE is NOT ALLOWED")
+	errNilColumnType       = errors.New("the COLUMN TYPE is NIL")
+
+	// Planisphere
+	errNotFoundSchema = errors.New("the given SCHEMA NAME is NOT FOUND")
 )

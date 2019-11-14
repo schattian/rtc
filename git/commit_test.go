@@ -163,7 +163,7 @@ func TestCommit_TableName(t *testing.T) {
 		name          string
 		comm          *Commit
 		wantTableName integrity.TableName
-		wantErr       bool
+		wantErr       error
 	}{
 		{
 			name: "changes contains the same single table",
@@ -171,14 +171,14 @@ func TestCommit_TableName(t *testing.T) {
 				gChanges.Foo.None, gChanges.Bar.TableName,
 			}},
 			wantTableName: gChanges.Foo.None.TableName,
-			wantErr:       false,
+			wantErr:       nil,
 		},
 		{
 			name: "changes contains mixed tables",
 			comm: &Commit{Changes: []*Change{
 				gChanges.Foo.None, gChanges.Bar.None,
 			}},
-			wantErr: true,
+			wantErr: errMixedTables,
 		},
 	}
 	for _, tt := range tests {
@@ -186,7 +186,7 @@ func TestCommit_TableName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			gotTableName, err := tt.comm.TableName()
-			if (err != nil) != tt.wantErr {
+			if err != tt.wantErr {
 				t.Errorf("Commit.TableName() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -203,7 +203,7 @@ func TestCommit_Type(t *testing.T) {
 		name         string
 		comm         *Commit
 		wantCommType integrity.CRUD
-		wantErr      bool
+		wantErr      error
 	}{
 		{
 			name: "changes contains the same single table",
@@ -211,14 +211,14 @@ func TestCommit_Type(t *testing.T) {
 				gChanges.Foo.Create, gChanges.Foo.Create,
 			}},
 			wantCommType: gChanges.Foo.Create.Type,
-			wantErr:      false,
+			wantErr:      nil,
 		},
 		{
 			name: "changes contains mixed types",
 			comm: &Commit{Changes: []*Change{
 				gChanges.Foo.Delete, gChanges.Foo.Create,
 			}},
-			wantErr: true,
+			wantErr: errMixedTypes,
 		},
 	}
 	for _, tt := range tests {
@@ -226,7 +226,7 @@ func TestCommit_Type(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			gotCommType, err := tt.comm.Type()
-			if (err != nil) != tt.wantErr {
+			if err != tt.wantErr {
 				t.Errorf("Commit.Type() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}

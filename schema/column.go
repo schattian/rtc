@@ -1,7 +1,6 @@
 package schema
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/sebach1/git-crud/integrity"
@@ -85,9 +84,9 @@ func (c *Column) applyBuiltinValidator() error {
 	case "[]byte":
 		c.Validator = valide.Bytes
 	case "":
-		return fmt.Errorf("the TYPE of COLUMN %v is NIL", c.Name)
+		return errNilColumnType
 	default:
-		return fmt.Errorf("the TYPE %v of COLUMN %v is INVALID", c.Type, c.Name)
+		return errUnallowedColumnType
 	}
 	return nil
 }

@@ -22,7 +22,7 @@ type Owner struct {
 // NewOwner returns a new instance of Owner, with needed initialization and validation
 func NewOwner(project *schema.Planisphere) (*Owner, error) {
 	if project == nil || len(*project) == 0 {
-		return nil, errors.New("The PROJECT cannot be NIL")
+		return nil, errEmptyProject
 	}
 	return newOwnerUnsafe(project), nil
 }
