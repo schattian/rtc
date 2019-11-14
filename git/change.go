@@ -183,7 +183,7 @@ func (chg *Change) FromMap(Map map[string]interface{}) error {
 		if col == "id" {
 			realVal, ok := val.(integrity.ID)
 			if !ok {
-				return integrity.ErrInvalidID
+				return errInvalidChangeID
 			}
 			chg.EntityID = realVal
 			continue

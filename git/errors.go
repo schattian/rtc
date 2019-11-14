@@ -4,6 +4,7 @@ import "errors"
 
 var (
 	// Changes
+	errInvalidChangeID   = errors.New("the change ID is NOT AN ID TYPE")
 	errDuplicatedChg     = errors.New("the change is ALREADY COMMITTED")
 	errUnclassifiableChg = errors.New("the change DOESN'T respect any PATTERN and thus CANNOT be CLASSIFIABLE")
 	errUnsafeValueType   = errors.New("the given value cannot be safety typed")
@@ -25,9 +26,10 @@ var (
 	errNotNilValue = errors.New("the VALUE cannot be NOT NIL")
 
 	// Commit
-	errMixedTypes  = errors.New("the TYPES over the commit are MIXED")
-	errMixedTables = errors.New("the TABLES over the commit are MIXED")
-	errMixedOpts   = errors.New("the OPTIONS over the commit are MIXED")
+	errInvalidCommitID = errors.New("the commit ID is NOT AN ID TYPE")
+	errMixedTypes      = errors.New("the TYPES over the commit are MIXED")
+	errMixedTables     = errors.New("the TABLES over the commit are MIXED")
+	errMixedOpts       = errors.New("the OPTIONS over the commit are MIXED")
 
 	// Community
 	errNotFoundSchema = errors.New("the SCHEMA NAME provided is NOT FOUND")

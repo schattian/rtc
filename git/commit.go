@@ -115,7 +115,7 @@ func CommitFromMap(Map map[string]interface{}) (comm *Commit, err error) {
 	maybeID := Map["id"]
 	ID, ok := maybeID.(integrity.ID)
 	if !ok && maybeID != nil {
-		return nil, integrity.ErrInvalidID
+		return nil, errInvalidCommitID
 	}
 	if maybeID != nil {
 		delete(Map, "id")
