@@ -106,7 +106,7 @@ func TestColumn_applyBuiltinValidator(t *testing.T) {
 		},
 
 		{
-			name:    "INVALId type",
+			name:    "INVALID type",
 			Type:    "invalid",
 			wantErr: errUnallowedColumnType,
 		},
@@ -122,7 +122,7 @@ func TestColumn_applyBuiltinValidator(t *testing.T) {
 			}
 			if err != nil {
 				if c.Validator != nil {
-					t.Errorf("Column.applyBuiltinValidator() ASSIGNED a VALIdATOR while it errored: %v", c.Validator)
+					t.Errorf("Column.applyBuiltinValidator() ASSIGNED a VALIDATOR while it errored: %v", c.Validator)
 				}
 				if c.Type != tt.Type {
 					t.Errorf("Column.applyBuiltinValidator() CHANGED a TYPE while it errored: %v", c.Validator)
@@ -131,7 +131,7 @@ func TestColumn_applyBuiltinValidator(t *testing.T) {
 			}
 
 			if fmt.Sprintf("%v", c.Validator) != fmt.Sprintf("%v", tt.wantValidator) {
-				t.Errorf("Column.applyBuiltinValidator() mismatch VALIdATOR")
+				t.Errorf("Column.applyBuiltinValidator() mismatch VALIDATOR")
 			}
 
 			if tt.wantType == "" {

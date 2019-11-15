@@ -36,8 +36,8 @@ type goldenChanges struct {
 }
 type variadicChanges struct {
 	None       *Change `json:"none,omitempty"`
-	Id         *Change `json:"id,omitempty"`
-	EntityId   *Change `json:"entity_id,omitempty"`
+	ID         *Change `json:"id,omitempty"`
+	EntityID   *Change `json:"entity_id,omitempty"`
 	TableName  *Change `json:"table_name,omitempty"`
 	ColumnName *Change `json:"column_name,omitempty"`
 

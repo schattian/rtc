@@ -3,11 +3,11 @@ local tables = import 'tables.jsonnet';
 
 //  Notice that foo & bar types are all from UPDATE operation type
 //  due to perform exhaustive fields analysis, and being UPDATE which takes all the fields
-local fooId = 1;
-local barId = 101;
+local fooID = 1;
+local barID = 101;
 
-local fooEntityId = '01EntityId';
-local barEntityId = '001EntityId';
+local fooEntityID = '01EntityID';
+local barEntityID = '001EntityID';
 
 local fooStringValue = 'fooValue';
 local barStringValue = 'barValue';
@@ -49,8 +49,8 @@ local createCRUD(x) = {
       column_name: columns.foo.name,
       str_value: fooStringValue,
       value_type: columns.foo.type,
-      id: fooId,
-      entity_id: fooEntityId,
+      id: fooID,
+      entity_id: fooEntityID,
       options: {
         fooOptionKey: fooOptionValue,
       },
@@ -70,9 +70,9 @@ local createCRUD(x) = {
 
     float64_value: base { float64_value: fooFloat64Value, value_type: "float64" },
 
-    id: base { id: barId },
+    id: base { id: barID },
 
-    entity_id: base { entity_id: barEntityId },
+    entity_id: base { entity_id: barEntityID },
 
     json_value: base { json_value: fooJSONValue, value_type: "json", str_value: '' },
 
@@ -90,8 +90,8 @@ local createCRUD(x) = {
       column_name: columns.bar.name,
       int_value: barIntValue,
       value_type: columns.bar.type,
-      id: barId,
-      entity_id: barEntityId,
+      id: barID,
+      entity_id: barEntityID,
       options: {
         barOptionKey: barOptionValue,
       },
@@ -107,11 +107,11 @@ local createCRUD(x) = {
 
     str_value: base { str_value: barStringValue, value_type: "string", int_value: 0 },
 
-    id: base { id: fooId },
+    id: base { id: fooID },
 
     json_value: base { json_value: barJSONValue, value_type: "json", int_value: 0 },
 
-    entity_id: base { entity_id: fooEntityId },
+    entity_id: base { entity_id: fooEntityID },
 
     clean_value: base { int_value: 0, value_type: '' },
     

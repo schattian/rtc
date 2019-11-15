@@ -6,7 +6,7 @@ import (
 
 // A PullRequest connects a group of Commits with a team
 type PullRequest struct {
-	Id      int
+	ID      int
 	Team    *Team
 	Commits []*Commit
 }

@@ -85,7 +85,7 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 			wantQtErr: 1,
 		},
 		{
-			name: "commit does NOT PASSES the SCHEMA VALIdATION",
+			name: "commit does NOT PASSES the SCHEMA VALIDATION",
 			own:  &Owner{Project: &schema.Planisphere{gSchemas.Foo, gSchemas.Bar}},
 			args: args{
 				sch: gSchemas.Bar,

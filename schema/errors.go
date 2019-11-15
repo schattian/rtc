@@ -14,7 +14,7 @@ var (
 	// Table errs
 	errNonexistentTable = errors.New("the TABLE given does NOT EXISTS")
 	errForeignTable     = errors.New("the TABLE given does NOT BELONGS to the given SCHEMA")
-	errInvalidOptionKey = errors.New("the provided OPTION KEY is INVALId OR NOT DEFINED")
+	errInvalidOptionKey = errors.New("the provided OPTION KEY is INVALID OR NOT DEFINED")
 	errNilTableName     = errors.New("the TABLE NAME is NIL")
 	errNilColumns       = errors.New("the COLUMNS cannot be NIL")
 	errNilTable         = errors.New("the TABLE is NIL")

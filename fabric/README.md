@@ -40,7 +40,7 @@ myOwner.Orchestrate(context.Background(), github.Community, "github", YOUR_COMMI
 myOwner.Close()
 
 for _, result := range myOwner.Summary {
-    comm := CommitById(result.CommitId)// find the created commit with your DB implementation
+    comm := CommitByID(result.CommitID)// find the created commit with your DB implementation
     jsComm := msh.ToJSON(comm)
     var repo fabric.Repository{})
     json.Unmarshal(jsComm, &repo) // In case u are using json decoder

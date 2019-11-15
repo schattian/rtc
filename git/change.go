@@ -8,7 +8,7 @@ import (
 
 // A Change represents every purposed/lookup for difference
 type Change struct {
-	Id int64 `json:"id,omitempty"`
+	ID int64 `json:"id,omitempty"`
 
 	TableName  integrity.TableName  `json:"table_name,omitempty"`
 	ColumnName integrity.ColumnName `json:"column_name,omitempty"`
@@ -20,7 +20,7 @@ type Change struct {
 	JSONValue    json.RawMessage `json:"json_value,omitempty"`
 	BytesValue   []byte          `json:"bytes_value,omitempty"`
 
-	EntityId integrity.Id `json:"entity_id,omitempty"`
+	EntityID integrity.ID `json:"entity_id,omitempty"`
 
 	ValueType integrity.ValueType `json:"value_type,omitempty"`
 
@@ -34,14 +34,14 @@ type Change struct {
 // NewChange safety creates a new Change entity
 // Notice it doesn't saves it on the db
 func NewChange(
-	entityId integrity.Id,
+	entityID integrity.ID,
 	tableName integrity.TableName,
 	columnName integrity.ColumnName,
 	val interface{},
 	Type integrity.CRUD,
 	opts Options,
 ) (*Change, error) {
-	chg := &Change{EntityId: entityId, TableName: tableName, ColumnName: columnName, Type: Type, Options: opts}
+	chg := &Change{EntityID: entityID, TableName: tableName, ColumnName: columnName, Type: Type, Options: opts}
 	chg.SetValue(val)
 	err := chg.Validate()
 	if err != nil {
@@ -181,11 +181,11 @@ func (chg *Change) Validate() (err error) {
 func (chg *Change) FromMap(Map map[string]interface{}) error {
 	for col, val := range Map {
 		if col == "id" {
-			realVal, ok := val.(integrity.Id)
+			realVal, ok := val.(integrity.ID)
 			if !ok {
-				return errInvalidChangeId
+				return errInvalidChangeID
 			}
-			chg.EntityId = realVal
+			chg.EntityID = realVal
 			continue
 		}
 		chg.ColumnName = integrity.ColumnName(col)
@@ -201,8 +201,8 @@ func (chg *Change) ToMap() map[string]interface{} {
 	if chg.ColumnName != "" {
 		chgMap[string(chg.ColumnName)] = chg.Value()
 	}
-	if !chg.EntityId.IsNil() {
-		chgMap["id"] = chg.EntityId
+	if !chg.EntityID.IsNil() {
+		chgMap["id"] = chg.EntityID
 	}
 	return chgMap
 }
@@ -247,8 +247,8 @@ func (chg *Change) classifyType() (integrity.CRUD, error) {
 }
 
 func (chg *Change) validateCreate() error {
-	if !chg.EntityId.IsNil() {
-		return errNotNilEntityId
+	if !chg.EntityID.IsNil() {
+		return errNotNilEntityID
 	}
 	if chg.ColumnName == "" {
 		return errNilColumn
@@ -270,8 +270,8 @@ func (chg *Change) validateRetrieve() (err error) {
 }
 
 func (chg *Change) validateUpdate() error {
-	if chg.EntityId.IsNil() {
-		return errNilEntityId
+	if chg.EntityID.IsNil() {
+		return errNilEntityID
 	}
 	if chg.ColumnName == "" {
 		return errNilColumn
@@ -283,8 +283,8 @@ func (chg *Change) validateUpdate() error {
 }
 
 func (chg *Change) validateDelete() error {
-	if chg.EntityId.IsNil() {
-		return errNilEntityId
+	if chg.EntityID.IsNil() {
+		return errNilEntityID
 	}
 	if chg.ValueType != "" {
 		return errNotNilValue

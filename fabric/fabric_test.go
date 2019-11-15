@@ -51,7 +51,7 @@ func TestFabric_Produce(t *testing.T) {
 			},
 		},
 		{
-			name:    "SCHEMA does NOT PASS THE VALIdATIONS (is nil)",
+			name:    "SCHEMA does NOT PASS THE VALIDATIONS (is nil)",
 			fabric:  &Fabric{Dir: customDir}, // customDir: see that checking os existance of "" dir always returns true
 			args:    args{marshal: "json"},
 			wantDir: customDir,

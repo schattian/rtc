@@ -13,16 +13,16 @@ import (
 
 // Commit is the git-like representation of a group of a ready-to-deliver signed changes
 type Commit struct {
-	Id      int64     `json:"id,omitempty"`
+	ID      int64     `json:"id,omitempty"`
 	Changes []*Change `json:"changes,omitempty"`
 
-	ChangeIds []int64      `json:"change_ids,omitempty"`
+	ChangeIDs []int64      `json:"change_ids,omitempty"`
 	Reviewer  Collaborator `json:"reviewer,omitempty"`
 
 	Errored bool `json:"emrrored,omitempty"`
 }
 
-// FetchChanges retrieves the changes from DB by its .ChangeIds and assigns them to .Changes field
+// FetchChanges retrieves the changes from DB by its .ChangeIDs and assigns them to .Changes field
 func (comm *Commit) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
 	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE id=ANY(:change_ids)`, comm)
 	if err != nil {
@@ -112,12 +112,12 @@ func CommitFromCloser(body io.ReadCloser) (comm *Commit, err error) {
 // CommitFromMap decodes the commit from its map version
 // Notice that Commit.FromMap() is reciprocal to ToMap(), so it doesn't assign a table
 func CommitFromMap(Map map[string]interface{}) (comm *Commit, err error) {
-	maybeId := Map["id"]
-	Id, ok := maybeId.(integrity.Id)
-	if !ok && maybeId != nil {
-		return nil, errInvalidCommitId
+	maybeID := Map["id"]
+	ID, ok := maybeID.(integrity.ID)
+	if !ok && maybeID != nil {
+		return nil, errInvalidCommitID
 	}
-	if maybeId != nil {
+	if maybeID != nil {
 		delete(Map, "id")
 	}
 
@@ -127,9 +127,9 @@ func CommitFromMap(Map map[string]interface{}) (comm *Commit, err error) {
 		comm.Changes = append(comm.Changes, chg)
 	}
 
-	if !Id.IsNil() {
+	if !ID.IsNil() {
 		for _, chg := range comm.Changes {
-			chg.EntityId = Id
+			chg.EntityID = ID
 		}
 	}
 	return
