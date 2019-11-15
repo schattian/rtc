@@ -19,7 +19,7 @@ func Test_toSnakeCase(t *testing.T) {
 		{"AnyKind of_string", "any_kind_of_string"},
 		{"numbers2and55with000", "numbers_2_and_55_with_000"},
 		{"JSONData", "json_data"},
-		{"userID", "user_id"},
+		{"userId", "user_id"},
 		{"AAAbbb", "aa_abbb"},
 	}
 	for _, i := range cases {

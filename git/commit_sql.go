@@ -1,8 +1,8 @@
 package git
 
-// SetID wraps the id assignation to implement Storable interface
-func (comm *Commit) SetID(id int64) {
-	comm.ID = id
+// SetId wraps the id assignation to implement Storable interface
+func (comm *Commit) SetId(id int64) {
+	comm.Id = id
 }
 
 // Table returns the sql table name of the entity

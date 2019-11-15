@@ -12,7 +12,7 @@ import (
 func Add(
 	ctx context.Context,
 	db *sqlx.DB,
-	entityID integrity.ID,
+	entityId integrity.Id,
 	tableName integrity.TableName,
 	columnName integrity.ColumnName,
 	branchName integrity.BranchName,
@@ -33,7 +33,7 @@ func Add(
 		return err
 	}
 
-	chg, err := NewChange(entityID, tableName, columnName, val, Type, opts)
+	chg, err := NewChange(entityId, tableName, columnName, val, Type, opts)
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func Add(
 func Rm(
 	ctx context.Context,
 	db *sqlx.DB,
-	entityID integrity.ID,
+	entityId integrity.Id,
 	tableName integrity.TableName,
 	columnName integrity.ColumnName,
 	branchName integrity.BranchName,
@@ -68,7 +68,7 @@ func Rm(
 		return err
 	}
 
-	chg, err := NewChange(entityID, tableName, columnName, val, Type, opts)
+	chg, err := NewChange(entityId, tableName, columnName, val, Type, opts)
 	if err != nil {
 		return err
 	}

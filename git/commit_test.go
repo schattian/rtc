@@ -11,7 +11,7 @@ import (
 func TestCommit_GroupBy(t *testing.T) {
 	t.Parallel()
 	type fields struct {
-		ID      int64
+		Id      int64
 		Changes []*Change
 	}
 	type args struct {
@@ -31,7 +31,7 @@ func TestCommit_GroupBy(t *testing.T) {
 		{
 			name: "all changes are groupable",
 			fields: fields{Changes: []*Change{
-				gChanges.Zero, gChanges.Foo.None, gChanges.Foo.EntityID,
+				gChanges.Zero, gChanges.Foo.None, gChanges.Foo.EntityId,
 			}},
 			args:       args{comparator: alwaysYes},
 			wantQtGrps: 1,
@@ -39,7 +39,7 @@ func TestCommit_GroupBy(t *testing.T) {
 		{
 			name: "all changes are UNgroupable",
 			fields: fields{Changes: []*Change{
-				gChanges.Zero, gChanges.Foo.None, gChanges.Foo.EntityID,
+				gChanges.Zero, gChanges.Foo.None, gChanges.Foo.EntityId,
 			}},
 			args:       args{comparator: alwaysNo},
 			wantQtGrps: 3,
@@ -70,7 +70,7 @@ func TestCommit_GroupBy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			comm := &Commit{
-				ID:      tt.fields.ID,
+				Id:      tt.fields.Id,
 				Changes: tt.fields.Changes,
 			}
 
@@ -125,14 +125,14 @@ func TestCommit_ToMap(t *testing.T) {
 			name: "RETRIEVE commit",
 			comm: &Commit{Changes: []*Change{gChanges.Foo.Delete}},
 			want: map[string]interface{}{
-				"id": gChanges.Foo.None.EntityID,
+				"id": gChanges.Foo.None.EntityId,
 			},
 		},
 		{
 			name: "UPDATE commit with multiple column changes",
 			comm: &Commit{Changes: []*Change{gChanges.Foo.None, gChanges.Foo.ColumnName}},
 			want: map[string]interface{}{
-				"id":                                 gChanges.Foo.None.EntityID,
+				"id":                                 gChanges.Foo.None.EntityId,
 				string(gChanges.Foo.None.ColumnName): gChanges.Foo.None.StrValue,
 				string(gChanges.Foo.ColumnName.ColumnName): gChanges.Foo.ColumnName.StrValue,
 			},
@@ -141,7 +141,7 @@ func TestCommit_ToMap(t *testing.T) {
 			name: "DELETE commit",
 			comm: &Commit{Changes: []*Change{gChanges.Foo.Delete}},
 			want: map[string]interface{}{
-				"id": gChanges.Foo.None.EntityID,
+				"id": gChanges.Foo.None.EntityId,
 			},
 		},
 	}

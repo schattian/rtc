@@ -7,7 +7,7 @@ import (
 
 type reqBody struct {
 	Branch integrity.BranchName `json:"branch,omitempty"`
-	Entity integrity.ID         `json:"entity,omitempty"`
+	Entity integrity.Id         `json:"entity,omitempty"`
 	Table  integrity.TableName  `json:"table,omitempty"`
 	Column integrity.ColumnName `json:"column,omitempty"`
 	Value  interface{}          `json:"value,omitempty"`

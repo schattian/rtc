@@ -10,7 +10,7 @@ import (
 // The Schema is the representation of a Database instructive. It uses concepts of SQL.
 // It provides the validation and construction structure.
 type Schema struct {
-	ID        int64                `json:"id,omitempty"`
+	Id        int64                `json:"id,omitempty"`
 	Name      integrity.SchemaName `json:"name,omitempty"`
 	Blueprint []*Table             `json:"blueprint,omitempty"`
 }
