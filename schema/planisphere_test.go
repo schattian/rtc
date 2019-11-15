@@ -80,14 +80,14 @@ func TestPlanisphere_GetSchemaFromName(t *testing.T) {
 			args:    args{gSchemas.Zero.Name},
 			psph:    Planisphere{gSchemas.Zero, gSchemas.Zero},
 			want:    nil,
-			wantErr: errNotFoundSchema,
+			wantErr: errSchemaNotFoundInScope,
 		},
 		{
 			name:    "giving no schema",
 			args:    args{gSchemas.Foo.Name},
 			psph:    Planisphere{},
 			want:    nil,
-			wantErr: errNotFoundSchema,
+			wantErr: errSchemaNotFoundInScope,
 		},
 	}
 	for _, tt := range tests {

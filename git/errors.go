@@ -32,8 +32,8 @@ var (
 	errMixedOpts       = errors.New("the OPTIONS over the commit are MIXED")
 
 	// Community
-	errNotFoundSchema = errors.New("the SCHEMA NAME provided is NOT FOUND")
-	errNilCommunity   = errors.New("the COMMUNITY cannot be NIL")
+	errSchemaNotFoundInCommunity = errors.New("the SCHEMA NAME provided is NOT FOUND in the community")
+	errNilCommunity              = errors.New("the COMMUNITY cannot be NIL")
 
 	// Team
 	errTableInUse      = errors.New("the TABLE is ALREADY IN USE by a member")

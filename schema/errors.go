@@ -28,5 +28,5 @@ var (
 	errNilColumnType       = errors.New("the COLUMN TYPE is NIL")
 
 	// Planisphere
-	errNotFoundSchema = errors.New("the given SCHEMA NAME is NOT FOUND")
+	errSchemaNotFoundInScope = errors.New("the given SCHEMA NAME is NOT FOUND in scope")
 )

@@ -17,7 +17,7 @@ func (psph Planisphere) GetSchemaFromName(schemaName integrity.SchemaName) (*Sch
 			return sch, nil
 		}
 	}
-	return nil, errNotFoundSchema
+	return nil, errSchemaNotFoundInScope
 }
 
 // preciseTableErr will assume there is an error with the tableName. Then, it precises the current behavior.

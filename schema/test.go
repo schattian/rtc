@@ -1,5 +1,7 @@
 package schema
 
+var ErrSchemaNotFoundInScope = errSchemaNotFoundInScope
+
 // GoldenSchemas is the golden file decoder for the schemas. Exposed to serve to git integration tests
 type GoldenSchemas struct {
 	Foo    *Schema `json:"foo,omitempty"`

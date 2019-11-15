@@ -92,9 +92,9 @@ func (own *Owner) Delegate(
 	return &pR, nil
 }
 
-// Close will wait for the Owner WaitGroup to be done and close the Owner.Summary
+// WaitAndClose will wait for the Owner WaitGroup to be done and close the Owner.Summary
 // It closes an orchestration (Owner.Orchestrate())
-func (own *Owner) Close() error {
+func (own *Owner) WaitAndClose() error {
 	own.Waiter.Wait()
 	if own.Summary != nil {
 		// The channel can be nil if the owner was errored before

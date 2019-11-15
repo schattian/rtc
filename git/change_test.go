@@ -183,23 +183,23 @@ func TestChange_classifyType(t *testing.T) {
 func TestChange_validateType(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
-		name    string
-		chg     *Change
-		wantErr error
+		name     string
+		chg      *Change
+		wantsErr bool
 	}{
 		{
 			name: "unclassifiable inconsistency",
 			chg: randChg(gChanges.Inconsistent.Create, gChanges.Inconsistent.Update,
 				gChanges.Inconsistent.Delete, gChanges.Inconsistent.Retrieve),
-			wantErr: errUnclassifiableChg,
+			wantsErr: true,
 		},
 	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			if err := tt.chg.validateType(); err != tt.wantErr {
-				t.Errorf("Change.validateType() %v error = %v, wantErr %v", tt.chg.Type, err, tt.wantErr)
+			if err := tt.chg.validateType(); (err != nil) != tt.wantsErr {
+				t.Errorf("Change.validateType() %v error = %v, wantsErr %v", tt.chg.Type, err, tt.wantsErr)
 			}
 		})
 	}

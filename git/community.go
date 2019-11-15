@@ -17,5 +17,5 @@ func (community *Community) LookFor(schName integrity.SchemaName) (*Team, error)
 			return team, nil
 		}
 	}
-	return nil, errNotFoundSchema
+	return nil, errSchemaNotFoundInCommunity
 }

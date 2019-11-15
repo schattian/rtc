@@ -132,6 +132,7 @@ func TestOwner_Orchestrate(t *testing.T) {
 		own           *Owner
 		args          args
 		wantErr       error
+		wantsErr      bool
 		wantQtResErrs int // Quantity of results in summary that are errored
 	}{
 		{
@@ -205,17 +206,17 @@ func TestOwner_Orchestrate(t *testing.T) {
 				comm:      &Commit{Changes: []*Change{gChanges.Foo.None.copy()}},
 				strategy:  AreCompatible,
 			},
-			wantErr: errEmptyProject,
+			wantsErr: true,
 		},
 	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			tt.own.Waiter.Add(1) // Prevent a line of the boilerplate when calling orchestra
+			tt.own.Waiter.Add(1) // Prevent a line of the boilerplate when calling orchestra (and ensures it'll have it's own WG)
 			go tt.own.Orchestrate(tt.args.ctx, tt.args.community, tt.args.schName, tt.args.comm, tt.args.strategy)
-			err := tt.own.Close()
-			if err != tt.wantErr {
+			err := tt.own.WaitAndClose()
+			if err != tt.wantErr && (tt.wantsErr != (err != nil)) {
 				t.Errorf("Owner.Orchestrate() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
