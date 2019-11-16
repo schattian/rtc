@@ -9,27 +9,28 @@ import (
 )
 
 type Storable interface {
-	SetId(int64)
-	Table() string
-	Columns() []string
+	setId(int64)
+	table() string
+	columns() []string
 }
 
 func sqlColumnValues(storable Storable) string {
 	fValues := []string{}
-	for _, s := range storable.Columns() {
+	for _, s := range storable.columns() {
 		fValues = append(fValues, ":"+s)
 	}
 	return name.Parenthize(strings.Join(fValues, ","))
 }
 
 func sqlColumnNames(storable Storable) string {
-	return name.Parenthize(strings.Join(storable.Columns(), ","))
+	return name.Parenthize(strings.Join(storable.columns(), ","))
 }
 
-func SaveToDB(storable Storable, ctx context.Context, db *sqlx.DB) error {
+// InsertToDB inserts the storable entity to the DB
+func InsertToDB(ctx context.Context, storable Storable, db *sqlx.DB) error {
 	res, err := db.NamedExecContext(
 		ctx,
-		`INSERT INTO`+storable.Table()+` `+sqlColumnNames(storable)+` VALUES `+sqlColumnValues(storable),
+		`INSERT INTO`+storable.table()+` `+sqlColumnNames(storable)+` VALUES `+sqlColumnValues(storable),
 		storable,
 	)
 	if err != nil {
@@ -39,7 +40,6 @@ func SaveToDB(storable Storable, ctx context.Context, db *sqlx.DB) error {
 	if err != nil {
 		return err
 	}
-	storable.SetId(possibleId)
+	storable.setId(possibleId)
 	return nil
-
 }
