@@ -13,40 +13,51 @@ func ToSnakeCase(s string) string {
 	return ToDelimitedLowerCase(s, '_')
 }
 
-func ToDelimitedLowerCase(s string, del uint8) string {
+func isUpper(r rune) bool {
+	return (r >= 'A' && r <= 'Z')
+}
+
+func isLower(r rune) bool {
+	return (r >= 'a' && r <= 'z')
+}
+
+func isDelimiter(r rune) bool {
+	return (r == ' ' || r == '_' || r == '-')
+}
+
+func ToDelimitedLowerCase(s string, del rune) string {
 	s = addWordBoundariesToNumbers(s)
-	s = strings.Trim(s, " ")
-	n := ""
-	for i, v := range s {
+	letters := []rune(strings.Trim(s, " "))
+	var n []rune
+	for i, letter := range letters {
 		// treat acronyms as words, eg for JSONData -> JSON is a whole word
 		nextCaseIsChanged := false
-		if i+1 < len(s) {
-			next := s[i+1]
-			if (v >= 'A' && v <= 'Z' && next >= 'a' && next <= 'z') || (v >= 'a' && v <= 'z' && next >= 'A' && next <= 'Z') {
+		if i+1 < len(letters) {
+			next := letters[i+1]
+			if (isUpper(letter) && isLower(next)) || (isLower(letter) && isUpper(next)) {
 				nextCaseIsChanged = true
 			}
 		}
-
 		if i > 0 && n[len(n)-1] != del && nextCaseIsChanged {
-			// add underscore if next letter case type is changed
-			if v >= 'A' && v <= 'Z' {
-				n += string(del) + string(v)
-			} else if v >= 'a' && v <= 'z' {
-				n += string(v) + string(del)
+			if isUpper(letter) {
+				n = append(n, del)
+				n = append(n, letter)
+			} else if isLower(letter) {
+				n = append(n, letter)
+				n = append(n, del)
 			}
-		} else if v == ' ' || v == '_' || v == '-' {
+		} else if isDelimiter(letter) {
 			// replace spaces/underscores with delimiters
-			n += string(del)
+			n = append(n, del)
 		} else {
-			n = n + string(v)
+			n = append(n, letter)
 		}
 	}
-
-	n = strings.ToLower(n)
-	return n
+	newString := string(n)
+	newString = strings.ToLower(newString)
+	return newString
 }
 
-// Converts a string to CamelCase
 func ToCamelCase(s string) string {
 	s = addWordBoundariesToNumbers(s)
 	s = strings.Trim(s, " ")
