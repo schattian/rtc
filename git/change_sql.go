@@ -1,14 +1,14 @@
 package git
 
 // SetId wraps the id assignation to implement Storable interface
-func (chg *Change) SetId(id int64) {
+func (chg *Change) setId(id int64) {
 	chg.Id = id
 }
 
 // Table returns the sql table name of the entity
 //
 // Testing: tested by using naming conventions. See internal/name pkg
-func (chg *Change) Table() string {
+func (chg *Change) table() string {
 	return "changes"
 }
 
@@ -17,7 +17,7 @@ func (chg *Change) Table() string {
 // It's done to avoid reflection
 //
 // Testing: tested by using reflection at Columns_Test to check being the tags
-func (chg *Change) Columns() []string {
+func (chg *Change) columns() []string {
 	return []string{
 		"id",
 		"table_name",

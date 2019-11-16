@@ -3,6 +3,7 @@ module github.com/sebach1/git-crud
 go 1.13
 
 require (
+	github.com/gedex/inflector v0.0.0-20170307190818-16278e9db813
 	github.com/golang-migrate/migrate v3.5.4+incompatible // indirect
 	github.com/google/go-cmp v0.3.1
 	github.com/jmoiron/sqlx v1.2.0
