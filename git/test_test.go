@@ -43,8 +43,8 @@ type variadicChanges struct {
 
 	StrValue     *Change `json:"str_value,omitempty"`
 	IntValue     *Change `json:"int_value,omitempty"`
-	Float32Value *Change `json:"float32_value,omitempty"`
-	Float64Value *Change `json:"float64_value,omitempty"`
+	Float32Value *Change `json:"float_32_value,omitempty"`
+	Float64Value *Change `json:"float_64_value,omitempty"`
 	JSONValue    *Change `json:"json_value,omitempty"`
 	CleanValue   *Change `json:"clean_value,omitempty"`
 

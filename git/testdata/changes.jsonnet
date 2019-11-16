@@ -66,9 +66,9 @@ local createCRUD(x) = {
 
     int_value: base { int_value: fooIntValue, value_type: "int", str_value: '' },
 
-    float32_value: base { float32_value: fooFloat32Value, value_type: "float32" },
+    float_32_value: base { float_32_value: fooFloat32Value, value_type: "float32" },
 
-    float64_value: base { float64_value: fooFloat64Value, value_type: "float64" },
+    float_64_value: base { float_64_value: fooFloat64Value, value_type: "float64" },
 
     id: base { id: barId },
 
