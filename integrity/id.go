@@ -1,6 +1,6 @@
 package integrity
 
-// Id is a string in order to handle with every kind of id types (UUId/GUId/int)
+// Id is a string in order to handle with every kind of id types (UUID/GUID/int)
 type Id string
 
 // IsNil verifies if the id is zero-valued
