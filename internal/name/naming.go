@@ -5,10 +5,13 @@ import (
 	"strings"
 )
 
+// Parenthize puts the string between parenthesis.
+// Notice it's a little macro for removing noise on sql queries
 func Parenthize(s string) string {
 	return `(` + s + `)`
 }
 
+// ToSnakeCase returns the string snake_cased
 func ToSnakeCase(s string) string {
 	return ToDelimitedLowerCase(s, '_')
 }
@@ -25,6 +28,7 @@ func isDelimiter(r rune) bool {
 	return (r == ' ' || r == '_' || r == '-')
 }
 
+// ToDelimitedLowerCase returns the given string lowercased and delimited by the given del
 func ToDelimitedLowerCase(s string, del rune) string {
 	s = addWordBoundariesToNumbers(s)
 	letters := []rune(strings.Trim(s, " "))
@@ -58,6 +62,7 @@ func ToDelimitedLowerCase(s string, del rune) string {
 	return newString
 }
 
+// ToCamelCase returns the string in CamelCase
 func ToCamelCase(s string) string {
 	s = addWordBoundariesToNumbers(s)
 	s = strings.Trim(s, " ")
