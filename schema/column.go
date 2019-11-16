@@ -36,7 +36,7 @@ func (c *Column) validationErr(err error) *integrity.ValidationError {
 	} else {
 		name = string(c.Name)
 	}
-	return &integrity.ValidationError{Err: err, Origin: "column", OriginName: name}
+	return &integrity.ValidationError{Err: err, OriginType: "column", OriginName: name}
 }
 
 // Copy returns a copy of the given column

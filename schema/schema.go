@@ -108,7 +108,7 @@ func (sch *Schema) validationErr(err error) *integrity.ValidationError {
 	} else {
 		name = string(sch.Name)
 	}
-	return &integrity.ValidationError{Err: err, Origin: "schema", OriginName: name}
+	return &integrity.ValidationError{Err: err, OriginType: "schema", OriginName: name}
 }
 
 // ValidateCtx checks if the context of the given tableName and colName is valid
