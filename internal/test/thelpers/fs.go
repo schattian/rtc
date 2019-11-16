@@ -12,17 +12,19 @@ import (
 	"github.com/spf13/afero"
 )
 
-func AddFileToFs(t *testing.T, filename string, content []byte, baseFs afero.Fs) afero.Fs {
+// AddFileToFs creates a file with the given filename filled with the content on the baseFs
+func AddFileToFs(t *testing.T, filename string, content []byte, baseFs afero.Fs) {
 	t.Helper()
-	Fs := afero.NewMemMapFs()
-	osErr := afero.WriteFile(Fs, filename, content, os.ModePerm)
+	osErr := afero.WriteFile(baseFs, filename, content, os.ModePerm)
 	if osErr != nil {
 		t.Fatalf("the afero Fs couldnt create the file: %v", osErr)
 	}
-	return Fs
+	return
 }
 
-func AddFileToFsByName(t *testing.T, filename string, subset string, baseFs afero.Fs) afero.Fs {
+// AddFileToFsByName looks for the filename given over the related testdata dir and creates the file on the baseFs
+// Notice the new file will be located in /{filename} path
+func AddFileToFsByName(t *testing.T, filename, subset string, baseFs afero.Fs) {
 	t.Helper()
 	var content []byte
 	ext := filepath.Ext(filename)
@@ -54,9 +56,11 @@ func AddFileToFsByName(t *testing.T, filename string, subset string, baseFs afer
 		}
 	}
 
-	return AddFileToFs(t, filename, content, baseFs)
+	AddFileToFs(t, filename, content, baseFs)
 }
 
+// IOExist wraps afero utility func for checking existances (.DirExists, .Exists)
+// over the given args and handles the error given of given T
 func IOExist(t *testing.T, Fs afero.Fs, sth string, existFunc func(afero.Fs, string) (bool, error)) bool {
 	t.Helper()
 	res, osErr := existFunc(Fs, sth)
@@ -66,9 +70,11 @@ func IOExist(t *testing.T, Fs afero.Fs, sth string, existFunc func(afero.Fs, str
 	return res
 }
 
-func IORead(t *testing.T, Fs afero.Fs, sth string, utilFunc func(afero.Fs, string) ([]byte, error)) []byte {
+// IOReadFile wraps afero.ReadFile
+// over the given args and handles the error given of given T
+func IOReadFile(t *testing.T, Fs afero.Fs, sth string) []byte {
 	t.Helper()
-	res, osErr := utilFunc(Fs, sth)
+	res, osErr := afero.ReadFile(Fs, sth)
 	if osErr != nil {
 		t.Fatalf("got UNEXPECTED ERR when trying to use aferos' util: %v", osErr)
 	}

@@ -44,9 +44,9 @@ func TestFromFilename(t *testing.T) {
 			t.Parallel()
 			Fs := afero.NewMemMapFs()
 			if tt.fake {
-				Fs = thelpers.AddFileToFs(t, tt.goldenFilename, []byte{}, Fs)
+				thelpers.AddFileToFs(t, tt.goldenFilename, []byte{}, Fs)
 			} else {
-				Fs = thelpers.AddFileToFsByName(t, tt.goldenFilename, "foo", Fs)
+				thelpers.AddFileToFsByName(t, tt.goldenFilename, "foo", Fs)
 			}
 			got, err := FromFilename(tt.goldenFilename, Fs)
 			if err != tt.wantErr {

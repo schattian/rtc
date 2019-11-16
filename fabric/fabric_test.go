@@ -82,7 +82,7 @@ func TestFabric_Produce(t *testing.T) {
 			}
 			for _, table := range tt.fabric.Schema.Blueprint {
 				generatedFilename := strings.ToLower(string(table.Name)) + ".go"
-				got := thelpers.IORead(t, mFs, tt.fabric.Dir+"/"+generatedFilename, afero.ReadFile)
+				got := thelpers.IOReadFile(t, mFs, tt.fabric.Dir+"/"+generatedFilename)
 				thelpers.CmpWithGoldenFile(t, got, fmt.Sprintf("fabric/%s", tt.product[table.Name]), "Fabric.Produce()")
 			}
 		})
