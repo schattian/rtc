@@ -9,7 +9,7 @@ import (
 )
 
 type Storable interface {
-	SetID(int64)
+	SetId(int64)
 	Table() string
 	Columns() []string
 }
@@ -35,11 +35,11 @@ func SaveToDB(storable Storable, ctx context.Context, db *sqlx.DB) error {
 	if err != nil {
 		return err
 	}
-	possibleID, err := res.LastInsertId()
+	possibleId, err := res.LastInsertId()
 	if err != nil {
 		return err
 	}
-	storable.SetID(possibleID)
+	storable.SetId(possibleId)
 	return nil
 
 }

@@ -10,13 +10,13 @@ import (
 
 // Index is the git-like representation of a group of a NON-ready-to-deliver changes
 type Index struct {
-	ID      int64     `json:"id,omitempty"`
+	Id      int64     `json:"id,omitempty"`
 	Changes []*Change `json:"changes,omitempty"`
 
-	ChangeIDs []int64 `json:"change_ids,omitempty"`
+	ChangeIds []int64 `json:"change_ids,omitempty"`
 }
 
-// FetchChanges retrieves the changes from DB by its .ChangeIDs and assigns them to .Changes field
+// FetchChanges retrieves the changes from DB by its .ChangeIds and assigns them to .Changes field
 func (idx *Index) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
 	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE commited=FALSE AND id=ANY(:change_ids)`, idx)
 	if err != nil {

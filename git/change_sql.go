@@ -1,8 +1,8 @@
 package git
 
-// SetID wraps the id assignation to implement Storable interface
-func (chg *Change) SetID(id int64) {
-	chg.ID = id
+// SetId wraps the id assignation to implement Storable interface
+func (chg *Change) SetId(id int64) {
+	chg.Id = id
 }
 
 // Table returns the sql table name of the entity

@@ -4,7 +4,7 @@ import "errors"
 
 var (
 	// Changes
-	errInvalidChangeID   = errors.New("the change ID is NOT AN ID TYPE")
+	errInvalidChangeId   = errors.New("the change Id is NOT AN Id TYPE")
 	errDuplicatedChg     = errors.New("the change is ALREADY COMMITTED")
 	errUnclassifiableChg = errors.New("the change DOESN'T respect any PATTERN and thus CANNOT be CLASSIFIABLE")
 	errUnsafeValueType   = errors.New("the given value cannot be safety typed")
@@ -17,16 +17,16 @@ var (
 	errNilColumn    = errors.New("change's COLUMN cannot be NIL")
 	errNotNilColumn = errors.New("change's COLUMN cannot be NOT NIL")
 
-	// EntityID
-	errNilEntityID    = errors.New("the ENTITY_ID is NIL")
-	errNotNilEntityID = errors.New("the ENTITY_ID is NOT NIL")
+	// EntityId
+	errNilEntityId    = errors.New("the ENTITY_Id is NIL")
+	errNotNilEntityId = errors.New("the ENTITY_Id is NOT NIL")
 
 	// Value
 	errNilValue    = errors.New("the VALUE cannot be NIL")
 	errNotNilValue = errors.New("the VALUE cannot be NOT NIL")
 
 	// Commit
-	errInvalidCommitID = errors.New("the commit ID is NOT AN ID TYPE")
+	errInvalidCommitId = errors.New("the commit Id is NOT AN Id TYPE")
 	errMixedTypes      = errors.New("the TYPES over the commit are MIXED")
 	errMixedTables     = errors.New("the TABLES over the commit are MIXED")
 	errMixedOpts       = errors.New("the OPTIONS over the commit are MIXED")
