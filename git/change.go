@@ -15,8 +15,8 @@ type Change struct {
 
 	StrValue     string          `json:"str_value,omitempty"`
 	IntValue     int             `json:"int_value,omitempty"`
-	Float32Value float32         `json:"float32_value,omitempty"`
-	Float64Value float64         `json:"float64_value,omitempty"`
+	Float32Value float32         `json:"float_32_value,omitempty"`
+	Float64Value float64         `json:"float_64_value,omitempty"`
 	JSONValue    json.RawMessage `json:"json_value,omitempty"`
 	BytesValue   []byte          `json:"bytes_value,omitempty"`
 
