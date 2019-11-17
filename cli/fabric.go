@@ -25,12 +25,12 @@ var fabricCmd = cli.Command{
 }
 
 func fabricExec(c *cli.Context) error {
-	schemaName := c.Args().First()
+	schFilename := c.Args().First()
 	marshalType := c.String("marshal, msh")
 
 	osFs := afero.NewOsFs()
 
-	decodedSchema, err := schema.FromFilename(schemaName, osFs)
+	decodedSchema, err := schema.FromFilename(schFilename, osFs)
 	if err != nil {
 		return err
 	}
