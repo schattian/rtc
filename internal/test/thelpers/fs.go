@@ -2,6 +2,7 @@ package thelpers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -41,19 +42,24 @@ func AddFileToFsByName(t *testing.T, filename, subset string, baseFs afero.Fs) {
 		t.Fatalf("the GOLDEN FILE could NOT be READEN: %v", err)
 	}
 
-	if subset != "" {
-		var set map[string]interface{}
-		switch ext {
-		case ".jsonnet", ".json":
-			err = json.Unmarshal(content, &set)
-		}
-		if err != nil {
-			t.Fatalf("the GOLDEN FILE could NOT be UNMARSHALLED: %v", err)
-		}
-		content, err = json.Marshal(set[subset])
-		if err != nil {
-			t.Fatalf("the GOLDEN FILE SUBSET could NOT be MARSHALLED: %v", err)
-		}
+	if subset == "" {
+		AddFileToFs(t, filename, content, baseFs)
+	}
+
+	var set map[string]interface{}
+	switch ext {
+	case ".jsonnet", ".json":
+		err = json.Unmarshal(content, &set)
+	default:
+		err = errors.New("extension unmarshaller isn't provided")
+	}
+	if err != nil {
+		t.Fatalf("the GOLDEN FILE could NOT be UNMARSHALLED: %v", err)
+	}
+
+	content, err = json.Marshal(set[subset])
+	if err != nil {
+		t.Fatalf("the GOLDEN FILE SUBSET could NOT be MARSHALLED: %v", err)
 	}
 
 	AddFileToFs(t, filename, content, baseFs)

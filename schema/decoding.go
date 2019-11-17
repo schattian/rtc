@@ -3,6 +3,7 @@ package schema
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"path/filepath"
@@ -56,7 +57,9 @@ func readRemoteFileByHTTPS(url string) (io.Reader, error) {
 	return resp.Body, nil
 }
 
-func decodeFromReader(reader io.Reader, ext string) (sch *Schema, err error) {
+func decodeFromReader(reader io.Reader, ext string) (*Schema, error) {
+	var err error
+	sch := &Schema{}
 	switch ext {
 	case ".json", ".jsonnet": // Notice that jsonnet is for already decoded jsonnet files
 		err = json.NewDecoder(reader).Decode(sch)
@@ -66,7 +69,8 @@ func decodeFromReader(reader io.Reader, ext string) (sch *Schema, err error) {
 		err = errUnallowedExt
 	}
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
-	return
+	return sch, nil
 }
