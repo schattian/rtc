@@ -1,4 +1,4 @@
-FROM golang:1.13
+FROM golang:1
 
 LABEL maintainer="Sebastián Chamena <sebachamena@gmail.com>"
 
@@ -7,7 +7,7 @@ ARG env=development
 ENV ENV $env
 ENV WORKDIR /git-crud
 
-WORKDIR ${WORKDIR} 
+WORKDIR ${WORKDIR}
 
 COPY go.* ./
 
@@ -23,4 +23,4 @@ CMD if [ ${ENV} = development ]; \
 	fresh; \
 	fi
 
-EXPOSE 8888 
+EXPOSE 8888
