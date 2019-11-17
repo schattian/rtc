@@ -3,7 +3,6 @@ package schema
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"path/filepath"
@@ -69,7 +68,6 @@ func decodeFromReader(reader io.Reader, ext string) (*Schema, error) {
 		err = errUnallowedExt
 	}
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 	return sch, nil
