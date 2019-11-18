@@ -7,6 +7,13 @@ const ErrorsSeparator = "; "
 // .Error() will retrieve the appended errs separated by ErrorsSeparator
 type MultiErr []error
 
+func (errs MultiErr) UnwrapAll(unwrapper func(error) error) (unwrappedErrs []error) {
+	for _, err := range errs {
+		unwrappedErrs = append(unwrappedErrs, unwrapper(err))
+	}
+	return
+}
+
 // NewMultiErr returns a MultiErr with the given errs
 func NewMultiErr(errs ...error) (mErr MultiErr) {
 	for _, err := range errs {
