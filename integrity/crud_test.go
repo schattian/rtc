@@ -14,6 +14,7 @@ func TestCRUD_ToHTTPVerb(t *testing.T) {
 		{crud: "update", want: "PUT"},
 		{crud: "retrieve", want: "GET"},
 		{crud: "delete", want: "DELETE"},
+		{crud: "foo", want: ""},
 	}
 	for _, tt := range tests {
 		tt := tt
