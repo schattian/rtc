@@ -16,7 +16,10 @@ type ValidationError struct {
 	Err        error
 }
 
-func (vErr *ValidationError) Error() string {
+func (vErr ValidationError) Error() string {
+	if vErr.Err == nil {
+		return ""
+	}
 	base := vErr.OriginType + " validation error: " + vErr.Err.Error()
 	if vErr.OriginName != "" {
 		base += fmt.Sprintf(". At %v", vErr.OriginName)
@@ -24,23 +27,22 @@ func (vErr *ValidationError) Error() string {
 	return strings.TrimSpace(base)
 }
 
-var vErrRegex = regexp.MustCompile(`validation error: (.*). At`)
+var fullVErrRegex = regexp.MustCompile(`validation error: (.*). At`)
+var tinyVErrRegex = regexp.MustCompile(`validation error: (.*)`)
 
-// UnwrapValidationError returns a slice of the errs given by a validation error
-// - Verbose: arg specifies if want to get details about where the error occured (vErr.Origin)
-func UnwrapValidationError(err error, verbose bool) (errs []error) {
-	if err == nil {
-		return
+// UnwrapValidationError will undo .Error() boilerplate (skipping origin information, and giving .Err)
+func UnwrapValidationError(vErr error) error {
+	if vErr == nil || vErr.Error() == "" {
+		return nil
 	}
-	strErr := err.Error()
-	strErrs := strings.Split(strErr, ErrorsSeparator)
-	strErrs = strErrs[0 : len(strErrs)-1] // Trims the latest separator
-	for _, strErr := range strErrs {
-		if !verbose {
-			strErr = vErrRegex.FindAllString(strErr, 1)[0]
-			strErr = strings.TrimSuffix(strings.TrimPrefix(strErr, "validation error: "), ". At")
-		}
-		errs = append(errs, errors.New(strErr))
+	strErr := vErr.Error()
+	var vErrRegex *regexp.Regexp
+	if strings.Contains(strErr, ". At") {
+		vErrRegex = fullVErrRegex
+	} else {
+		vErrRegex = tinyVErrRegex
 	}
-	return
+	strErr = vErrRegex.FindAllString(strErr, 1)[0]
+	strErr = strings.TrimSuffix(strings.TrimPrefix(strErr, "validation error: "), ". At")
+	return errors.New(strErr)
 }
