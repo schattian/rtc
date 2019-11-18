@@ -193,9 +193,8 @@ func TestSchema_WrapValidateSelf(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			sch := tt.function(gSchemas.Foo.Copy())
-			err := sch.ValidateSelf()
-			unwrappedVErr := integrity.UnwrapValidationError(err, false)
-			diffGot, diffWant := diffBetweenErrs(unwrappedVErr, []error{tt.err})
+			errs := sch.ValidateSelf().UnwrapAll(integrity.UnwrapValidationError)
+			diffGot, diffWant := diffBetweenErrs(errs, []error{tt.err})
 			if diffGot != nil {
 				t.Errorf("Schema.WrapValidate() GOT more errs than want: %v", diffGot)
 			}
@@ -214,9 +213,8 @@ func TestSchema_WrapValidateSelf(t *testing.T) {
 		}
 		t.Run(strconv.Itoa(k), func(t *testing.T) {
 			t.Parallel()
-			err := sch.ValidateSelf()
-			unwrappedVErr := integrity.UnwrapValidationError(err, false)
-			diffGot, diffWant := diffBetweenErrs(unwrappedVErr, wantErrs)
+			errs := sch.ValidateSelf().UnwrapAll(integrity.UnwrapValidationError)
+			diffGot, diffWant := diffBetweenErrs(errs, wantErrs)
 			if diffGot != nil {
 				t.Errorf("Schema.WrapValidate() GOT more errs than want: %v", diffGot)
 			}

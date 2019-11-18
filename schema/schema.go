@@ -1,7 +1,6 @@
 package schema
 
 import (
-	"errors"
 	"sync"
 
 	"github.com/sebach1/git-crud/integrity"
@@ -52,22 +51,16 @@ func (sch *Schema) Copy() *Schema {
 
 // ValidateSelf performs a deep self-validation to check data integrity
 // It wraps internal method validateSelf
-func (sch *Schema) ValidateSelf() (err error) {
+func (sch *Schema) ValidateSelf() (errs integrity.MultiErr) {
 	done := make(chan bool)
 	validationErrs := make(chan error)
 	go sch.validateSelf(done, validationErrs)
-
-	var errMsg string
 	for {
 		select {
 		case <-done:
-			if errMsg != "" {
-				err = errors.New(errMsg)
-			}
 			return
 		case vErr := <-validationErrs:
-			errMsg += vErr.Error()
-			errMsg += integrity.ErrorsSeparator
+			errs = append(errs, vErr)
 		}
 	}
 }
