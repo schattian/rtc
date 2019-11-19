@@ -211,6 +211,12 @@ func TestChange_SetOption(t *testing.T) {
 		key integrity.OptionKey
 		val interface{}
 	}
+
+	assignAndReturn := func(opts Options, k integrity.OptionKey, v interface{}) Options {
+		opts[k] = v
+		return opts
+	}
+
 	tests := []struct {
 		name        string
 		chg         *Change
@@ -223,7 +229,7 @@ func TestChange_SetOption(t *testing.T) {
 			chg:         gChanges.Foo.None.copy(),
 			args:        args{key: "testKey", val: "testVal"},
 			wantErr:     nil,
-			wantOptions: gChanges.Foo.None.copy().Options.assignAndReturn("testKey", "testVal"),
+			wantOptions: assignAndReturn(gChanges.Foo.None.copy().Options, "testKey", "testVal"),
 		},
 		{
 			name:        "UNINITALIZED options",

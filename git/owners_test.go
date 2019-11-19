@@ -16,6 +16,11 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 		sch *schema.Schema
 		pR  *PullRequest
 	}
+	addCommitAndReturn := func(pR *PullRequest, comm *Commit) *PullRequest {
+		pR.Commits = append(pR.Commits, comm)
+		return pR
+	}
+
 	tests := []struct {
 		name      string
 		own       *Owner
@@ -45,7 +50,7 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 			own:  &Owner{Project: &schema.Planisphere{gSchemas.Foo}},
 			args: args{
 				sch: gSchemas.Foo,
-				pR: gPullRequests.ZeroCommits.copy().addCommit(
+				pR: addCommitAndReturn(gPullRequests.ZeroCommits.copy(),
 					&Commit{Changes: []*Change{gChanges.Foo.None.copy(), gChanges.Foo.TableName.copy()}},
 				).mock(gTables.Foo.Name, nil),
 			},
@@ -56,7 +61,7 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 			own:  &Owner{Project: &schema.Planisphere{gSchemas.Foo}},
 			args: args{
 				sch: gSchemas.Foo,
-				pR: gPullRequests.ZeroCommits.copy().addCommit(
+				pR: addCommitAndReturn(gPullRequests.ZeroCommits.copy(),
 					&Commit{Changes: []*Change{gChanges.Inconsistent.Delete}},
 				).mock(gTables.Foo.Name, nil),
 			},
@@ -67,7 +72,7 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 			own:  &Owner{Project: &schema.Planisphere{gSchemas.Foo}},
 			args: args{
 				sch: gSchemas.Foo,
-				pR: gPullRequests.ZeroCommits.copy().addCommit(
+				pR: addCommitAndReturn(gPullRequests.ZeroCommits.copy(),
 					&Commit{Changes: []*Change{gChanges.Foo.None.copy(), gChanges.Bar.TableName.copy()}},
 				).mock(gTables.Foo.Name, nil),
 			},
@@ -78,7 +83,7 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 			own:  &Owner{Project: &schema.Planisphere{gSchemas.Foo}},
 			args: args{
 				sch: gSchemas.Foo,
-				pR: gPullRequests.ZeroCommits.copy().addCommit(
+				pR: addCommitAndReturn(gPullRequests.ZeroCommits.copy(),
 					&Commit{Changes: []*Change{gChanges.Foo.Create.copy(), gChanges.Foo.Update.copy()}},
 				).mock(gTables.Foo.Name, nil),
 			},

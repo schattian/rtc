@@ -187,6 +187,7 @@ func (own *Owner) Delete(ctx context.Context, comm *Commit) (*Commit, error) {
 		return comm, err
 	}
 	*comm = *newComm
+
 	return comm, nil
 }
 

@@ -320,3 +320,15 @@ func (chg *Change) tearDownValue() {
 		chg.BytesValue = nil
 	}
 }
+
+func (chg *Change) copy() *Change {
+	if chg == nil {
+		return nil
+	}
+	newChg := &Change{}
+	*newChg = *chg
+	if chg.Options != nil {
+		newChg.Options = chg.Options.copy()
+	}
+	return newChg
+}
