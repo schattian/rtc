@@ -123,7 +123,10 @@ func CommitFromMap(Map map[string]interface{}) (comm *Commit, err error) {
 
 	for col, val := range Map {
 		chg := &Change{}
-		chg.FromMap(map[string]interface{}{col: val})
+		err := chg.FromMap(map[string]interface{}{col: val})
+		if err != nil {
+			return nil, err
+		}
 		comm.Changes = append(comm.Changes, chg)
 	}
 

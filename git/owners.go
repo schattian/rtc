@@ -79,7 +79,10 @@ func (own *Owner) Delegate(
 		comm := &Commit{Changes: changes}
 		pR.Commits = append(pR.Commits, comm)
 	}
-	pR.AssignTeam(community, schName)
+	err = pR.AssignTeam(community, schName)
+	if err != nil {
+		return nil, err
+	}
 
 	own.Summary = make(chan *Result, len(pR.Commits))
 

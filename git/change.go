@@ -42,8 +42,12 @@ func NewChange(
 	opts Options,
 ) (*Change, error) {
 	chg := &Change{EntityId: entityId, TableName: tableName, ColumnName: columnName, Type: Type, Options: opts}
-	chg.SetValue(val)
-	err := chg.Validate()
+	err := chg.SetValue(val)
+	if err != nil {
+		return nil, err
+	}
+
+	err = chg.Validate()
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +193,11 @@ func (chg *Change) FromMap(Map map[string]interface{}) error {
 			continue
 		}
 		chg.ColumnName = integrity.ColumnName(col)
-		chg.SetValue(val)
+		err := chg.SetValue(val)
+		if err != nil {
+			return err
+		}
+
 	}
 	return nil
 }

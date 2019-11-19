@@ -3,6 +3,7 @@ package git
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/sebach1/git-crud/integrity"
 )
@@ -53,7 +54,10 @@ func (pR *PullRequest) mock(tableName integrity.TableName, err error) *PullReque
 // Copies and pushes a MOCKED COLLABORATOR with the ASSIGNED TABLE which RETURNS THE GIVEN ERROR
 func (t *Team) mock(tableName integrity.TableName, err error) *Team {
 	mock := &collabMock{Err: err}
-	t.AddMember(tableName, mock, true /*forces mock*/)
+	mockingErr := t.AddMember(tableName, mock, true /*forces mock*/)
+	if mockingErr != nil {
+		log.Fatal(mockingErr)
+	}
 	return t
 }
 

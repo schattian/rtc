@@ -41,7 +41,6 @@ var (
 	errNoMembers       = errors.New("there are NOT MEMBERS to achieve this TABLE")
 
 	// Owner
-	errErroredMerge = errors.New("the MERGE was ERRORED")
 	errNilProject   = errors.New("the PROJECT is NIL")
 	errEmptyProject = errors.New("the PROJECT does NOT contain ANY SCHEMA")
 )
