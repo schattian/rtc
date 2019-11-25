@@ -74,6 +74,17 @@ func TestSchema_ValidateCtx(t *testing.T) {
 			wantsErr: false,
 		},
 		{
+			name: "but NO GIVEN COL passes validation",
+			sch:  gSchemas.Foo,
+			args: args{
+				tableName:   gTables.Foo.Name,
+				colName:     "",
+				optionKeys:  []integrity.OptionKey{gTables.Foo.OptionKeys[0]},
+				helperScope: &Planisphere{gSchemas.Foo},
+			},
+			wantsErr: false,
+		},
+		{
 			name: "optionKey nonexistant",
 			sch:  gSchemas.Foo,
 			args: args{
