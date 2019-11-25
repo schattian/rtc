@@ -11,8 +11,8 @@ var OpenSource = &git.Community{
 	&git.Team{
 		AssignedSchema: "github",
 		Members: []*git.Member{
-			&git.Member{AssignedTable: "repositories", Collab: new(repositories)},
-			&git.Member{AssignedTable: "organizations", Collab: new(organizations)},
+			{AssignedTable: "repositories", Collab: new(repositories)},
+			{AssignedTable: "organizations", Collab: new(organizations)},
 		},
 	},
 }

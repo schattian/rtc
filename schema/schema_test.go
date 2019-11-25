@@ -155,46 +155,46 @@ func TestSchema_WrapValidateSelf(t *testing.T) {
 	t.Parallel()
 	fuzzyTests := []*schemaVary{
 		// Schema
-		&schemaVary{
+		{
 			name:     "sch nil name",
 			function: func(sch *Schema) *Schema { sch.Name = ""; return sch },
 			err:      errNilSchemaName},
 		// Table
-		&schemaVary{
+		{
 			name:     "table nil name",
 			function: func(sch *Schema) *Schema { sch.Blueprint[0].Name = ""; return sch },
 			err:      errNilTableName},
 		// Column
-		&schemaVary{
+		{
 			name:     "col nil type",
 			function: func(sch *Schema) *Schema { sch.Blueprint[0].Columns[0].Type = ""; return sch },
 			err:      errNilColumnType},
-		&schemaVary{
+		{
 			name:     "col nil name",
 			function: func(sch *Schema) *Schema { sch.Blueprint[0].Columns[0].Name = ""; return sch },
 			err:      errNilColumnName},
 	}
 	normalTests := []*schemaVary{
 		// Schema
-		&schemaVary{
+		{
 			name:     "sch nil",
 			function: func(sch *Schema) *Schema { return nil },
 			err:      errNilSchema},
-		&schemaVary{
+		{
 			name:     "sch nil bp",
 			function: func(sch *Schema) *Schema { sch.Blueprint = nil; return sch },
 			err:      errNilBlueprint},
 		// Table
-		&schemaVary{
+		{
 			name:     "table nil",
 			function: func(sch *Schema) *Schema { sch.Blueprint[0] = nil; return sch },
 			err:      errNilTable},
-		&schemaVary{
+		{
 			name:     "table nil columns",
 			function: func(sch *Schema) *Schema { sch.Blueprint[0].Columns = nil; return sch },
 			err:      errNilColumns},
 		// Column
-		&schemaVary{
+		{
 			name:     "col nil",
 			function: func(sch *Schema) *Schema { sch.Blueprint[0].Columns[0] = nil; return sch },
 			err:      errNilColumn},

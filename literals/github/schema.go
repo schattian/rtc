@@ -11,19 +11,19 @@ var GitHub = &schema.Schema{
 	Name: "github",
 	Blueprint: []*schema.Table{
 
-		&schema.Table{
+		{
 			Name: "repositories",
 			Columns: []*schema.Column{
-				&schema.Column{Name: "name", Validator: valide.String},
-				&schema.Column{Name: "private", Validator: valide.String},
+				{Name: "name", Validator: valide.String},
+				{Name: "private", Validator: valide.String},
 			},
 			OptionKeys: []integrity.OptionKey{"username"},
 		},
-		&schema.Table{
+		{
 			Name: "organizations",
 			Columns: []*schema.Column{
-				&schema.Column{Name: "name", Validator: valide.String},
-				&schema.Column{Name: "projects", Validator: valide.Bytes},
+				{Name: "name", Validator: valide.String},
+				{Name: "projects", Validator: valide.Bytes},
 			},
 			OptionKeys: []integrity.OptionKey{"owner"},
 		},
