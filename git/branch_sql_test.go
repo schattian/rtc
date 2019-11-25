@@ -25,10 +25,10 @@ func TestBranch_columns(t *testing.T) {
 	}
 	sort.Strings(want)
 
-	got := b.columns()
+	got := b.SQLColumns()
 	sort.Strings(got)
 	if diff := cmp.Diff(got, want); diff != "" {
-		t.Errorf("Branch.columns() mismatch (-want +got): %s", diff)
+		t.Errorf("Branch.SQLColumns() mismatch (-want +got): %s", diff)
 	}
 }
 
@@ -36,8 +36,8 @@ func TestBranch_table(t *testing.T) {
 	b := Branch{}
 	typeOf := reflect.TypeOf(b)
 	want := inflector.Pluralize(name.ToSnakeCase(typeOf.Name()))
-	got := b.table()
+	got := b.SQLTable()
 	if diff := cmp.Diff(got, want); diff != "" {
-		t.Errorf("Branch.table() mismatch (-want +got): %s", diff)
+		t.Errorf("Branch.SQLTable() mismatch (-want +got): %s", diff)
 	}
 }

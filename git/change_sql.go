@@ -1,23 +1,23 @@
 package git
 
 // SetId wraps the id assignation to implement Storable interface
-func (chg *Change) setId(id int64) {
+func (chg *Change) SetId(id int64) {
 	chg.Id = id
 }
 
-// Table returns the sql table name of the entity
+// SQLTable returns the sql SQLTable name of the entity
 //
 // Testing: tested by using naming conventions. See internal/name pkg
-func (chg *Change) table() string {
+func (chg *Change) SQLTable() string {
 	return "changes"
 }
 
-// Columns returns the columns each field represent on db
+// SQLColumns returns the SQLColumns each field represent on db
 // Notice the returned slice is the list of struct tags of exported fields
 // It's done to avoid reflection
 //
 // Testing: tested by using reflection at Columns_Test to check being the tags
-func (chg *Change) columns() []string {
+func (chg *Change) SQLColumns() []string {
 	return []string{
 		"id",
 		"table_name",

@@ -9,37 +9,33 @@ import (
 )
 
 type Storable interface {
-	setId(int64)
-	table() string
-	columns() []string
+	SetId(int64)
+	SQLTable() string
+	SQLColumns() []string
 }
 
 func sqlColumnValues(storable Storable) string {
 	fValues := []string{}
-	for _, s := range storable.columns() {
+	for _, s := range storable.SQLColumns() {
 		fValues = append(fValues, ":"+s)
 	}
 	return name.Parenthize(strings.Join(fValues, ","))
 }
 
 func sqlColumnNames(storable Storable) string {
-	return name.Parenthize(strings.Join(storable.columns(), ","))
+	return name.Parenthize(strings.Join(storable.SQLColumns(), ","))
 }
 
 // InsertToDB inserts the storable entity to the DB
-func InsertToDB(ctx context.Context, storable Storable, db *sqlx.DB) error {
+// Returns the inserted id
+func InsertToDB(ctx context.Context, storable Storable, db *sqlx.DB) (int64, error) {
 	res, err := db.NamedExecContext(
 		ctx,
-		`INSERT INTO`+storable.table()+` `+sqlColumnNames(storable)+` VALUES `+sqlColumnValues(storable),
+		`INSERT INTO`+storable.SQLTable()+` `+sqlColumnNames(storable)+` VALUES `+sqlColumnValues(storable),
 		storable,
 	)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	possibleId, err := res.LastInsertId()
-	if err != nil {
-		return err
-	}
-	storable.setId(possibleId)
-	return nil
+	return res.LastInsertId()
 }

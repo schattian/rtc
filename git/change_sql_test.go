@@ -25,10 +25,10 @@ func TestChange_columns(t *testing.T) {
 	}
 	sort.Strings(want)
 
-	got := chg.columns()
+	got := chg.SQLColumns()
 	sort.Strings(got)
 	if diff := cmp.Diff(got, want); diff != "" {
-		t.Errorf("Change.columns() mismatch (-want +got): %s", diff)
+		t.Errorf("Change.SQLColumns() mismatch (-want +got): %s", diff)
 	}
 }
 
@@ -36,8 +36,8 @@ func TestChange_table(t *testing.T) {
 	chg := Change{}
 	typeOf := reflect.TypeOf(chg)
 	want := inflector.Pluralize(name.ToSnakeCase(typeOf.Name()))
-	got := chg.table()
+	got := chg.SQLTable()
 	if diff := cmp.Diff(got, want); diff != "" {
-		t.Errorf("Change.table() mismatch (-want +got): %s", diff)
+		t.Errorf("Change.SQLTable() mismatch (-want +got): %s", diff)
 	}
 }

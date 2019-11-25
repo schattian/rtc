@@ -25,10 +25,10 @@ func TestCommit_columns(t *testing.T) {
 	}
 	sort.Strings(want)
 
-	got := comm.columns()
+	got := comm.SQLColumns()
 	sort.Strings(got)
 	if diff := cmp.Diff(got, want); diff != "" {
-		t.Errorf("Commit.columns() mismatch (-want +got): %s", diff)
+		t.Errorf("Commit.SQLColumns() mismatch (-want +got): %s", diff)
 	}
 }
 
@@ -36,8 +36,8 @@ func TestCommit_table(t *testing.T) {
 	comm := Commit{}
 	typeOf := reflect.TypeOf(comm)
 	want := inflector.Pluralize(name.ToSnakeCase(typeOf.Name()))
-	got := comm.table()
+	got := comm.SQLTable()
 	if diff := cmp.Diff(got, want); diff != "" {
-		t.Errorf("Branch.table() mismatch (-want +got): %s", diff)
+		t.Errorf("Branch.SQLTable() mismatch (-want +got): %s", diff)
 	}
 }
