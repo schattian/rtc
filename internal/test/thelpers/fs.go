@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 
+	"github.com/google/go-jsonnet"
 	"github.com/spf13/afero"
 )
 
@@ -20,7 +21,6 @@ func AddFileToFs(t *testing.T, filename string, content []byte, baseFs afero.Fs)
 	if osErr != nil {
 		t.Fatalf("the afero Fs couldnt create the file: %v", osErr)
 	}
-	return
 }
 
 // AddFileToFsByName looks for the filename given over the related testdata dir and creates the file on the baseFs
@@ -29,14 +29,12 @@ func AddFileToFsByName(t *testing.T, filename, subset string, baseFs afero.Fs) {
 	t.Helper()
 	var content []byte
 	ext := filepath.Ext(filename)
-	testFilename := fmt.Sprintf("testdata/%s", filename)
-
 	var err error
 	switch ext {
 	case ".jsonnet":
-		content, err = exec.Command("jsonnet", testFilename).Output() // Notice avoiding the use of assist pkg due it uses log.Fatal
+		content = ReadJsonnet(t, strings.TrimSuffix(filename, ext))
 	default:
-		content, err = ioutil.ReadFile(testFilename)
+		content, err = ioutil.ReadFile(fmt.Sprintf("testdata/%s", filename))
 	}
 	if err != nil {
 		t.Fatalf("the GOLDEN FILE could NOT be READEN: %v", err)
@@ -74,6 +72,26 @@ func IOExist(t *testing.T, Fs afero.Fs, sth string, existFunc func(afero.Fs, str
 		t.Fatalf("got UNEXPECTED ERR when trying to use aferos' util: %v", osErr)
 	}
 	return res
+}
+
+// ReadJsonnet reads the jsonnet given from the specified file
+// It'll add the boilerplate of testdata/%s.jsonnet
+// Is the broda of assist.ReadJsonnet, but in a t.Helper() version
+func ReadJsonnet(t *testing.T, name string) []byte {
+	t.Helper()
+	filename := fmt.Sprintf("testdata/%s.jsonnet", name)
+	vm := jsonnet.MakeVM()
+	content, err := ioutil.ReadFile(filename)
+	if err != nil {
+		t.Fatalf("Error READIN JSONNET FILE: %v ", err)
+	}
+
+	json, err := vm.EvaluateSnippet(filename, string(content))
+	if err != nil {
+		t.Fatalf("Error IN JSONNET EVAL: %v ", err)
+	}
+
+	return []byte(json)
 }
 
 // IOReadFile wraps afero.ReadFile
