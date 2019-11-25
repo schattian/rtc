@@ -10,9 +10,17 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+func UnmarshalValidatorsAndReturn(t *testing.T, sch *Schema) *Schema {
+	t.Helper()
+	err := sch.applyBuiltinValidators()
+	if err != nil {
+		t.Fatalf("Couldn't unmarshal validators at helper layer: %v", err)
+	}
+	return sch
+}
+
 func TestFromFilename(t *testing.T) {
 	t.Parallel()
-	decodeValidators := func(sch *Schema) *Schema { sch.applyBuiltinValidators(); return sch } // Skips err checking
 	tests := []struct {
 		name           string
 		goldenFilename string
@@ -23,7 +31,7 @@ func TestFromFilename(t *testing.T) {
 		{
 			name:           "CORRECT USAGE",
 			goldenFilename: "schemas.jsonnet",
-			want:           decodeValidators(gSchemas.Foo.Copy()),
+			want:           UnmarshalValidatorsAndReturn(t, gSchemas.Foo.Copy()),
 			wantErr:        nil,
 		},
 		{
