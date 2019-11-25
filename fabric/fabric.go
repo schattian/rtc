@@ -27,10 +27,10 @@ type Fabric struct {
 }
 
 // Produce is the main Fabric wrapper
-func (f *Fabric) Produce(marshal string, fs afero.Fs) (err error) {
-	err = f.Schema.ValidateSelf()
+func (f *Fabric) Produce(marshal string, fs afero.Fs) error {
+	err := f.Schema.ValidateSelf()
 	if err != nil {
-		return
+		return err
 	}
 
 	f.Schema = f.Schema.Copy()
@@ -43,10 +43,11 @@ func (f *Fabric) Produce(marshal string, fs afero.Fs) (err error) {
 	f.initFsConcurrency()
 
 	for _, table := range f.Schema.Blueprint {
-		f.wg.Add(1)
-		go f.mkStructFileFromTable(table, marshal, fs)
+		err := f.mkStructFileFromTable(table, marshal, fs)
+		if err != nil {
+			return err
+		}
 	}
-	f.wg.Wait()
 
 	if len(f.fsErrCh) > 0 {
 		return <-f.fsErrCh
@@ -67,11 +68,10 @@ func (f *Fabric) initFsConcurrency() {
 	f.fsErrCh = make(chan error, 1)
 }
 
-func (f *Fabric) mkStructFileFromTable(table *schema.Table, marshal string, fs afero.Fs) (err error) {
-	defer f.wg.Done()
+func (f *Fabric) mkStructFileFromTable(table *schema.Table, marshal string, fs afero.Fs) error {
 	var out bytes.Buffer
 	tableStruct := f.structFromTable(table, marshal)
-	err = structTemplate.Execute(&out, tableStruct)
+	err := structTemplate.Execute(&out, tableStruct)
 	if err != nil {
 		return err
 	}
@@ -97,16 +97,15 @@ func (f *Fabric) writeAll(fs afero.Fs) {
 
 func (f *Fabric) writeFile(fs afero.Fs, filename string, generated []byte) {
 	defer f.fsWg.Done()
+
 	for {
-		select {
-		case <-f.fsSmp:
-			err := afero.WriteFile(fs, filename, generated, os.ModePerm)
-			if err != nil {
-				f.fsErrCh <- err
-			}
-			f.fsSmp <- 0 // Unblocks the next any writeFile
-			return
+		<-f.fsSmp
+		err := afero.WriteFile(fs, filename, generated, os.ModePerm)
+		if err != nil {
+			f.fsErrCh <- err
 		}
+		f.fsSmp <- 0 // Unblocks the next call of writeFile
+		break
 	}
 }
 
