@@ -8,8 +8,5 @@ type Id string
 // IsNil verifies if the id is zero-valued
 func (id Id) IsNil() bool {
 	withoutZeros := strings.ReplaceAll(string(id), "0", "")
-	if withoutZeros == "" {
-		return true
-	}
-	return false
+	return withoutZeros == ""
 }
