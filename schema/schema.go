@@ -14,29 +14,6 @@ type Schema struct {
 	Blueprint []*Table             `json:"blueprint,omitempty"`
 }
 
-// All retrieves all registered schemas from the DB
-// func (sch *Schema) All(ctx context.Context, db *sqlx.DB) (*Planisphere, error) {
-// 	rows, err := db.QueryxContext(ctx, `SELECT * FROM schemas`)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer rows.Close()
-// 	var psph Planisphere
-// 	for rows.Next() {
-// 		sch := Schema{}
-// 		err = rows.StructScan(&sch)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		psph = append(psph, &sch)
-// 	}
-// 	err = rows.Err()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &psph, nil
-// }
-
 // Copy returns a copy of the given schema, including a deep copy if its blueprint
 func (sch *Schema) Copy() *Schema {
 	newSch := &Schema{}
