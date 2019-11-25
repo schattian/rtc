@@ -3,8 +3,10 @@ package assist
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
-	"os/exec"
+
+	"github.com/google/go-jsonnet"
 )
 
 // DecodeJsonnet will load the specified fixture and decode onto the given pointer
@@ -12,7 +14,7 @@ import (
 func DecodeJsonnet(name string, pointer interface{}) {
 	err := json.Unmarshal(ReadJsonnet(name), pointer)
 	if err != nil {
-		log.Fatalf("Error DECODING JSONNET: %v: ", err)
+		log.Fatal(err)
 	}
 }
 
@@ -20,9 +22,16 @@ func DecodeJsonnet(name string, pointer interface{}) {
 // It'll add the boilerplate of testdata/%s.jsonnet
 func ReadJsonnet(name string) []byte {
 	filename := fmt.Sprintf("testdata/%s.jsonnet", name)
-	out, err := exec.Command("jsonnet", filename).Output()
+	vm := jsonnet.MakeVM()
+	content, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Fatalf("Error PARSING JSONNET: %v ", err)
+		log.Fatalf("Error READIN JSONNET FILE: %v ", err)
 	}
-	return out
+
+	json, err := vm.EvaluateSnippet(filename, string(content))
+	if err != nil {
+		log.Fatalf("Error IN JSONNET EVAL: %v ", err)
+	}
+
+	return []byte(json)
 }
