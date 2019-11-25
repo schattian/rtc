@@ -5,6 +5,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/git-crud/internal/store"
 )
 
 // Branch is the state-manager around indeces
@@ -19,10 +20,10 @@ type Branch struct {
 	IndexId int64
 }
 
-// NewBranch safety creates a new Branch entity
-// Notice it doesn't saves it on the db
-func NewBranch(ctx context.Context, db *sqlx.DB, name integrity.BranchName) (*Branch, error) {
-	res, err := db.Exec(`INSERT INTO indeces (changes) VALUES ([])`)
+// NewBranchWithIndex safety creates a new Branch entity and assigns a new index_id to it
+// Notice it persists on the db and assigns the inserted id
+func NewBranchWithIndex(ctx context.Context, db *sqlx.DB, name integrity.BranchName) (*Branch, error) {
+	res, err := db.Exec(`INSERT INTO indeces DEFAULT VALUES`)
 	if err != nil {
 		return nil, err
 	}
@@ -31,14 +32,11 @@ func NewBranch(ctx context.Context, db *sqlx.DB, name integrity.BranchName) (*Br
 		return nil, err
 	}
 	branch := &Branch{Name: string(name), IndexId: idxId}
-	res, err = db.Exec(`INSERT INTO branches (name, index_id) VALUES ($1, $2)`, branch.Name, branch.IndexId)
+	id, err := store.InsertToDB(ctx, branch, db)
 	if err != nil {
 		return nil, err
 	}
-	branch.Id, err = res.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
+	branch.SetId(id)
 	return branch, nil
 }
 
