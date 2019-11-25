@@ -40,14 +40,14 @@ func (idx *Index) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
 }
 
 // Add will attach the given change to the commit changes
-// In case the change is invalid or is already committed, it returns an error
+// In case the change is invalid or is duplicated, it returns an error
 func (idx *Index) Add(chg *Change) error {
 	err := chg.Validate()
 	if err != nil {
 		return err
 	}
 	if idx.containsChange(chg) { // avoids duplication. It discards untracked changes in the comparison
-		return errDuplicatedChg
+		return nil
 	}
 
 	for i, otherChg := range idx.Changes {

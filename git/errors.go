@@ -5,7 +5,6 @@ import "errors"
 var (
 	// Changes
 	errInvalidChangeId   = errors.New("the change Id is NOT AN Id TYPE")
-	errDuplicatedChg     = errors.New("the change is ALREADY COMMITTED")
 	errUnclassifiableChg = errors.New("the change DOESN'T respect any PATTERN and thus CANNOT be CLASSIFIABLE")
 	errUnsafeValueType   = errors.New("the given value cannot be safety typed")
 	errNilOptionKey      = errors.New("the given OPTION KEY is NIL")

@@ -22,7 +22,8 @@ func TestIdx_Add(t *testing.T) {
 			name:    "change was already added",
 			idx:     &Index{Changes: []*Change{gChanges.Foo.Update.copy()}},
 			args:    args{chg: gChanges.Foo.None.copy()},
-			wantErr: errDuplicatedChg,
+			newComm: &Index{Changes: []*Change{gChanges.Foo.Update}},
+			wantErr: nil,
 		},
 		{
 			name:    "both identical untracked changes",
