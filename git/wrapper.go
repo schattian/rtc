@@ -20,9 +20,14 @@ func Add(
 	Type integrity.CRUD,
 	opts Options,
 ) error {
+	chg, err := NewChange(entityId, tableName, columnName, val, Type, opts) // The specific order is to avoid creating new branch with unvalid change
+	if err != nil {
+		return err
+	}
+
 	branch, err := BranchByName(ctx, db, branchName)
 	if err == sql.ErrNoRows {
-		branch, err = NewBranch(ctx, db, branchName)
+		branch, err = NewBranchWithIndex(ctx, db, branchName)
 	}
 	if err != nil {
 		return err
@@ -32,8 +37,7 @@ func Add(
 	if err != nil {
 		return err
 	}
-
-	chg, err := NewChange(entityId, tableName, columnName, val, Type, opts)
+	err = branch.Index.FetchChanges(ctx, db)
 	if err != nil {
 		return err
 	}
@@ -64,6 +68,10 @@ func Rm(
 	}
 
 	err = branch.FetchIndex(ctx, db)
+	if err != nil {
+		return err
+	}
+	err = branch.Index.FetchChanges(ctx, db)
 	if err != nil {
 		return err
 	}
