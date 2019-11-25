@@ -1,28 +1,28 @@
 local columns = import 'columns.jsonnet';
 local tables = import 'tables.jsonnet';
 
-//  Notice that basic & rare types are all from UPDATE operation type
+//  Notice that foo & bar types are all from UPDATE operation type
 //  due to perform exhaustive fields analysis, and being UPDATE which takes all the fields
-local basicID = 1;
-local rareID = 101;
+local fooId = 1;
+local barId = 101;
 
-local basicEntityID = '01EntityID';
-local rareEntityID = '001EntityID';
+local fooEntityId = '01EntityId';
+local barEntityId = '001EntityId';
 
-local basicStringValue = 'basicValue';
-local rareStringValue = 'rareValue';
-local basicIntValue = 1001;
-local basicFloat32Value = basicIntValue;
-local basicFloat64Value = basicIntValue;
-local rareIntValue = 9001;
-local basicJSONValue = { embedded_value: { another_embedding: 'basicValue' } };
-local rareJSONValue = { embedded_value: { another_embedding: 'rareValue' } };
+local fooStringValue = 'fooValue';
+local barStringValue = 'barValue';
+local fooIntValue = 1001;
+local fooFloat32Value = fooIntValue;
+local fooFloat64Value = fooIntValue;
+local barIntValue = 9001;
+local fooJSONValue = { embedded_value: { another_embedding: 'fooValue' } };
+local barJSONValue = { embedded_value: { another_embedding: 'barValue' } };
 
 // oK
-local basicOptionKey = tables.basicOptionKey;
-local rareOptionKey = tables.rareOptionKey;
-local basicOptionValue = 'basicOptionValue';
-local rareOptionValue = 'rareOptionValue';
+local fooOptionKey = tables.fooOptionKey;
+local barOptionKey = tables.barOptionKey;
+local fooOptionValue = 'fooOptionValue';
+local barOptionValue = 'barOptionValue';
 
 // CRUD
 local toCreate(x) = x { entity_id: '', type: 'create' };
@@ -37,91 +37,96 @@ local createCRUD(x) = {
 };
 
 {
-  local basic = self.basic,
+  local foo = self.foo,
+  local bar = self.bar,
 
 
-  basic: {
+  foo: {
     local base = self.none,
 
     none: {
-      table_name: tables.basic.name,
-      column_name: columns.basic.name,
-      str_value: basicStringValue,
-      value_type: columns.basic.type,
-      id: basicID,
-      entity_id: basicEntityID,
+      table_name: tables.foo.name,
+      column_name: columns.foo.name,
+      str_value: fooStringValue,
+      value_type: columns.foo.type,
+      id: fooId,
+      entity_id: fooEntityId,
       options: {
-        basicOptionKey: basicOptionValue,
+        fooOptionKey: fooOptionValue,
       },
     },
 
     crud: createCRUD(base),
 
-    table_name: base { table_name: tables.rare.name },
+    table_name: base { table_name: tables.bar.name },
 
-    column_name: base { column_name: columns.rare.name },
+    column_name: base { column_name: columns.bar.name },
 
-    str_value: base { str_value: rareStringValue, value_type: "string" },
+    str_value: base { str_value: barStringValue, value_type: "string" },
 
-    int_value: base { int_value: basicIntValue, value_type: "int", str_value: '' },
+    int_value: base { int_value: fooIntValue, value_type: "int", str_value: '' },
 
-    float32_value: base { float32_value: basicFloat32Value, value_type: "float32" },
+    float_32_value: base { float_32_value: fooFloat32Value, value_type: "float32" },
 
-    float64_value: base { float64_value: basicFloat64Value, value_type: "float64" },
+    float_64_value: base { float_64_value: fooFloat64Value, value_type: "float64" },
 
-    id: base { id: rareID },
+    id: base { id: barId },
 
-    entity_id: base { entity_id: rareEntityID },
+    entity_id: base { entity_id: barEntityId },
 
-    json_value: base { json_value: basicJSONValue, value_type: "json", str_value: '' },
+    json_value: base { json_value: fooJSONValue, value_type: "json", str_value: '' },
 
     clean_value: base { str_value: '', value_type: '' },
+    
+    options: base { options: bar.none.options },
 
   },
 
-  rare: {
+  bar: {
     local base = self.none,
 
     none: {
-      table_name: tables.rare.name,
-      column_name: columns.rare.name,
-      int_value: rareIntValue,
-      value_type: columns.rare.type,
-      id: rareID,
-      entity_id: rareEntityID,
+      table_name: tables.bar.name,
+      column_name: columns.bar.name,
+      int_value: barIntValue,
+      value_type: columns.bar.type,
+      id: barId,
+      entity_id: barEntityId,
       options: {
-        rareOptionKey: rareOptionValue,
+        barOptionKey: barOptionValue,
       },
     },
 
     crud: createCRUD(base),
 
-    table_name: base { table_name: tables.basic.name },
+    table_name: base { table_name: tables.foo.name },
 
-    column_name: base { column_name: columns.basic.name },
+    column_name: base { column_name: columns.foo.name },
 
-    int_value: base { int_value: basicIntValue },
+    int_value: base { int_value: fooIntValue },
 
-    str_value: base { str_value: rareStringValue, value_type: "string", int_value: 0 },
+    str_value: base { str_value: barStringValue, value_type: "string", int_value: 0 },
 
-    id: base { id: basicID },
+    id: base { id: fooId },
 
-    json_value: base { json_value: rareJSONValue, value_type: "json", int_value: 0 },
+    json_value: base { json_value: barJSONValue, value_type: "json", int_value: 0 },
 
-    entity_id: base { entity_id: basicEntityID },
+    entity_id: base { entity_id: fooEntityId },
 
     clean_value: base { int_value: 0, value_type: '' },
+    
+    options: base { options: foo.none.options },
   },
 
   inconsistent: {
     crud: {
-      create: basic.crud.create { column_name: '' },
-      retrieve: basic.crud.retrieve { column_name: '' },
-      update: basic.crud.update { column_name: '' },
-      delete: basic.crud.delete { value_type: basic.none.value_type },
+      create: foo.crud.create { column_name: '' },
+      retrieve: foo.crud.retrieve { column_name: '' },
+      update: foo.crud.update { column_name: '' },
+      delete: foo.crud.delete { value_type: foo.none.value_type },
     },
-    table_name: basic.none { table_name: '' },
-    column_name: basic.none { column_name: '', entity_id: '' },  // Contains entity to avoid unclassifiable handlings
+    table_name: foo.none { table_name: '' },
+    column_name: foo.none { column_name: '', entity_id: '' },  // Contains entity to avoid unclassifiable handlings
   },
 
   zero: {},

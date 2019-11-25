@@ -6,7 +6,7 @@ import (
 
 // A PullRequest connects a group of Commits with a team
 type PullRequest struct {
-	ID      int
+	Id      int
 	Team    *Team
 	Commits []*Commit
 }
@@ -21,4 +21,19 @@ func (pR *PullRequest) AssignTeam(community *Community, schName integrity.Schema
 	}
 	pR.Team = team
 	return nil
+}
+
+func (pR *PullRequest) copy() *PullRequest {
+	if pR == nil {
+		return nil
+	}
+	newPr := new(PullRequest)
+	*newPr = *pR
+	var newComms []*Commit
+	for _, comm := range pR.Commits {
+		newComms = append(newComms, comm.copy())
+	}
+	newPr.Commits = newComms
+	newPr.Team = pR.Team.copy()
+	return newPr
 }

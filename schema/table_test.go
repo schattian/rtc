@@ -17,13 +17,13 @@ func TestTable_columnNames(t *testing.T) {
 	}{
 		{
 			name:         "single-column table",
-			table:        gTables.Basic,
-			wantColNames: []integrity.ColumnName{gColumns.Basic.Name},
+			table:        gTables.Foo,
+			wantColNames: []integrity.ColumnName{gColumns.Foo.Name},
 		},
 		{
 			name:         "multi-column table",
-			table:        gTables.BasicRare,
-			wantColNames: []integrity.ColumnName{gColumns.Basic.Name, gColumns.Rare.Name},
+			table:        gTables.FooBar,
+			wantColNames: []integrity.ColumnName{gColumns.Foo.Name, gColumns.Bar.Name},
 		},
 		{
 			name:         "table is zero-valued",

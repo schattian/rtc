@@ -4,13 +4,15 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/sebach1/git-crud/integrity"
 )
 
+// Add wraps change adding from the inferred index
 func Add(
 	ctx context.Context,
-	DB *sql.DB,
-	entityID integrity.ID,
+	db *sqlx.DB,
+	entityId integrity.Id,
 	tableName integrity.TableName,
 	columnName integrity.ColumnName,
 	branchName integrity.BranchName,
@@ -18,25 +20,29 @@ func Add(
 	Type integrity.CRUD,
 	opts Options,
 ) error {
-	branch, err := BranchByName(ctx, DB, branchName)
+	chg, err := NewChange(entityId, tableName, columnName, val, Type, opts) // The specific order is to avoid creating new branch with unvalid change
+	if err != nil {
+		return err
+	}
+
+	branch, err := BranchByName(ctx, db, branchName)
 	if err == sql.ErrNoRows {
-		branch, err = NewBranch(ctx, DB, branchName)
+		branch, err = NewBranchWithIndex(ctx, db, branchName)
 	}
 	if err != nil {
 		return err
 	}
 
-	idx, err := branch.Index(ctx, DB)
+	err = branch.FetchIndex(ctx, db)
+	if err != nil {
+		return err
+	}
+	err = branch.Index.FetchChanges(ctx, db)
 	if err != nil {
 		return err
 	}
 
-	chg, err := NewChange(entityID, tableName, columnName, val, Type, opts)
-	if err != nil {
-		return err
-	}
-
-	err = idx.Add(chg)
+	err = branch.Index.Add(chg)
 	if err != nil {
 		return err
 	}
@@ -44,10 +50,11 @@ func Add(
 	return nil
 }
 
+// Rm wraps change removing from the inferred index
 func Rm(
 	ctx context.Context,
-	DB *sql.DB,
-	entityID integrity.ID,
+	db *sqlx.DB,
+	entityId integrity.Id,
 	tableName integrity.TableName,
 	columnName integrity.ColumnName,
 	branchName integrity.BranchName,
@@ -55,22 +62,26 @@ func Rm(
 	Type integrity.CRUD,
 	opts Options,
 ) error {
-	branch, err := BranchByName(ctx, DB, branchName)
+	branch, err := BranchByName(ctx, db, branchName)
 	if err != nil {
 		return err
 	}
 
-	idx, err := branch.Index(ctx, DB)
+	err = branch.FetchIndex(ctx, db)
+	if err != nil {
+		return err
+	}
+	err = branch.Index.FetchChanges(ctx, db)
 	if err != nil {
 		return err
 	}
 
-	chg, err := NewChange(entityID, tableName, columnName, val, Type, opts)
+	chg, err := NewChange(entityId, tableName, columnName, val, Type, opts)
 	if err != nil {
 		return err
 	}
 
-	err = idx.Rm(chg)
+	err = branch.Index.Rm(chg)
 	if err != nil {
 		return err
 	}

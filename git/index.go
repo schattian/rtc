@@ -1,25 +1,53 @@
 package git
 
 import (
+	"context"
 	"fmt"
 	"sync"
+
+	"github.com/jmoiron/sqlx"
 )
 
 // Index is the git-like representation of a group of a NON-ready-to-deliver changes
 type Index struct {
-	ID      int
-	Changes []*Change
+	Id      int64     `json:"id,omitempty"`
+	Changes []*Change `json:"changes,omitempty"`
+
+	ChangeIds []int64 `json:"change_ids,omitempty"`
+}
+
+// FetchChanges retrieves the changes from DB by its .ChangeIds and assigns them to .Changes field
+func (idx *Index) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
+	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE commited=FALSE AND id=ANY(:change_ids)`, idx)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		chg := Change{}
+		err = rows.StructScan(chg)
+		if err != nil {
+			return
+		}
+		idx.Changes = append(idx.Changes, &chg)
+	}
+	err = rows.Err()
+	if err != nil {
+		return err
+	}
+
+	return
 }
 
 // Add will attach the given change to the commit changes
-// In case the change is invalid or is already committed, it returns an error
+// In case the change is invalid or is duplicated, it returns an error
 func (idx *Index) Add(chg *Change) error {
 	err := chg.Validate()
 	if err != nil {
 		return err
 	}
-	if idx.containsChange(chg) { // checks duplication. It discards untracked changes in the comparison
-		return errDuplicatedChg
+	if idx.containsChange(chg) { // avoids duplication. It discards untracked changes in the comparison
+		return nil
 	}
 
 	for i, otherChg := range idx.Changes {

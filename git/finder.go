@@ -2,18 +2,17 @@ package git
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/sebach1/git-crud/integrity"
 )
 
-func BranchByName(ctx context.Context, DB *sql.DB, branchName integrity.BranchName) (*Branch, error) {
-	branch := &Branch{}
-	row := DB.QueryRowContext(ctx, fmt.Sprintf("SELECT * FROM branches WHERE Name = %s", branchName))
-	err := row.Scan(branch)
+// BranchByName finds a branch in the DB given its name
+func BranchByName(ctx context.Context, db *sqlx.DB, branchName integrity.BranchName) (*Branch, error) {
+	branch := Branch{}
+	err := db.GetContext(ctx, &branch, `SELECT * FROM branches WHERE name=?`, branchName)
 	if err != nil {
 		return nil, err
 	}
-	return branch, nil
+	return &branch, nil
 }

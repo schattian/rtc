@@ -17,21 +17,21 @@ func TestTeam_Delegate(t *testing.T) {
 		team    *Team
 		args    args
 		want    Collaborator
-		wantErr bool
+		wantErr error
 	}{
 		{
 			name:    "a member is assigned to the given table",
-			team:    gTeams.ZeroMembers.copy().mock(gChanges.Basic.None.TableName, nil),
-			args:    args{tableName: gChanges.Basic.None.TableName},
+			team:    gTeams.ZeroMembers.copy().mock(gChanges.Foo.None.TableName, nil),
+			args:    args{tableName: gChanges.Foo.None.TableName},
 			want:    &collabMock{},
-			wantErr: false,
+			wantErr: nil,
 		},
 		{
 			name:    "a member isn't assigned to the given table",
-			team:    gTeams.ZeroMembers.copy().mock(gChanges.Basic.None.TableName, nil),
-			args:    args{tableName: gChanges.Basic.TableName.TableName},
+			team:    gTeams.ZeroMembers.copy().mock(gChanges.Foo.None.TableName, nil),
+			args:    args{tableName: gChanges.Foo.TableName.TableName},
 			want:    &collabMock{},
-			wantErr: true,
+			wantErr: errNoMembers,
 		},
 	}
 	for _, tt := range tests {
@@ -39,7 +39,7 @@ func TestTeam_Delegate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			got, err := tt.team.Delegate(tt.args.tableName)
-			if (err != nil) != tt.wantErr {
+			if err != tt.wantErr {
 				t.Errorf("Team.Delegate() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}

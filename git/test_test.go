@@ -28,28 +28,29 @@ func init() {
 }
 
 type goldenChanges struct {
-	Basic      variadicChanges `json:"basic,omitempty"`
-	Rare         variadicChanges `json:"rare,omitempty"`
+	Foo          variadicChanges `json:"foo,omitempty"`
+	Bar          variadicChanges `json:"bar,omitempty"`
 	Inconsistent variadicChanges `json:"inconsistent,omitempty"`
 
 	Zero *Change `json:"zero,omitempty"`
 }
 type variadicChanges struct {
 	None       *Change `json:"none,omitempty"`
+	Id         *Change `json:"id,omitempty"`
+	EntityId   *Change `json:"entity_id,omitempty"`
 	TableName  *Change `json:"table_name,omitempty"`
 	ColumnName *Change `json:"column_name,omitempty"`
 
 	StrValue     *Change `json:"str_value,omitempty"`
 	IntValue     *Change `json:"int_value,omitempty"`
-	Float32Value *Change `json:"float32_value,omitempty"`
-	Float64Value *Change `json:"float64_value,omitempty"`
+	Float32Value *Change `json:"float_32_value,omitempty"`
+	Float64Value *Change `json:"float_64_value,omitempty"`
 	JSONValue    *Change `json:"json_value,omitempty"`
 	CleanValue   *Change `json:"clean_value,omitempty"`
 
-	ChgCRUD `json:"crud,omitempty"`
+	Options *Change `json:"options,omitempty"`
 
-	ID       *Change `json:"id,omitempty"`
-	EntityID *Change `json:"entity_id,omitempty"`
+	ChgCRUD `json:"crud,omitempty"`
 }
 
 func randChg(chgs ...*Change) *Change {
@@ -57,7 +58,7 @@ func randChg(chgs ...*Change) *Change {
 }
 
 type goldenPullRequests struct {
-	Basic *PullRequest `json:"basic,omitempty"`
+	Foo *PullRequest `json:"foo,omitempty"`
 
 	Full *PullRequest `json:"full,omitempty"`
 
@@ -84,9 +85,9 @@ type PrCRUD struct {
 }
 
 type goldenTeams struct {
-	Basic     *Team `json:"basic,omitempty"`
-	Rare      *Team `json:"rare,omitempty"`
-	BasicRare *Team `json:"basic_rare,omitempty"`
+	Foo    *Team `json:"foo,omitempty"`
+	Bar    *Team `json:"bar,omitempty"`
+	FooBar *Team `json:"foo_bar,omitempty"`
 
 	Inconsistent *Team `json:"inconsistent,omitempty"`
 

@@ -48,7 +48,7 @@ func (t *Table) validationErr(err error) *integrity.ValidationError {
 	} else {
 		name = string(t.Name)
 	}
-	return &integrity.ValidationError{Err: err, Origin: "table", OriginName: name}
+	return &integrity.ValidationError{Err: err, OriginType: "table", OriginName: name}
 }
 
 // Copy returns a copy of the given table, including embedded cols

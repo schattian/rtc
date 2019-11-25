@@ -16,3 +16,14 @@ func (opts Options) Keys() (keys []integrity.OptionKey) {
 	}
 	return
 }
+
+func (opts *Options) copy() Options {
+	if opts == nil {
+		return nil
+	}
+	newOpts := make(Options)
+	for k, v := range *opts {
+		newOpts[k] = v
+	}
+	return newOpts
+}

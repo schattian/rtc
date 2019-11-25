@@ -11,7 +11,7 @@ import (
 func TestCommit_GroupBy(t *testing.T) {
 	t.Parallel()
 	type fields struct {
-		ID      int
+		Id      int64
 		Changes []*Change
 	}
 	type args struct {
@@ -31,7 +31,7 @@ func TestCommit_GroupBy(t *testing.T) {
 		{
 			name: "all changes are groupable",
 			fields: fields{Changes: []*Change{
-				gChanges.Zero, gChanges.Basic.None, gChanges.Basic.EntityID,
+				gChanges.Zero, gChanges.Foo.None, gChanges.Foo.EntityId,
 			}},
 			args:       args{comparator: alwaysYes},
 			wantQtGrps: 1,
@@ -39,7 +39,7 @@ func TestCommit_GroupBy(t *testing.T) {
 		{
 			name: "all changes are UNgroupable",
 			fields: fields{Changes: []*Change{
-				gChanges.Zero, gChanges.Basic.None, gChanges.Basic.EntityID,
+				gChanges.Zero, gChanges.Foo.None, gChanges.Foo.EntityId,
 			}},
 			args:       args{comparator: alwaysNo},
 			wantQtGrps: 3,
@@ -47,8 +47,8 @@ func TestCommit_GroupBy(t *testing.T) {
 		{
 			name: "changes are groupable if with same tableName",
 			fields: fields{Changes: []*Change{
-				gChanges.Basic.None, gChanges.Basic.Create, gChanges.Basic.None, gChanges.Rare.TableName,
-				gChanges.Basic.TableName,
+				gChanges.Foo.None, gChanges.Foo.Create, gChanges.Foo.None, gChanges.Bar.TableName,
+				gChanges.Foo.TableName,
 			}},
 			args:       args{comparator: areSameTable},
 			wantQtGrps: 2,
@@ -56,10 +56,10 @@ func TestCommit_GroupBy(t *testing.T) {
 		{
 			name: "changes are groupable if are compatible",
 			fields: fields{Changes: []*Change{
-				gChanges.Basic.None, gChanges.Basic.ColumnName,
-				gChanges.Rare.None,
+				gChanges.Foo.None, gChanges.Foo.ColumnName,
+				gChanges.Bar.None,
 				gChanges.Zero,
-				gChanges.Basic.TableName,
+				gChanges.Foo.TableName,
 			}},
 			args:       args{comparator: AreCompatible},
 			wantQtGrps: 4,
@@ -70,7 +70,7 @@ func TestCommit_GroupBy(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			comm := &Commit{
-				ID:      tt.fields.ID,
+				Id:      tt.fields.Id,
 				Changes: tt.fields.Changes,
 			}
 
@@ -116,32 +116,32 @@ func TestCommit_ToMap(t *testing.T) {
 	}{
 		{
 			name: "CREATE commit with multiple columns",
-			comm: &Commit{Changes: []*Change{gChanges.Basic.Create}},
+			comm: &Commit{Changes: []*Change{gChanges.Foo.Create}},
 			want: map[string]interface{}{
-				string(gChanges.Basic.Create.ColumnName): gChanges.Basic.Create.StrValue,
+				string(gChanges.Foo.Create.ColumnName): gChanges.Foo.Create.StrValue,
 			},
 		},
 		{
 			name: "RETRIEVE commit",
-			comm: &Commit{Changes: []*Change{gChanges.Basic.Delete}},
+			comm: &Commit{Changes: []*Change{gChanges.Foo.Delete}},
 			want: map[string]interface{}{
-				"id": gChanges.Basic.None.EntityID,
+				"id": gChanges.Foo.None.EntityId,
 			},
 		},
 		{
 			name: "UPDATE commit with multiple column changes",
-			comm: &Commit{Changes: []*Change{gChanges.Basic.None, gChanges.Basic.ColumnName}},
+			comm: &Commit{Changes: []*Change{gChanges.Foo.None, gChanges.Foo.ColumnName}},
 			want: map[string]interface{}{
-				"id":                                   gChanges.Basic.None.EntityID,
-				string(gChanges.Basic.None.ColumnName): gChanges.Basic.None.StrValue,
-				string(gChanges.Basic.ColumnName.ColumnName): gChanges.Basic.ColumnName.StrValue,
+				"id":                                 gChanges.Foo.None.EntityId,
+				string(gChanges.Foo.None.ColumnName): gChanges.Foo.None.StrValue,
+				string(gChanges.Foo.ColumnName.ColumnName): gChanges.Foo.ColumnName.StrValue,
 			},
 		},
 		{
 			name: "DELETE commit",
-			comm: &Commit{Changes: []*Change{gChanges.Basic.Delete}},
+			comm: &Commit{Changes: []*Change{gChanges.Foo.Delete}},
 			want: map[string]interface{}{
-				"id": gChanges.Basic.None.EntityID,
+				"id": gChanges.Foo.None.EntityId,
 			},
 		},
 	}
@@ -163,22 +163,22 @@ func TestCommit_TableName(t *testing.T) {
 		name          string
 		comm          *Commit
 		wantTableName integrity.TableName
-		wantErr       bool
+		wantErr       error
 	}{
 		{
 			name: "changes contains the same single table",
 			comm: &Commit{Changes: []*Change{
-				gChanges.Basic.None, gChanges.Rare.TableName,
+				gChanges.Foo.None, gChanges.Bar.TableName,
 			}},
-			wantTableName: gChanges.Basic.None.TableName,
-			wantErr:       false,
+			wantTableName: gChanges.Foo.None.TableName,
+			wantErr:       nil,
 		},
 		{
 			name: "changes contains mixed tables",
 			comm: &Commit{Changes: []*Change{
-				gChanges.Basic.None, gChanges.Rare.None,
+				gChanges.Foo.None, gChanges.Bar.None,
 			}},
-			wantErr: true,
+			wantErr: errMixedTables,
 		},
 	}
 	for _, tt := range tests {
@@ -186,7 +186,7 @@ func TestCommit_TableName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			gotTableName, err := tt.comm.TableName()
-			if (err != nil) != tt.wantErr {
+			if err != tt.wantErr {
 				t.Errorf("Commit.TableName() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -203,22 +203,22 @@ func TestCommit_Type(t *testing.T) {
 		name         string
 		comm         *Commit
 		wantCommType integrity.CRUD
-		wantErr      bool
+		wantErr      error
 	}{
 		{
 			name: "changes contains the same single table",
 			comm: &Commit{Changes: []*Change{
-				gChanges.Basic.Create, gChanges.Basic.Create,
+				gChanges.Foo.Create, gChanges.Foo.Create,
 			}},
-			wantCommType: gChanges.Basic.Create.Type,
-			wantErr:      false,
+			wantCommType: gChanges.Foo.Create.Type,
+			wantErr:      nil,
 		},
 		{
 			name: "changes contains mixed types",
 			comm: &Commit{Changes: []*Change{
-				gChanges.Basic.Delete, gChanges.Basic.Create,
+				gChanges.Foo.Delete, gChanges.Foo.Create,
 			}},
-			wantErr: true,
+			wantErr: errMixedTypes,
 		},
 	}
 	for _, tt := range tests {
@@ -226,7 +226,7 @@ func TestCommit_Type(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			gotCommType, err := tt.comm.Type()
-			if (err != nil) != tt.wantErr {
+			if err != tt.wantErr {
 				t.Errorf("Commit.Type() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}

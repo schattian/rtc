@@ -22,7 +22,7 @@ type Owner struct {
 // NewOwner returns a new instance of Owner, with needed initialization and validation
 func NewOwner(project *schema.Planisphere) (*Owner, error) {
 	if project == nil || len(*project) == 0 {
-		return nil, errors.New("The PROJECT cannot be NIL")
+		return nil, errEmptyProject
 	}
 	return newOwnerUnsafe(project), nil
 }
@@ -79,7 +79,10 @@ func (own *Owner) Delegate(
 		comm := &Commit{Changes: changes}
 		pR.Commits = append(pR.Commits, comm)
 	}
-	pR.AssignTeam(community, schName)
+	err = pR.AssignTeam(community, schName)
+	if err != nil {
+		return nil, err
+	}
 
 	own.Summary = make(chan *Result, len(pR.Commits))
 
@@ -92,9 +95,9 @@ func (own *Owner) Delegate(
 	return &pR, nil
 }
 
-// Close will wait for the Owner WaitGroup to be done and close the Owner.Summary
+// WaitAndClose will wait for the Owner WaitGroup to be done and close the Owner.Summary
 // It closes an orchestration (Owner.Orchestrate())
-func (own *Owner) Close() error {
+func (own *Owner) WaitAndClose() error {
 	own.Waiter.Wait()
 	if own.Summary != nil {
 		// The channel can be nil if the owner was errored before
@@ -114,7 +117,7 @@ func (own *Owner) Merge(ctx context.Context, pR *PullRequest) {
 
 		commType, err := comm.Type()
 		if err != nil {
-			own.Summary <- &Result{CommitID: comm.ID, Error: err}
+			own.Summary <- &Result{CommitId: comm.Id, Error: err}
 			continue
 		}
 
@@ -137,12 +140,12 @@ func (own *Owner) Push(ctx context.Context, comm *Commit) (*Commit, error) {
 	*newComm = *comm
 	err := comm.Reviewer.Init(ctx)
 	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: err}
+		own.Summary <- &Result{CommitId: comm.Id, Error: err}
 		return comm, err
 	}
 	newComm, err = comm.Reviewer.Push(ctx, newComm)
 	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: err}
+		own.Summary <- &Result{CommitId: comm.Id, Error: err}
 		return comm, err
 	}
 	*comm = *newComm
@@ -156,12 +159,12 @@ func (own *Owner) Pull(ctx context.Context, comm *Commit) (*Commit, error) {
 	*newComm = *comm
 	err := comm.Reviewer.Init(ctx)
 	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: err}
+		own.Summary <- &Result{CommitId: comm.Id, Error: err}
 		return comm, err
 	}
 	newComm, err = comm.Reviewer.Pull(ctx, newComm)
 	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: err}
+		own.Summary <- &Result{CommitId: comm.Id, Error: err}
 		return comm, err
 	}
 	*comm = *newComm
@@ -175,15 +178,16 @@ func (own *Owner) Delete(ctx context.Context, comm *Commit) (*Commit, error) {
 	*newComm = *comm
 	err := comm.Reviewer.Init(ctx)
 	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: err}
+		own.Summary <- &Result{CommitId: comm.Id, Error: err}
 		return comm, err
 	}
 	newComm, err = comm.Reviewer.Delete(ctx, newComm)
 	if err != nil {
-		own.Summary <- &Result{CommitID: comm.ID, Error: err}
+		own.Summary <- &Result{CommitId: comm.Id, Error: err}
 		return comm, err
 	}
 	*comm = *newComm
+
 	return comm, nil
 }
 
@@ -207,7 +211,7 @@ func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx in
 	comm := pR.Commits[commIdx]
 	defer func() {
 		if err != nil {
-			own.Summary <- &Result{CommitID: comm.ID, Error: err}
+			own.Summary <- &Result{CommitId: comm.Id, Error: err}
 			comm.Errored = true
 		}
 	}()

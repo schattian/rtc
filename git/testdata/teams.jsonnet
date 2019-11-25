@@ -2,33 +2,33 @@ local schemas = import './schemas.jsonnet';
 local tables = import './tables.jsonnet';
 
 {
-  local basic = self.basic,
-  basic: {
-    assigned_schema: schemas.basic.name,
+  local foo = self.foo,
+  foo: {
+    assigned_schema: schemas.foo.name,
     members: [
-      { assigned_table: tables.basic.name },
+      { assigned_table: tables.foo.name },
     ],
   },
-  rare: {
-    assigned_schema: schemas.rare.name,
+  bar: {
+    assigned_schema: schemas.bar.name,
     members: [
-      { assigned_table: tables.rare.name },
+      { assigned_table: tables.bar.name },
     ],
   },
-  basic_rare: {
-    assigned_schema: schemas.basic_rare.name,
+  foo_bar: {
+    assigned_schema: schemas.foo_bar.name,
     members: [
-      { assigned_table: tables.basic_rare.name },
+      { assigned_table: tables.foo_bar.name },
     ],
   },
 
   inconsistent:
-    basic { members: [
-      { assigned_table: schemas.basic_rare.blueprint[0].name },
+    foo { members: [
+      { assigned_table: schemas.foo_bar.blueprint[0].name },
     ] },
 
   zero_members:
-    basic { members: [] },
+    foo { members: [] },
 
   zero: {},
 }

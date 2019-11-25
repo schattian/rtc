@@ -1,25 +1,51 @@
 package git
 
 import (
+	"context"
 	"encoding/json"
-	"errors"
 	"io"
 	"reflect"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/sebach1/git-crud/integrity"
 	"github.com/sebach1/git-crud/msh"
 )
 
 // Commit is the git-like representation of a group of a ready-to-deliver signed changes
 type Commit struct {
-	ID      int       `json:"id,omitempty"`
+	Id      int64     `json:"id,omitempty"`
 	Changes []*Change `json:"changes,omitempty"`
 
-	Reviewer Collaborator `json:"reviewer,omitempty"`
-	Errored  bool
+	ChangeIds []int64      `json:"change_ids,omitempty"`
+	Reviewer  Collaborator `json:"reviewer,omitempty"`
+
+	Errored bool `json:"emrrored,omitempty"`
 }
 
-// GroupBy splits the commit changes by the given comparator criteria
+// FetchChanges retrieves the changes from DB by its .ChangeIds and assigns them to .Changes field
+func (comm *Commit) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
+	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE id=ANY(:change_ids)`, comm)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		chg := Change{}
+		err = rows.StructScan(chg)
+		if err != nil {
+			return
+		}
+		comm.Changes = append(comm.Changes, &chg)
+	}
+	err = rows.Err()
+	if err != nil {
+		return err
+	}
+
+	return
+}
+
+// GroupBy splits the commit's changes by the given comparator criteria
 // See that strategy MUST define an equivalence relation (reflexive, transitive, symmetric)
 func (comm *Commit) GroupBy(strategy changesMatcher) (grpChanges [][]*Change) {
 	var omitTrans []int // Omits the transitivity of the comparisons storing the <j> element
@@ -66,8 +92,8 @@ func (comm *Commit) Unmarshal(data interface{}, format string) error {
 	return nil
 }
 
-// FromCloser takes a io.ReadCloser as the guideline of a new commit
-func FromCloser(body io.ReadCloser) (comm *Commit, err error) {
+// CommitFromCloser takes a io.ReadCloser as the guideline of a new commit
+func CommitFromCloser(body io.ReadCloser) (comm *Commit, err error) {
 	var bodyMap map[string]interface{}
 
 	err = json.NewDecoder(body).Decode(&bodyMap)
@@ -75,7 +101,7 @@ func FromCloser(body io.ReadCloser) (comm *Commit, err error) {
 		return nil, err
 	}
 
-	err = comm.FromMap(bodyMap)
+	comm, err = CommitFromMap(bodyMap)
 	if err != nil {
 		return nil, err
 	}
@@ -83,30 +109,33 @@ func FromCloser(body io.ReadCloser) (comm *Commit, err error) {
 	return
 }
 
-// FromMap decodes the commit from its map version
-// Notice that FromMap() is reciprocal to ToMap(), so it doesn't assign a table
-func (comm *Commit) FromMap(Map map[string]interface{}) error {
-	maybeID := Map["id"]
-	ID, ok := maybeID.(integrity.ID)
-	if !ok && maybeID != nil {
-		return errors.New("the ENTITY_ID is NOT an ID type")
+// CommitFromMap decodes the commit from its map version
+// Notice that Commit.FromMap() is reciprocal to ToMap(), so it doesn't assign a table
+func CommitFromMap(Map map[string]interface{}) (comm *Commit, err error) {
+	maybeId := Map["id"]
+	Id, ok := maybeId.(integrity.Id)
+	if !ok && maybeId != nil {
+		return nil, errInvalidCommitId
 	}
-	if maybeID != nil {
+	if maybeId != nil {
 		delete(Map, "id")
 	}
 
 	for col, val := range Map {
-		chg := new(Change)
-		chg.FromMap(map[string]interface{}{col: val})
+		chg := &Change{}
+		err := chg.FromMap(map[string]interface{}{col: val})
+		if err != nil {
+			return nil, err
+		}
 		comm.Changes = append(comm.Changes, chg)
 	}
 
-	if !ID.IsNil() {
+	if !Id.IsNil() {
 		for _, chg := range comm.Changes {
-			chg.EntityID = ID
+			chg.EntityId = Id
 		}
 	}
-	return nil
+	return
 }
 
 // ToMap returns a map with the content of the commit, omitting unnecessary fields
@@ -182,4 +211,18 @@ func checkIntInSlice(slice []int, elem int) bool {
 		}
 	}
 	return false
+}
+
+func (comm *Commit) copy() *Commit {
+	if comm == nil {
+		return nil
+	}
+	newComm := new(Commit)
+	*newComm = *comm
+	var newChgs []*Change
+	for _, chg := range comm.Changes {
+		newChgs = append(newChgs, chg.copy())
+	}
+	newComm.Changes = newChgs
+	return newComm
 }

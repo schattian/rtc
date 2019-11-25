@@ -1,9 +1,6 @@
 package schema
 
 import (
-	"context"
-	"database/sql"
-	"errors"
 	"sync"
 
 	"github.com/sebach1/git-crud/integrity"
@@ -12,31 +9,9 @@ import (
 // The Schema is the representation of a Database instructive. It uses concepts of SQL.
 // It provides the validation and construction structure.
 type Schema struct {
-	ID        int64                `json:"id,omitempty"`
+	Id        int64                `json:"id,omitempty"`
 	Name      integrity.SchemaName `json:"name,omitempty"`
 	Blueprint []*Table             `json:"blueprint,omitempty"`
-}
-
-func (sch *Schema) All(ctx context.Context, DB *sql.DB) (*Planisphere, error) {
-	rows, err := DB.QueryContext(ctx, `SELECT * FROM schemas`)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var psph Planisphere
-	for rows.Next() {
-		sch := &Schema{}
-		err = rows.Scan(sch)
-		if err != nil {
-			return nil, err
-		}
-		psph = append(psph, sch)
-	}
-	err = rows.Err()
-	if err != nil {
-		return nil, err
-	}
-	return &psph, nil
 }
 
 // Copy returns a copy of the given schema, including a deep copy if its blueprint
@@ -53,22 +28,16 @@ func (sch *Schema) Copy() *Schema {
 
 // ValidateSelf performs a deep self-validation to check data integrity
 // It wraps internal method validateSelf
-func (sch *Schema) ValidateSelf() (err error) {
+func (sch *Schema) ValidateSelf() (errs integrity.MultiErr) {
 	done := make(chan bool)
 	validationErrs := make(chan error)
 	go sch.validateSelf(done, validationErrs)
-
-	var errMsg string
 	for {
 		select {
 		case <-done:
-			if errMsg != "" {
-				err = errors.New(errMsg)
-			}
 			return
 		case vErr := <-validationErrs:
-			errMsg += vErr.Error()
-			errMsg += integrity.ErrorsSeparator
+			errs = append(errs, vErr)
 		}
 	}
 }
@@ -109,7 +78,7 @@ func (sch *Schema) validationErr(err error) *integrity.ValidationError {
 	} else {
 		name = string(sch.Name)
 	}
-	return &integrity.ValidationError{Err: err, Origin: "schema", OriginName: name}
+	return &integrity.ValidationError{Err: err, OriginType: "schema", OriginName: name}
 }
 
 // ValidateCtx checks if the context of the given tableName and colName is valid

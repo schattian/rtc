@@ -2,58 +2,50 @@ package git
 
 import (
 	"context"
-	"database/sql"
-	"fmt"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/git-crud/internal/store"
 )
-
-type credentials map[integrity.SchemaName]string
-
-func (creds *credentials) Encrypt(schName integrity.SchemaName, cred string) {
-}
-
-func (creds *credentials) Decrypt(schName integrity.SchemaName, cred string) {
-
-}
 
 // Branch is the state-manager around indeces
 type Branch struct {
-	ID   int64
+	Id   int64
 	Name string
 
 	Credentials credentials
 
-	IndexID int64
+	Index *Index
+
+	IndexId int64
 }
 
-func NewBranch(ctx context.Context, DB *sql.DB, name integrity.BranchName) (*Branch, error) {
-	res, err := DB.Exec(`INSERT INTO indeces (changes) VALUES ([])`)
+// NewBranchWithIndex safety creates a new Branch entity and assigns a new index_id to it
+// Notice it persists on the db and assigns the inserted id
+func NewBranchWithIndex(ctx context.Context, db *sqlx.DB, name integrity.BranchName) (*Branch, error) {
+	res, err := db.Exec(`INSERT INTO indeces DEFAULT VALUES`)
 	if err != nil {
 		return nil, err
 	}
-	idxID, err := res.LastInsertId()
+	idxId, err := res.LastInsertId()
 	if err != nil {
 		return nil, err
 	}
-	branch := &Branch{Name: string(name), IndexID: idxID}
-	res, err = DB.Exec(`INSERT INTO branches (name, index_id) VALUES ($1, $2)`, branch.Name, branch.IndexID)
+	branch := &Branch{Name: string(name), IndexId: idxId}
+	id, err := store.InsertToDB(ctx, branch, db)
 	if err != nil {
 		return nil, err
 	}
-	branch.ID, err = res.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
+	branch.SetId(id)
 	return branch, nil
 }
 
-func (b *Branch) Index(ctx context.Context, DB *sql.DB) (*Index, error) {
-	idx := &Index{}
-	row := DB.QueryRowContext(ctx, fmt.Sprintf("SELECT * FROM indeces WHERE id = %v", b.IndexID))
-	err := row.Scan(idx)
+// FetchIndex retrieves the Index by .IndexId and assigns it to .Index field
+func (b *Branch) FetchIndex(ctx context.Context, db *sqlx.DB) error {
+	row := db.QueryRowxContext(ctx, `SELECT * FROM indeces WHERE id=?`, b.IndexId)
+	err := row.StructScan(b.Index)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return idx, nil
+	return nil
 }

@@ -48,7 +48,7 @@ func (orgs *organizations) Push(ctx context.Context, comm *git.Commit) (*git.Com
 	}
 
 	defer res.Body.Close()
-	commit, err := git.CommitFrom(res.Body)
+	commit, err := git.CommitFromCloser(res.Body)
 	if err != nil {
 		return nil, err
 	}

@@ -13,28 +13,28 @@ func Test_preciseTableErr(t *testing.T) {
 	}
 
 	tests := []struct {
-		name string
-		args args
-		psph Planisphere
-		want error
+		name    string
+		args    args
+		psph    Planisphere
+		wantErr error
 	}{
 		{
-			name: "given tableName is in a schema",
-			args: args{tableName: gTables.Basic.Name},
-			psph: Planisphere{gSchemas.Basic},
-			want: errForeignTable,
+			name:    "given tableName is in a schema",
+			args:    args{tableName: gTables.Foo.Name},
+			psph:    Planisphere{gSchemas.Foo},
+			wantErr: errForeignTable,
 		},
 		{
-			name: "given tableName doesn't exists on any scoped schema",
-			args: args{gTables.Zero.Name},
-			psph: Planisphere{gSchemas.Basic, gSchemas.Rare},
-			want: errNonexistentTable,
+			name:    "given tableName doesn't exists on any scoped schema",
+			args:    args{gTables.Zero.Name},
+			psph:    Planisphere{gSchemas.Foo, gSchemas.Bar},
+			wantErr: errNonexistentTable,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.psph.preciseTableErr(tt.args.tableName); err != tt.want {
-				t.Errorf("preciseTableErr() error = %v, want %v", err, tt.want)
+			if err := tt.psph.preciseTableErr(tt.args.tableName); err != tt.wantErr {
+				t.Errorf("preciseTableErr() error = %v, want %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -51,42 +51,43 @@ func TestPlanisphere_GetSchemaFromName(t *testing.T) {
 		psph    Planisphere
 		args    args
 		want    *Schema
-		wantErr bool
+		wantErr error
 	}{
+		{
+			name:    "giving a single schema matching the given name",
+			args:    args{gSchemas.Foo.Name},
+			psph:    Planisphere{gSchemas.Foo},
+			want:    gSchemas.Foo,
+			wantErr: nil,
+		},
+		{
+			name:    "giving multiple gSchemas matching the given name it matches the first",
+			args:    args{gSchemas.Foo.Name},
+			psph:    Planisphere{gSchemas.Foo, gSchemas.FooBar},
+			want:    gSchemas.Foo,
+			wantErr: nil,
+		},
+		{
+			name:    "giving mixed correct schemas w/nil",
+			args:    args{gSchemas.Foo.Name},
+			psph:    Planisphere{nil, gSchemas.Foo, nil},
+			want:    gSchemas.Foo,
+			wantErr: nil,
+		},
+		//
 		{
 			name:    "blank schemaName and having blank schemas",
 			args:    args{gSchemas.Zero.Name},
 			psph:    Planisphere{gSchemas.Zero, gSchemas.Zero},
 			want:    nil,
-			wantErr: true,
-		},
-		{
-			name:    "giving a single schema matching the given name",
-			args:    args{gSchemas.Basic.Name},
-			psph:    Planisphere{gSchemas.Basic},
-			want:    gSchemas.Basic,
-			wantErr: false,
-		},
-		{
-			name:    "giving multiple gSchemas matching the given name it matches the first",
-			args:    args{gSchemas.Basic.Name},
-			psph:    Planisphere{gSchemas.Basic, gSchemas.BasicRare},
-			want:    gSchemas.Basic,
-			wantErr: false,
-		},
-		{
-			name:    "giving mixed correct schemas w/nil",
-			args:    args{gSchemas.Basic.Name},
-			psph:    Planisphere{nil, gSchemas.Basic, nil},
-			want:    gSchemas.Basic,
-			wantErr: false,
+			wantErr: errSchemaNotFoundInScope,
 		},
 		{
 			name:    "giving no schema",
-			args:    args{gSchemas.Basic.Name},
+			args:    args{gSchemas.Foo.Name},
 			psph:    Planisphere{},
 			want:    nil,
-			wantErr: true,
+			wantErr: errSchemaNotFoundInScope,
 		},
 	}
 	for _, tt := range tests {
@@ -94,7 +95,7 @@ func TestPlanisphere_GetSchemaFromName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			got, err := tt.psph.GetSchemaFromName(tt.args.schemaName)
-			if (err != nil) != tt.wantErr {
+			if err != tt.wantErr {
 				t.Errorf("Planisphere.GetSchemaFromName() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}

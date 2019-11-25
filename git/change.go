@@ -2,30 +2,56 @@ package git
 
 import (
 	"encoding/json"
-	"errors"
 
 	"github.com/sebach1/git-crud/integrity"
 )
 
 // A Change represents every purposed/lookup for difference
 type Change struct {
+	Id int64 `json:"id,omitempty"`
+
 	TableName  integrity.TableName  `json:"table_name,omitempty"`
 	ColumnName integrity.ColumnName `json:"column_name,omitempty"`
 
 	StrValue     string          `json:"str_value,omitempty"`
 	IntValue     int             `json:"int_value,omitempty"`
-	Float32Value float32         `json:"float32_value,omitempty"`
-	Float64Value float64         `json:"float64_value,omitempty"`
+	Float32Value float32         `json:"float_32_value,omitempty"`
+	Float64Value float64         `json:"float_64_value,omitempty"`
 	JSONValue    json.RawMessage `json:"json_value,omitempty"`
 	BytesValue   []byte          `json:"bytes_value,omitempty"`
 
-	EntityID integrity.ID `json:"entity_id,omitempty"`
+	EntityId integrity.Id `json:"entity_id,omitempty"`
 
 	ValueType integrity.ValueType `json:"value_type,omitempty"`
 
 	Type integrity.CRUD `json:"type,omitempty"`
 
 	Options Options
+
+	Commited bool `json:"commited,omitempty"`
+}
+
+// NewChange safety creates a new Change entity
+// Notice it doesn't saves it on the db
+func NewChange(
+	entityId integrity.Id,
+	tableName integrity.TableName,
+	columnName integrity.ColumnName,
+	val interface{},
+	Type integrity.CRUD,
+	opts Options,
+) (*Change, error) {
+	chg := &Change{EntityId: entityId, TableName: tableName, ColumnName: columnName, Type: Type, Options: opts}
+	err := chg.SetValue(val)
+	if err != nil {
+		return nil, err
+	}
+
+	err = chg.Validate()
+	if err != nil {
+		return nil, err
+	}
+	return chg, nil
 }
 
 // SetOption assigns the given key to the given value. Returns an error if the key is not allowed for any option
@@ -96,7 +122,7 @@ func (chg *Change) SetValue(val interface{}) (err error) {
 		chg.ValueType = "bytes"
 		return
 	}
-	return errors.New("the given value cannot be safety typed")
+	return errUnsafeValueType
 }
 
 // Overrides check if changes are overridable by each other
@@ -120,6 +146,14 @@ func (chg *Change) Equals(otherChg *Change) bool {
 	}
 	if chg.Value() != otherChg.Value() {
 		return false
+	}
+	if len(chg.Options) != len(otherChg.Options) {
+		return false
+	}
+	for k, v := range chg.Options {
+		if otherChg.Options[k] != v {
+			return false
+		}
 	}
 
 	return true
@@ -151,15 +185,19 @@ func (chg *Change) Validate() (err error) {
 func (chg *Change) FromMap(Map map[string]interface{}) error {
 	for col, val := range Map {
 		if col == "id" {
-			realVal, ok := val.(integrity.ID)
+			realVal, ok := val.(integrity.Id)
 			if !ok {
-				return errInvalidID
+				return errInvalidChangeId
 			}
-			chg.EntityID = realVal
+			chg.EntityId = realVal
 			continue
 		}
 		chg.ColumnName = integrity.ColumnName(col)
-		chg.SetValue(val)
+		err := chg.SetValue(val)
+		if err != nil {
+			return err
+		}
+
 	}
 	return nil
 }
@@ -171,8 +209,8 @@ func (chg *Change) ToMap() map[string]interface{} {
 	if chg.ColumnName != "" {
 		chgMap[string(chg.ColumnName)] = chg.Value()
 	}
-	if !chg.EntityID.IsNil() {
-		chgMap["id"] = chg.EntityID
+	if !chg.EntityId.IsNil() {
+		chgMap["id"] = chg.EntityId
 	}
 	return chgMap
 }
@@ -217,8 +255,8 @@ func (chg *Change) classifyType() (integrity.CRUD, error) {
 }
 
 func (chg *Change) validateCreate() error {
-	if !chg.EntityID.IsNil() {
-		return errNotNilEntityID
+	if !chg.EntityId.IsNil() {
+		return errNotNilEntityId
 	}
 	if chg.ColumnName == "" {
 		return errNilColumn
@@ -240,8 +278,8 @@ func (chg *Change) validateRetrieve() (err error) {
 }
 
 func (chg *Change) validateUpdate() error {
-	if chg.EntityID.IsNil() {
-		return errNilEntityID
+	if chg.EntityId.IsNil() {
+		return errNilEntityId
 	}
 	if chg.ColumnName == "" {
 		return errNilColumn
@@ -253,8 +291,8 @@ func (chg *Change) validateUpdate() error {
 }
 
 func (chg *Change) validateDelete() error {
-	if chg.EntityID.IsNil() {
-		return errNilEntityID
+	if chg.EntityId.IsNil() {
+		return errNilEntityId
 	}
 	if chg.ValueType != "" {
 		return errNotNilValue
@@ -281,4 +319,16 @@ func (chg *Change) tearDownValue() {
 	case "bytes":
 		chg.BytesValue = nil
 	}
+}
+
+func (chg *Change) copy() *Change {
+	if chg == nil {
+		return nil
+	}
+	newChg := &Change{}
+	*newChg = *chg
+	if chg.Options != nil {
+		newChg.Options = chg.Options.copy()
+	}
+	return newChg
 }

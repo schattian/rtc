@@ -28,30 +28,30 @@ func TestFabric_Produce(t *testing.T) {
 	}{
 		{
 			name:    "correct usage",
-			fabric:  &Fabric{Schema: gSchemas.BasicRare},
+			fabric:  &Fabric{Schema: gSchemas.FooBar},
 			args:    args{marshal: "json"},
-			wantDir: fmt.Sprintf("fabric/%v", strings.ToLower(string(gSchemas.BasicRare.Name))),
+			wantDir: fmt.Sprintf("fabric/%v", strings.ToLower(string(gSchemas.FooBar.Name))),
 			wantErr: false,
 			product: map[integrity.TableName]string{
-				gTables.Basic.Name:     "basic.go",
-				gTables.Rare.Name:      "rare.go",
-				gTables.BasicRare.Name: "basic_rare.go",
+				gTables.Foo.Name:    "foo.go",
+				gTables.Bar.Name:    "bar.go",
+				gTables.FooBar.Name: "foo_bar.go",
 			},
 		},
 		{
 			name:    "but w/PRESET DIR",
-			fabric:  &Fabric{Schema: gSchemas.BasicRare, Dir: customDir},
+			fabric:  &Fabric{Schema: gSchemas.FooBar, Dir: customDir},
 			args:    args{marshal: "json"},
 			wantDir: customDir,
 			wantErr: false,
 			product: map[integrity.TableName]string{
-				gTables.Basic.Name:     "basic.go",
-				gTables.Rare.Name:      "rare.go",
-				gTables.BasicRare.Name: "basic_rare.go",
+				gTables.Foo.Name:    "foo.go",
+				gTables.Bar.Name:    "bar.go",
+				gTables.FooBar.Name: "foo_bar.go",
 			},
 		},
 		{
-			name:    "SCHEMA does NOT PASS THE VALIDATIONS (is nil)",
+			name:    "SCHEMA does NOT PASS THE VALIdATIONS (is nil)",
 			fabric:  &Fabric{Dir: customDir}, // customDir: see that checking os existance of "" dir always returns true
 			args:    args{marshal: "json"},
 			wantDir: customDir,
@@ -82,7 +82,7 @@ func TestFabric_Produce(t *testing.T) {
 			}
 			for _, table := range tt.fabric.Schema.Blueprint {
 				generatedFilename := strings.ToLower(string(table.Name)) + ".go"
-				got := thelpers.IORead(t, mFs, tt.fabric.Dir+"/"+generatedFilename, afero.ReadFile)
+				got := thelpers.IOReadFile(t, mFs, tt.fabric.Dir+"/"+generatedFilename)
 				thelpers.CmpWithGoldenFile(t, got, fmt.Sprintf("fabric/%s", tt.product[table.Name]), "Fabric.Produce()")
 			}
 		})

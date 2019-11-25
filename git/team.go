@@ -42,3 +42,17 @@ func (t *Team) Delegate(tableName integrity.TableName) (Collaborator, error) {
 	}
 	return nil, errNoMembers
 }
+
+func (t *Team) copy() *Team {
+	if t == nil {
+		return nil
+	}
+	team := &Team{}
+	*team = *t
+	var newMembers []*Member
+	for _, member := range t.Members {
+		newMembers = append(newMembers, member.copy())
+	}
+	team.Members = newMembers
+	return team
+}

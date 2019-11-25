@@ -19,22 +19,22 @@ func TestColumn_Validate(t *testing.T) {
 		val interface{}
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name     string
+		fields   fields
+		args     args
+		wantsErr bool // Notice wantSErr (errs are not necessarily std due they're wrapped from the col validator)
 	}{
 		{
-			name:    "passes the validation",
-			fields:  fields{Validator: valide.String},
-			args:    args{val: "anything"},
-			wantErr: false,
+			name:     "passes the validation",
+			fields:   fields{Validator: valide.String},
+			args:     args{val: "anything"},
+			wantsErr: false,
 		},
 		{
-			name:    "doesnt passes the validation",
-			fields:  fields{Validator: valide.Int},
-			args:    args{val: "anything"},
-			wantErr: true,
+			name:     "doesnt passes the validation",
+			fields:   fields{Validator: valide.Int},
+			args:     args{val: "anything"},
+			wantsErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -45,8 +45,8 @@ func TestColumn_Validate(t *testing.T) {
 				Name:      tt.fields.Name,
 				Validator: tt.fields.Validator,
 			}
-			if err := c.Validate(tt.args.val); (err != nil) != tt.wantErr {
-				t.Errorf("Column.Validate() error = %v, wantErr %v", err, tt.wantErr)
+			if err := c.Validate(tt.args.val); (err != nil) != tt.wantsErr {
+				t.Errorf("Column.Validate() error = %v, wantErr %v", err, tt.wantsErr)
 			}
 		})
 	}
@@ -59,56 +59,56 @@ func TestColumn_applyBuiltinValidator(t *testing.T) {
 		Type          integrity.ValueType
 		wantValidator integrity.Validator
 		wantType      integrity.ValueType
-		wantErr       bool
+		wantErr       error
 	}{
 		{
 			name:          "JSON type",
 			Type:          "json",
 			wantType:      "json.RawMessage",
 			wantValidator: valide.JSON,
-			wantErr:       false,
+			wantErr:       nil,
 		},
 		{
 			name:          "BYTES type",
 			Type:          "bytes",
 			wantType:      "[]byte",
 			wantValidator: valide.Bytes,
-			wantErr:       false,
+			wantErr:       nil,
 		},
 		{
 			name:          "STR type",
 			Type:          "string",
 			wantValidator: valide.String,
-			wantErr:       false,
+			wantErr:       nil,
 		},
 		{
 			name:          "INT type",
 			Type:          "int",
 			wantValidator: valide.Int,
-			wantErr:       false,
+			wantErr:       nil,
 		},
 		{
 			name:          "FLOAT32 type",
 			Type:          "float32",
 			wantValidator: valide.Float32,
-			wantErr:       false,
+			wantErr:       nil,
 		},
 		{
 			name:          "FLOAT64 type",
 			Type:          "float64",
 			wantValidator: valide.Float64,
-			wantErr:       false,
+			wantErr:       nil,
 		},
 		{
 			name:    "NIL type",
 			Type:    "",
-			wantErr: true,
+			wantErr: errNilColumnType,
 		},
 
 		{
-			name:    "INVALID type",
+			name:    "INVALId type",
 			Type:    "invalid",
-			wantErr: true,
+			wantErr: errUnallowedColumnType,
 		},
 	}
 	for _, tt := range tests {
@@ -117,12 +117,12 @@ func TestColumn_applyBuiltinValidator(t *testing.T) {
 			t.Parallel()
 			c := &Column{Type: tt.Type}
 			err := c.applyBuiltinValidator()
-			if (err != nil) != tt.wantErr {
+			if err != tt.wantErr {
 				t.Errorf("Column.applyBuiltinValidator() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if err != nil {
 				if c.Validator != nil {
-					t.Errorf("Column.applyBuiltinValidator() ASSIGNED a VALIDATOR while it errored: %v", c.Validator)
+					t.Errorf("Column.applyBuiltinValidator() ASSIGNED a VALIdATOR while it errored: %v", c.Validator)
 				}
 				if c.Type != tt.Type {
 					t.Errorf("Column.applyBuiltinValidator() CHANGED a TYPE while it errored: %v", c.Validator)
@@ -131,7 +131,7 @@ func TestColumn_applyBuiltinValidator(t *testing.T) {
 			}
 
 			if fmt.Sprintf("%v", c.Validator) != fmt.Sprintf("%v", tt.wantValidator) {
-				t.Errorf("Column.applyBuiltinValidator() mismatch VALIDATOR")
+				t.Errorf("Column.applyBuiltinValidator() mismatch VALIdATOR")
 			}
 
 			if tt.wantType == "" {

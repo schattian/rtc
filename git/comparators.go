@@ -9,10 +9,10 @@ func AreCompatible(chg, otherChg *Change) bool {
 	if chg.TableName != otherChg.TableName {
 		return false
 	}
-	if chg.EntityID != otherChg.EntityID {
+	if chg.EntityId != otherChg.EntityId {
 		return false
 	}
-	if chg.Type == "create" { // In case of both of EntityIDs are nil
+	if chg.Type == "create" { // In case of both of EntityIds are nil
 		//  (see that the above comparison discards 2x checking)
 		return false
 	}

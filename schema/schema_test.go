@@ -16,32 +16,32 @@ func TestSchema_preciseColErr(t *testing.T) {
 		colName integrity.ColumnName
 	}
 	tests := []struct {
-		name string
-		args args
-		want error
+		name    string
+		args    args
+		wantErr error
 	}{
 		{
-			name: "column is in the schema",
-			args: args{sch: gSchemas.Basic, colName: gColumns.Basic.Name},
-			want: errForeignColumn,
+			name:    "column is in the schema",
+			args:    args{sch: gSchemas.Foo, colName: gColumns.Foo.Name},
+			wantErr: errForeignColumn,
 		},
 		{
-			name: "column doesn't exists in the schema",
-			args: args{sch: gSchemas.Basic, colName: gColumns.Rare.Name},
-			want: errNonexistentColumn,
+			name:    "column doesn't exists in the schema",
+			args:    args{sch: gSchemas.Foo, colName: gColumns.Bar.Name},
+			wantErr: errNonexistentColumn,
 		},
 		{
-			name: "schema caller is zero-valued",
-			args: args{sch: gSchemas.Zero, colName: gColumns.Basic.Name},
-			want: errNonexistentColumn,
+			name:    "schema caller is zero-valued",
+			args:    args{sch: gSchemas.Zero, colName: gColumns.Foo.Name},
+			wantErr: errNonexistentColumn,
 		},
 	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			if err := tt.args.sch.preciseColErr(tt.args.colName); err != tt.want {
-				t.Errorf("Schema.preciseColErr() error = %v, want %v", err, tt.want)
+			if err := tt.args.sch.preciseColErr(tt.args.colName); err != tt.wantErr {
+				t.Errorf("Schema.preciseColErr() error = %v, want %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -57,66 +57,77 @@ func TestSchema_ValidateCtx(t *testing.T) {
 		helperScope *Planisphere
 	}
 	tests := []struct {
-		name    string
-		sch     *Schema
-		args    args
-		wantErr bool
+		name     string
+		sch      *Schema
+		args     args
+		wantsErr bool
 	}{
 		{
 			name: "passes the validations",
-			sch:  gSchemas.Basic,
+			sch:  gSchemas.Foo,
 			args: args{
-				tableName:   gTables.Basic.Name,
-				colName:     gColumns.Basic.Name,
-				optionKeys:  []integrity.OptionKey{gTables.Basic.OptionKeys[0]},
-				helperScope: &Planisphere{gSchemas.Basic},
+				tableName:   gTables.Foo.Name,
+				colName:     gColumns.Foo.Name,
+				optionKeys:  []integrity.OptionKey{gTables.Foo.OptionKeys[0]},
+				helperScope: &Planisphere{gSchemas.Foo},
 			},
-			wantErr: false,
+			wantsErr: false,
+		},
+		{
+			name: "but NO GIVEN COL passes validation",
+			sch:  gSchemas.Foo,
+			args: args{
+				tableName:   gTables.Foo.Name,
+				colName:     "",
+				optionKeys:  []integrity.OptionKey{gTables.Foo.OptionKeys[0]},
+				helperScope: &Planisphere{gSchemas.Foo},
+			},
+			wantsErr: false,
 		},
 		{
 			name: "optionKey nonexistant",
-			sch:  gSchemas.Basic,
+			sch:  gSchemas.Foo,
 			args: args{
-				tableName:   gTables.Basic.Name,
-				colName:     gColumns.Basic.Name,
-				optionKeys:  []integrity.OptionKey{gTables.Rare.OptionKeys[0]},
-				helperScope: &Planisphere{gSchemas.Basic},
+				tableName:   gTables.Foo.Name,
+				colName:     gColumns.Foo.Name,
+				optionKeys:  []integrity.OptionKey{gTables.Bar.OptionKeys[0]},
+				helperScope: &Planisphere{gSchemas.Foo},
 			},
-			wantErr: true,
+			wantsErr: true,
 		},
 		{
 			name: "value doesn't pass the column validator func",
-			sch:  gSchemas.Basic.Copy().addColValidator(gColumns.Basic.Name, valide.String),
+			sch:  gSchemas.Foo.Copy().addColValidator(gColumns.Foo.Name, valide.String),
 			args: args{
-				tableName:   gTables.Basic.Name,
-				colName:     gColumns.Basic.Name,
+				tableName:   gTables.Foo.Name,
+				colName:     gColumns.Foo.Name,
 				val:         3,
 				optionKeys:  []integrity.OptionKey{},
-				helperScope: &Planisphere{gSchemas.Basic},
+				helperScope: &Planisphere{gSchemas.Foo},
 			},
-			wantErr: true,
+			wantsErr: true,
 		},
 		{
 			name: "column not inside any table",
-			sch:  gSchemas.Basic,
+			sch:  gSchemas.Foo,
 			args: args{
-				tableName:   gTables.Basic.Name,
-				colName:     gColumns.Rare.Name,
-				optionKeys:  []integrity.OptionKey{gTables.Basic.OptionKeys[0]},
-				helperScope: &Planisphere{gSchemas.Basic},
+				tableName:   gTables.Foo.Name,
+				colName:     gColumns.Bar.Name,
+				optionKeys:  []integrity.OptionKey{gTables.Foo.OptionKeys[0]},
+				helperScope: &Planisphere{gSchemas.Foo},
 			},
-			wantErr: true,
+			wantsErr: true,
 		},
 		{
 			name: "table nonexistant",
-			sch:  gSchemas.Basic,
+			sch:  gSchemas.Foo,
 			args: args{
-				tableName:   gTables.Rare.Name,
-				colName:     gColumns.Basic.Name,
+				tableName:   gTables.Bar.Name,
+				colName:     gColumns.Foo.Name,
 				optionKeys:  []integrity.OptionKey{},
-				helperScope: &Planisphere{gSchemas.Basic},
+				helperScope: &Planisphere{gSchemas.Foo},
 			},
-			wantErr: true,
+			wantsErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -129,12 +140,12 @@ func TestSchema_ValidateCtx(t *testing.T) {
 			go tt.sch.ValidateCtx(tt.args.tableName, tt.args.colName, tt.args.optionKeys, tt.args.val, tt.args.helperScope, wg, errCh)
 			wg.Wait()
 			isErrored := len(errCh) == 1
-			if isErrored && !tt.wantErr {
+			if isErrored && !tt.wantsErr {
 				err := <-errCh
-				t.Errorf("Schema.ValidateCtx() error: %v; wantErr %v", err, tt.wantErr)
+				t.Errorf("Schema.ValidateCtx() error: %v; wantErr %v", err, tt.wantsErr)
 			}
-			if !isErrored && tt.wantErr {
-				t.Errorf("Schema.ValidateCtx() error: %v; wantErr %v", nil, tt.wantErr)
+			if !isErrored && tt.wantsErr {
+				t.Errorf("Schema.ValidateCtx() error: %v; wantErr %v", nil, tt.wantsErr)
 			}
 		})
 	}
@@ -192,10 +203,9 @@ func TestSchema_WrapValidateSelf(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			sch := tt.function(gSchemas.Basic.Copy())
-			err := sch.ValidateSelf()
-			unwrappedVErr := integrity.UnwrapValidationError(err, false)
-			diffGot, diffWant := diffBetweenErrs(unwrappedVErr, []error{tt.err})
+			sch := tt.function(gSchemas.Foo.Copy())
+			errs := sch.ValidateSelf().UnwrapAll(integrity.UnwrapValidationError)
+			diffGot, diffWant := diffBetweenErrs(errs, []error{tt.err})
 			if diffGot != nil {
 				t.Errorf("Schema.WrapValidate() GOT more errs than want: %v", diffGot)
 			}
@@ -207,16 +217,15 @@ func TestSchema_WrapValidateSelf(t *testing.T) {
 	for k, test := range fuzzyFactorial(fuzzyTests) {
 		test := test
 		var wantErrs []error
-		sch := gSchemas.Basic.Copy()
+		sch := gSchemas.Foo.Copy()
 		for _, tt := range test {
 			sch = tt.function(sch)
 			wantErrs = append(wantErrs, tt.err)
 		}
 		t.Run(strconv.Itoa(k), func(t *testing.T) {
 			t.Parallel()
-			err := sch.ValidateSelf()
-			unwrappedVErr := integrity.UnwrapValidationError(err, false)
-			diffGot, diffWant := diffBetweenErrs(unwrappedVErr, wantErrs)
+			errs := sch.ValidateSelf().UnwrapAll(integrity.UnwrapValidationError)
+			diffGot, diffWant := diffBetweenErrs(errs, wantErrs)
 			if diffGot != nil {
 				t.Errorf("Schema.WrapValidate() GOT more errs than want: %v", diffGot)
 			}

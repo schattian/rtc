@@ -1,8 +1,6 @@
 package schema
 
 import (
-	"fmt"
-
 	"github.com/sebach1/git-crud/integrity"
 )
 
@@ -19,7 +17,7 @@ func (psph Planisphere) GetSchemaFromName(schemaName integrity.SchemaName) (*Sch
 			return sch, nil
 		}
 	}
-	return nil, fmt.Errorf("the desired schema doesn't exists. Given: %v", schemaName)
+	return nil, errSchemaNotFoundInScope
 }
 
 // preciseTableErr will assume there is an error with the tableName. Then, it precises the current behavior.
