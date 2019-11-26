@@ -97,16 +97,12 @@ func (f *Fabric) writeAll(fs afero.Fs) {
 
 func (f *Fabric) writeFile(fs afero.Fs, filename string, generated []byte) {
 	defer f.fsWg.Done()
-
-	for {
-		<-f.fsSmp
-		err := afero.WriteFile(fs, filename, generated, os.ModePerm)
-		if err != nil {
-			f.fsErrCh <- err
-		}
-		f.fsSmp <- 0 // Unblocks the next call of writeFile
-		break
+	<-f.fsSmp
+	err := afero.WriteFile(fs, filename, generated, os.ModePerm)
+	if err != nil {
+		f.fsErrCh <- err
 	}
+	f.fsSmp <- 0 // Unblocks the next call of writeFile
 }
 
 func (f *Fabric) structFromTable(table *schema.Table, marshal string) *tableData {
