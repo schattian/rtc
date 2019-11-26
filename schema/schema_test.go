@@ -152,29 +152,12 @@ func TestSchema_ValidateCtx(t *testing.T) {
 }
 
 func TestSchema_WrapValidateSelf(t *testing.T) {
-	t.Parallel()
-	fuzzyTests := []*schemaVary{
-		// Schema
+	tests := []*schemaVary{
+		// Identity func
 		{
-			name:     "sch nil name",
-			function: func(sch *Schema) *Schema { sch.Name = ""; return sch },
-			err:      errNilSchemaName},
-		// Table
-		{
-			name:     "table nil name",
-			function: func(sch *Schema) *Schema { sch.Blueprint[0].Name = ""; return sch },
-			err:      errNilTableName},
-		// Column
-		{
-			name:     "col nil type",
-			function: func(sch *Schema) *Schema { sch.Blueprint[0].Columns[0].Type = ""; return sch },
-			err:      errNilColumnType},
-		{
-			name:     "col nil name",
-			function: func(sch *Schema) *Schema { sch.Blueprint[0].Columns[0].Name = ""; return sch },
-			err:      errNilColumnName},
-	}
-	normalTests := []*schemaVary{
+			name:     "sch is valid",
+			function: func(sch *Schema) *Schema { return sch },
+			err:      nil},
 		// Schema
 		{
 			name:     "sch nil",
@@ -199,13 +182,17 @@ func TestSchema_WrapValidateSelf(t *testing.T) {
 			function: func(sch *Schema) *Schema { sch.Blueprint[0].Columns[0] = nil; return sch },
 			err:      errNilColumn},
 	}
-	for _, tt := range normalTests {
+	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			sch := tt.function(gSchemas.Foo.Copy())
 			errs := sch.ValidateSelf().UnwrapAll(integrity.UnwrapValidationError)
-			diffGot, diffWant := diffBetweenErrs(errs, []error{tt.err})
+			var wantErr []error
+			if tt.err != nil {
+				wantErr = append(wantErr, tt.err)
+			}
+			diffGot, diffWant := diffBetweenErrs(errs, wantErr)
 			if diffGot != nil {
 				t.Errorf("Schema.WrapValidate() GOT more errs than want: %v", diffGot)
 			}
@@ -213,6 +200,31 @@ func TestSchema_WrapValidateSelf(t *testing.T) {
 				t.Errorf("Schema.WrapValidate() WANT more errs than got: %v", diffWant)
 			}
 		})
+	}
+}
+
+func TestSchema_WrapValidateSelf_Fuzzy(t *testing.T) {
+	t.Parallel()
+	fuzzyTests := []*schemaVary{
+		// Schema
+		{
+			name:     "sch nil name",
+			function: func(sch *Schema) *Schema { sch.Name = ""; return sch },
+			err:      errNilSchemaName},
+		// Table
+		{
+			name:     "table nil name",
+			function: func(sch *Schema) *Schema { sch.Blueprint[0].Name = ""; return sch },
+			err:      errNilTableName},
+		// Column
+		{
+			name:     "col nil type",
+			function: func(sch *Schema) *Schema { sch.Blueprint[0].Columns[0].Type = ""; return sch },
+			err:      errNilColumnType},
+		{
+			name:     "col nil name",
+			function: func(sch *Schema) *Schema { sch.Blueprint[0].Columns[0].Name = ""; return sch },
+			err:      errNilColumnName},
 	}
 	for k, test := range fuzzyFactorial(fuzzyTests) {
 		test := test
@@ -234,6 +246,7 @@ func TestSchema_WrapValidateSelf(t *testing.T) {
 			}
 		})
 	}
+
 }
 
 type schemaVary struct {
