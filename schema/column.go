@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/git-crud/internal/xerrors"
 	"github.com/sebach1/git-crud/schema/valide"
 )
 
@@ -29,14 +30,14 @@ func (c *Column) validateSelf(wg *sync.WaitGroup, vErrCh chan<- error) {
 	}
 }
 
-func (c *Column) validationErr(err error) *integrity.ValidationError {
+func (c *Column) validationErr(err error) *xerrors.ValidationError {
 	var name string
 	if c == nil {
 		name = ""
 	} else {
 		name = string(c.Name)
 	}
-	return &integrity.ValidationError{Err: err, OriginType: "column", OriginName: name}
+	return &xerrors.ValidationError{Err: err, OriginType: "column", OriginName: name}
 }
 
 // Copy returns a copy of the given column

@@ -1,3 +1,6 @@
+/*
+Pkg msh provides general marshal utilities, including custom Decoders/Encoders
+*/
 package msh
 
 import "encoding/json"

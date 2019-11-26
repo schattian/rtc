@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/git-crud/internal/xerrors"
 	"github.com/sebach1/git-crud/schema"
 )
 
@@ -248,7 +249,7 @@ func (own *Owner) ReviewPRCommit(sch *schema.Schema, pR *PullRequest, commIdx in
 		var errs string
 		for err := range schErrCh {
 			errs += err.Error()
-			errs += integrity.ErrorsSeparator
+			errs += xerrors.ErrorsSeparator
 		}
 		err = errors.New(errs)
 		return

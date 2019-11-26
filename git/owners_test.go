@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/git-crud/internal/xerrors"
 	"github.com/sebach1/git-crud/schema"
 )
 
@@ -234,7 +235,7 @@ func TestOwner_Orchestrate(t *testing.T) {
 			for result := range tt.own.Summary {
 				if result.Error != nil {
 					gotErrs += result.Error.Error()
-					gotErrs += integrity.ErrorsSeparator
+					gotErrs += xerrors.ErrorsSeparator
 					gotQtResErrs++
 				}
 			}

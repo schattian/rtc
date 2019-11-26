@@ -1,9 +1,14 @@
+/*
+Package schema is the main package of the schema definition
+It is responsible for creating a structure over the data, and pretends to perform validations before having to communicate
+*/
 package schema
 
 import (
 	"sync"
 
 	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/git-crud/internal/xerrors"
 )
 
 // The Schema is the representation of a Database instructive. It uses concepts of SQL.
@@ -28,7 +33,7 @@ func (sch *Schema) Copy() *Schema {
 
 // ValidateSelf performs a deep self-validation to check data integrity
 // It wraps internal method validateSelf
-func (sch *Schema) ValidateSelf() (errs integrity.MultiErr) {
+func (sch *Schema) ValidateSelf() (errs xerrors.MultiErr) {
 	done := make(chan bool)
 	validationErrs := make(chan error)
 	go sch.validateSelf(done, validationErrs)
@@ -71,14 +76,14 @@ func (sch *Schema) validateSelf(done chan<- bool, vErrCh chan<- error) {
 	schVWg.Wait()
 }
 
-func (sch *Schema) validationErr(err error) *integrity.ValidationError {
+func (sch *Schema) validationErr(err error) *xerrors.ValidationError {
 	var name string
 	if sch == nil {
 		name = ""
 	} else {
 		name = string(sch.Name)
 	}
-	return &integrity.ValidationError{Err: err, OriginType: "schema", OriginName: name}
+	return &xerrors.ValidationError{Err: err, OriginType: "schema", OriginName: name}
 }
 
 // ValidateCtx checks if the context of the given tableName and colName is valid

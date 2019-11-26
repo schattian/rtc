@@ -12,7 +12,7 @@ vet: | test
 
 staticcheck:
 	$(GO) get honnef.co/go/tools/cmd/staticcheck
-	staticcheck -checks all $(PKGS)
+	staticcheck $(PKGS)
 
 misspell:
 	$(GO) get github.com/client9/misspell/cmd/misspell

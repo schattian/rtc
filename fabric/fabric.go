@@ -1,3 +1,6 @@
+/*
+Package fabric provides an easy way to create native struct receiver types given a schema
+*/
 package fabric
 
 import (

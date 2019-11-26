@@ -1,3 +1,6 @@
+/*
+Package name contains the naming conventions on git-crud
+*/
 package name
 
 import (

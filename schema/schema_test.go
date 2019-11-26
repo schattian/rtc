@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/git-crud/internal/xerrors"
 	"github.com/sebach1/git-crud/schema/valide"
 )
 
@@ -187,7 +188,7 @@ func TestSchema_WrapValidateSelf(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			sch := tt.function(gSchemas.Foo.Copy())
-			errs := sch.ValidateSelf().UnwrapAll(integrity.UnwrapValidationError)
+			errs := sch.ValidateSelf().UnwrapAll(xerrors.UnwrapValidationError)
 			var wantErr []error
 			if tt.err != nil {
 				wantErr = append(wantErr, tt.err)
@@ -236,7 +237,7 @@ func TestSchema_WrapValidateSelf_Fuzzy(t *testing.T) {
 		}
 		t.Run(strconv.Itoa(k), func(t *testing.T) {
 			t.Parallel()
-			errs := sch.ValidateSelf().UnwrapAll(integrity.UnwrapValidationError)
+			errs := sch.ValidateSelf().UnwrapAll(xerrors.UnwrapValidationError)
 			diffGot, diffWant := diffBetweenErrs(errs, wantErrs)
 			if diffGot != nil {
 				t.Errorf("Schema.WrapValidate() GOT more errs than want: %v", diffGot)

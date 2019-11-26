@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/git-crud/internal/xerrors"
 )
 
 // A Table is the representation of SQL table (or Mongo/CQL Collections) which acts as a collection of entities.
@@ -41,14 +42,14 @@ func (t *Table) validateSelf(wg *sync.WaitGroup, vErrCh chan<- error) {
 	tVWg.Wait()
 }
 
-func (t *Table) validationErr(err error) *integrity.ValidationError {
+func (t *Table) validationErr(err error) *xerrors.ValidationError {
 	var name string
 	if t == nil {
 		name = ""
 	} else {
 		name = string(t.Name)
 	}
-	return &integrity.ValidationError{Err: err, OriginType: "table", OriginName: name}
+	return &xerrors.ValidationError{Err: err, OriginType: "table", OriginName: name}
 }
 
 // Copy returns a copy of the given table, including embedded cols
