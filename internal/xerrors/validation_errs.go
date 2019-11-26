@@ -1,4 +1,4 @@
-package integrity
+package xerrors
 
 import (
 	"errors"
