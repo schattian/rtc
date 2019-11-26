@@ -1,3 +1,3 @@
 # Git-crud
 
-[![CircleCI](https://circleci.com/gh/sebach1/git-crud.svg?style=svg)](https://circleci.com/gh/sebach1/git-crud)
+[![Build Status](https://travis-ci.com/sebach1/git-crud.svg?branch=master)](https://travis-ci.com/sebach1/git-crud)
