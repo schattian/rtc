@@ -19,19 +19,19 @@ func TestFabric_Produce(t *testing.T) {
 	}
 	customDir := "testF/testSf"
 	tests := []struct {
-		name    string
-		fabric  *Fabric
-		args    args
-		wantDir string
-		wantErr bool
-		product map[integrity.TableName]string // Maps the golden filenames to created goldenFiles
+		name     string
+		fabric   *Fabric
+		args     args
+		wantDir  string
+		wantsErr bool
+		product  map[integrity.TableName]string // Maps the golden filenames to created goldenFiles
 	}{
 		{
-			name:    "correct usage",
-			fabric:  &Fabric{Schema: gSchemas.FooBar},
-			args:    args{marshal: "json"},
-			wantDir: fmt.Sprintf("fabric/%v", strings.ToLower(string(gSchemas.FooBar.Name))),
-			wantErr: false,
+			name:     "correct usage",
+			fabric:   &Fabric{Schema: gSchemas.FooBar},
+			args:     args{marshal: "json"},
+			wantDir:  fmt.Sprintf("fabric/%v", strings.ToLower(string(gSchemas.FooBar.Name))),
+			wantsErr: false,
 			product: map[integrity.TableName]string{
 				gTables.Foo.Name:    "foo.go",
 				gTables.Bar.Name:    "bar.go",
@@ -39,11 +39,11 @@ func TestFabric_Produce(t *testing.T) {
 			},
 		},
 		{
-			name:    "but w/PRESET DIR",
-			fabric:  &Fabric{Schema: gSchemas.FooBar, Dir: customDir},
-			args:    args{marshal: "json"},
-			wantDir: customDir,
-			wantErr: false,
+			name:     "but w/PRESET DIR",
+			fabric:   &Fabric{Schema: gSchemas.FooBar, Dir: customDir},
+			args:     args{marshal: "json"},
+			wantDir:  customDir,
+			wantsErr: false,
 			product: map[integrity.TableName]string{
 				gTables.Foo.Name:    "foo.go",
 				gTables.Bar.Name:    "bar.go",
@@ -51,11 +51,11 @@ func TestFabric_Produce(t *testing.T) {
 			},
 		},
 		{
-			name:    "SCHEMA does NOT PASS THE VALIdATIONS (is nil)",
-			fabric:  &Fabric{Dir: customDir}, // customDir: see that checking os existance of "" dir always returns true
-			args:    args{marshal: "json"},
-			wantDir: customDir,
-			wantErr: true,
+			name:     "SCHEMA does NOT PASS THE VALIdATIONS (is nil)",
+			fabric:   &Fabric{Dir: customDir}, // customDir: see that checking os existance of "" dir always returns true
+			args:     args{marshal: "json"},
+			wantDir:  customDir,
+			wantsErr: true,
 		},
 	}
 	for _, tt := range tests {
@@ -67,6 +67,9 @@ func TestFabric_Produce(t *testing.T) {
 			isCreated := thelpers.IOExist(t, mFs, tt.fabric.Dir, afero.DirExists)
 			if tt.fabric.Dir != tt.wantDir {
 				t.Errorf("Fabric.Produce() DIFF DIR than expected; want: %v, got: %v", tt.wantDir, tt.fabric.Dir)
+			}
+			if (err != nil) != tt.wantsErr {
+				t.Errorf("Fabric.Produce() err behavior mismatch; wantsErr: %v, got: %v", tt.wantsErr, err)
 			}
 
 			if err != nil {
