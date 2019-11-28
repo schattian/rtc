@@ -1,7 +1,7 @@
 package git
 
 import (
-	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/rtc/integrity"
 )
 
 // A Team is a group of Members which work for the same AssignedSchema

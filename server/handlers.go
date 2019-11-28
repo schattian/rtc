@@ -7,9 +7,9 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/sebach1/git-crud/config"
-	"github.com/sebach1/git-crud/git"
-	"github.com/sebach1/git-crud/internal/name"
+	"github.com/sebach1/rtc/config"
+	"github.com/sebach1/rtc/git"
+	"github.com/sebach1/rtc/internal/name"
 	"github.com/valyala/fasthttp"
 )
 

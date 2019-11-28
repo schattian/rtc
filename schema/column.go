@@ -3,9 +3,9 @@ package schema
 import (
 	"sync"
 
-	"github.com/sebach1/git-crud/integrity"
-	"github.com/sebach1/git-crud/internal/xerrors"
-	"github.com/sebach1/git-crud/schema/valide"
+	"github.com/sebach1/rtc/integrity"
+	"github.com/sebach1/rtc/internal/xerrors"
+	"github.com/sebach1/rtc/schema/valide"
 )
 
 // A Column is the representation of SQL column which defines the structure of the fields that is contains.

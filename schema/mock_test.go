@@ -1,6 +1,6 @@
 package schema
 
-import "github.com/sebach1/git-crud/integrity"
+import "github.com/sebach1/rtc/integrity"
 
 func (c *Column) addValidator(validator integrity.Validator) *Column {
 	c.Validator = validator

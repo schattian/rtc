@@ -5,9 +5,9 @@ import (
 	"errors"
 	"sync"
 
-	"github.com/sebach1/git-crud/integrity"
-	"github.com/sebach1/git-crud/internal/xerrors"
-	"github.com/sebach1/git-crud/schema"
+	"github.com/sebach1/rtc/integrity"
+	"github.com/sebach1/rtc/internal/xerrors"
+	"github.com/sebach1/rtc/schema"
 )
 
 // Owner is the agent which coordinates any given action

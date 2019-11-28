@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/sebach1/git-crud/git"
-	"github.com/sebach1/git-crud/literals"
-	"github.com/sebach1/git-crud/msh"
+	"github.com/sebach1/rtc/git"
+	"github.com/sebach1/rtc/literals"
+	"github.com/sebach1/rtc/msh"
 )
 
 type repositories struct {

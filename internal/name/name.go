@@ -1,5 +1,5 @@
 /*
-Package name contains the naming conventions on git-crud
+Package name contains the naming conventions on rtc
 */
 package name
 

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/sebach1/git-crud/git"
+	"github.com/sebach1/rtc/git"
 )
 
 // The BaseCollab builtin literal provides a standard Collaborator agent, and can be used to prevent

@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/rtc/integrity"
 )
 
 type collabMock struct {

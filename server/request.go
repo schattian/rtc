@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/sebach1/git-crud/git"
-	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/rtc/git"
+	"github.com/sebach1/rtc/integrity"
 )
 
 type reqBody struct {

@@ -5,7 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/rtc/integrity"
 )
 
 // Add wraps change adding from the inferred index

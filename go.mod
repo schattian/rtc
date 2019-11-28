@@ -1,4 +1,4 @@
-module github.com/sebach1/git-crud
+module github.com/sebach1/rtc
 
 go 1.13
 

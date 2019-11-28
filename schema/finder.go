@@ -5,7 +5,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/rtc/integrity"
 )
 
 // ByName finds a schema from the DB given its name

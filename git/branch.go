@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/sebach1/git-crud/integrity"
-	"github.com/sebach1/git-crud/internal/store"
+	"github.com/sebach1/rtc/integrity"
+	"github.com/sebach1/rtc/internal/store"
 )
 
 // Branch is the state-manager around indeces

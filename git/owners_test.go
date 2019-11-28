@@ -6,9 +6,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/sebach1/git-crud/integrity"
-	"github.com/sebach1/git-crud/internal/xerrors"
-	"github.com/sebach1/git-crud/schema"
+	"github.com/sebach1/rtc/integrity"
+	"github.com/sebach1/rtc/internal/xerrors"
+	"github.com/sebach1/rtc/schema"
 )
 
 func TestOwner_ReviewPRCommit(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 
 	"github.com/gedex/inflector"
 	"github.com/google/go-cmp/cmp"
-	"github.com/sebach1/git-crud/internal/name"
+	"github.com/sebach1/rtc/internal/name"
 )
 
 func TestCommit_columns(t *testing.T) {

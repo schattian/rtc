@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/sebach1/git-crud/integrity"
-	"github.com/sebach1/git-crud/schema/valide"
+	"github.com/sebach1/rtc/integrity"
+	"github.com/sebach1/rtc/schema/valide"
 )
 
 func TestColumn_Validate(t *testing.T) {

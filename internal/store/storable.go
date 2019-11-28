@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/sebach1/git-crud/internal/name"
+	"github.com/sebach1/rtc/internal/name"
 )
 
 type Storable interface {

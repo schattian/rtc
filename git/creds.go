@@ -1,6 +1,6 @@
 package git
 
-import "github.com/sebach1/git-crud/integrity"
+import "github.com/sebach1/rtc/integrity"
 
 type credentials map[integrity.SchemaName]string
 

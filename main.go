@@ -6,7 +6,7 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
-	"github.com/sebach1/git-crud/server"
+	"github.com/sebach1/rtc/server"
 
 	"github.com/valyala/fasthttp"
 )

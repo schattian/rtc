@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/afero"
 
-	"github.com/sebach1/git-crud/internal/test/thelpers"
+	"github.com/sebach1/rtc/internal/test/thelpers"
 
 	"github.com/google/go-cmp/cmp"
 )

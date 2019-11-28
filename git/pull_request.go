@@ -1,7 +1,7 @@
 package git
 
 import (
-	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/rtc/integrity"
 )
 
 // A PullRequest connects a group of Commits with a team

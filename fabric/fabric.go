@@ -11,9 +11,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/sebach1/git-crud/integrity"
-	"github.com/sebach1/git-crud/internal/name"
-	"github.com/sebach1/git-crud/schema"
+	"github.com/sebach1/rtc/integrity"
+	"github.com/sebach1/rtc/internal/name"
+	"github.com/sebach1/rtc/schema"
 	"github.com/spf13/afero"
 )
 

@@ -7,8 +7,8 @@ package schema
 import (
 	"sync"
 
-	"github.com/sebach1/git-crud/integrity"
-	"github.com/sebach1/git-crud/internal/xerrors"
+	"github.com/sebach1/rtc/integrity"
+	"github.com/sebach1/rtc/internal/xerrors"
 )
 
 // The Schema is the representation of a Database instructive. It uses concepts of SQL.

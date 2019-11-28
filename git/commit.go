@@ -7,8 +7,8 @@ import (
 	"reflect"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/sebach1/git-crud/integrity"
-	"github.com/sebach1/git-crud/msh"
+	"github.com/sebach1/rtc/integrity"
+	"github.com/sebach1/rtc/msh"
 )
 
 // Commit is the git-like representation of a group of a ready-to-deliver signed changes

@@ -5,7 +5,7 @@ LABEL maintainer="Sebastián Chamena <sebachamena@gmail.com>"
 ARG env=development
  
 ENV ENV $env
-ENV WORKDIR /git-crud
+ENV WORKDIR /rtc
 
 WORKDIR ${WORKDIR}
 

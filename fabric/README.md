@@ -10,13 +10,13 @@ An alternative to this could be using [gojson](https://github.com/ChimeraCoder/g
 
 The standard usage of this module would be:
 
-1. Fabric the structs with `git-crud fabric <SCHEMA_PATH>`.
+1. Fabric the structs with `rtc fabric <SCHEMA_PATH>`.
 2. Marshal the git.Commit using any utility provided in the msh pkg or use the `Mapable` provided abstraction to create your own marshaler.
 3. Unmarshal the obtained map to the struct you generated in the first step.
 
 Example:
 
-Using the github literal, first we are going to create the native structs for this `git-crud fabric literals/github.yaml`.
+Using the github literal, first we are going to create the native structs for this `rtc fabric literals/github.yaml`.
 
 Then, and after committing a few changes (see how to commit)[] we orchestrate the changes:
 
@@ -28,10 +28,10 @@ import (
     "context"
 
     fabric "my_fabric_dir/github"
-    "github.com/sebach1/git-crud/git"
-    "github.com/sebach1/git-crud/literals"
-    "github.com/sebach1/git-crud/literals/github"
-    "github.com/sebach1/git-crud/msh"
+    "github.com/sebach1/rtc/git"
+    "github.com/sebach1/rtc/literals"
+    "github.com/sebach1/rtc/literals/github"
+    "github.com/sebach1/rtc/msh"
 )
 
 myOwner := git.NewOwner(literals.StdPlanisphere)

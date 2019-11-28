@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/rtc/integrity"
 
-	"github.com/sebach1/git-crud/internal/test/thelpers"
+	"github.com/sebach1/rtc/internal/test/thelpers"
 
 	"github.com/spf13/afero"
 )

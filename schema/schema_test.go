@@ -5,9 +5,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/sebach1/git-crud/integrity"
-	"github.com/sebach1/git-crud/internal/xerrors"
-	"github.com/sebach1/git-crud/schema/valide"
+	"github.com/sebach1/rtc/integrity"
+	"github.com/sebach1/rtc/internal/xerrors"
+	"github.com/sebach1/rtc/schema/valide"
 )
 
 func TestSchema_preciseColErr(t *testing.T) {

@@ -3,8 +3,8 @@ package git
 import (
 	"math/rand"
 
-	"github.com/sebach1/git-crud/internal/test/assist"
-	"github.com/sebach1/git-crud/schema"
+	"github.com/sebach1/rtc/internal/test/assist"
+	"github.com/sebach1/rtc/schema"
 )
 
 var (

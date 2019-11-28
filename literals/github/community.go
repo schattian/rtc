@@ -1,7 +1,7 @@
 package github
 
 import (
-	"github.com/sebach1/git-crud/git"
+	"github.com/sebach1/rtc/git"
 )
 
 const baseURL = "https://api.github.com"

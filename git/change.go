@@ -3,7 +3,7 @@ package git
 import (
 	"encoding/json"
 
-	"github.com/sebach1/git-crud/integrity"
+	"github.com/sebach1/rtc/integrity"
 )
 
 // A Change represents every purposed/lookup for difference
