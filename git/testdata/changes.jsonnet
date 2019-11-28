@@ -1,34 +1,17 @@
 local columns = import 'columns.jsonnet';
 local tables = import 'tables.jsonnet';
+local ChangeScale = 300;
+local FooScale = ChangeScale + 1;
+local BarScale = ChangeScale + 5;
 
-//  Notice that foo & bar types are all from UPDATE operation type
-//  due to perform exhaustive fields analysis, and being UPDATE which takes all the fields
-local fooId = 1;
-local barId = 101;
-
-local fooEntityId = '01EntityId';
-local barEntityId = '001EntityId';
-
-local fooStringValue = 'fooValue';
-local barStringValue = 'barValue';
-local fooIntValue = 1001;
-local fooFloat32Value = fooIntValue;
-local fooFloat64Value = fooIntValue;
-local barIntValue = 9001;
-local fooJSONValue = { embedded_value: { another_embedding: 'fooValue' } };
-local barJSONValue = { embedded_value: { another_embedding: 'barValue' } };
-
-// oK
-local fooOptionKey = tables.fooOptionKey;
-local barOptionKey = tables.barOptionKey;
-local fooOptionValue = 'fooOptionValue';
-local barOptionValue = 'barOptionValue';
+local cleanVals(x) = x { str_value: '', int_value: 0, float_32_value: 0, float_64_value: 0, json_value: '', value_type: '' };
+local assignVal(base, val, typ) = cleanVals(base) { [std.format('%s_value', typ)]: val, value_type: typ };
 
 // CRUD
 local toCreate(x) = x { entity_id: '', type: 'create' };
 local toRetrieve(x) = x { value_type: '', str_value: '', type: 'retrieve' };
 local toUpdate(x) = x { type: 'update' };
-local toDelete(x) = x { value_type: '', str_value: '', column_name: '', type: 'delete' };
+local toDelete(x) = cleanVals(x) { column_name: '', type: 'delete' };
 local createCRUD(x) = {
   create: toCreate(x),
   retrieve: toRetrieve(x),
@@ -36,86 +19,71 @@ local createCRUD(x) = {
   delete: toDelete(x),
 };
 
+//  Notice that foo & bar types are all from UPDATE operation type
+//  due to the need to perform exhaustive fields analysis, and being UPDATE which takes all the fields
 {
   local foo = self.foo,
   local bar = self.bar,
 
-
   foo: {
     local base = self.none,
-
+    local alt = $.bar.none,
     none: {
       table_name: tables.foo.name,
       column_name: columns.foo.name,
-      str_value: fooStringValue,
+      str_value: 'fooChangeStringValue',
       value_type: columns.foo.type,
-      id: fooId,
-      entity_id: fooEntityId,
+      id: FooScale,
+      entity_id: 'fooChangeEntityId',
       options: {
-        fooOptionKey: fooOptionValue,
+        fooOptionKey: 'fooChangeOptionValue',
       },
     },
-
-    crud: createCRUD(base),
-
+    id: base { id: alt.id },
+    entity_id: base { entity_id: alt.entity_id },
+    options: base { options: alt.options },
     table_name: base { table_name: tables.bar.name },
-
     column_name: base { column_name: columns.bar.name },
 
-    str_value: base { str_value: barStringValue, value_type: "string" },
+    str_value: assignVal(base, bar.str_value.str_value, 'str'),
+    int_value: assignVal(base, FooScale * 2, 'int'),
+    float_32_value: assignVal(base, FooScale * 3.2, 'float32'),
+    float_64_value: assignVal(base, FooScale * 6.4, 'float64'),
+    json_value: assignVal(base, 'fooChangeJsonValue', 'json'),
+    clean_value: cleanVals(base),
 
-    int_value: base { int_value: fooIntValue, value_type: "int", str_value: '' },
-
-    float_32_value: base { float_32_value: fooFloat32Value, value_type: "float32" },
-
-    float_64_value: base { float_64_value: fooFloat64Value, value_type: "float64" },
-
-    id: base { id: barId },
-
-    entity_id: base { entity_id: barEntityId },
-
-    json_value: base { json_value: fooJSONValue, value_type: "json", str_value: '' },
-
-    clean_value: base { str_value: '', value_type: '' },
-    
-    options: base { options: bar.none.options },
-
+    crud: createCRUD(base),
   },
 
   bar: {
     local base = self.none,
+    local alt = $.foo.none,
 
     none: {
       table_name: tables.bar.name,
       column_name: columns.bar.name,
-      int_value: barIntValue,
+      int_value: BarScale * 2,
       value_type: columns.bar.type,
-      id: barId,
-      entity_id: barEntityId,
+      id: BarScale,
+      entity_id: 'barChangeEntityId',
       options: {
-        barOptionKey: barOptionValue,
+        barOptionKey: 'barChangeOptionValue',
       },
     },
+    table_name: base { table_name: tables.foo.name },
+    column_name: base { column_name: columns.foo.name },
+    id: base { id: alt.id },
+    entity_id: base { entity_id: alt.entity_id },
+    options: base { options: alt.options },
+
+    str_value: assignVal(base, 'fooChangeStringValue', 'str'),
+    int_value: assignVal(base, BarScale * 2, 'int'),
+    float_32_value: assignVal(base, BarScale * 3.2, 'float32'),
+    float_64_value: assignVal(base, BarScale * 6.4, 'float64'),
+    json_value: assignVal(base, 'barChangeJsonValue', 'json'),
+    clean_value: cleanVals(base),
 
     crud: createCRUD(base),
-
-    table_name: base { table_name: tables.foo.name },
-
-    column_name: base { column_name: columns.foo.name },
-
-    int_value: base { int_value: fooIntValue },
-
-    str_value: base { str_value: barStringValue, value_type: "string", int_value: 0 },
-
-    id: base { id: fooId },
-
-    json_value: base { json_value: barJSONValue, value_type: "json", int_value: 0 },
-
-    entity_id: base { entity_id: fooEntityId },
-
-    clean_value: base { int_value: 0, value_type: '' },
-    
-    options: base { options: foo.none.options },
   },
 
   inconsistent: {
