@@ -1,28 +1,24 @@
 local tables = import 'tables.jsonnet';
 
-local fooName = 'fooSchemaName';
-local barName = 'barSchemaName';
-local fooBarName = 'fooBarSchemaName';
-
 {
   foo: {
-    name: fooName,
+    name: 'fooSchemaName',
     blueprint: [tables.foo],
   },
 
   bar: {
-    name: barName,
+    name: 'barSchemaName',
     blueprint: [tables.bar],
   },
 
   foo_bar: {
-    name: fooBarName,
+    name: 'fooBarSchemaName',
     blueprint: [
       tables.foo_bar,
       tables.foo,
       tables.bar,
     ],
   },
- 
-  zero:{},
+
+  zero: {},
 }
