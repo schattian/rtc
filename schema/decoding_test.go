@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/afero"
 
-	"github.com/sebach1/rtc/internal/test/thelpers"
+	"github.com/sebach1/rtc/internal/test/thelper"
 
 	"github.com/google/go-cmp/cmp"
 )
@@ -52,9 +52,9 @@ func TestFromFilename(t *testing.T) {
 			t.Parallel()
 			Fs := afero.NewMemMapFs()
 			if tt.fake {
-				thelpers.AddFileToFs(t, tt.goldenFilename, []byte{}, Fs)
+				thelper.AddFileToFs(t, tt.goldenFilename, []byte{}, Fs)
 			} else {
-				thelpers.AddFileToFsByName(t, tt.goldenFilename, "foo", Fs)
+				thelper.AddFileToFsByName(t, tt.goldenFilename, "foo", Fs)
 			}
 			got, err := FromFilename(tt.goldenFilename, Fs)
 			if err != tt.wantErr {
