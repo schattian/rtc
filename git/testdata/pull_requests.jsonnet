@@ -1,13 +1,22 @@
-local schemas = import './schemas.jsonnet';
-local changes = import './changes.jsonnet';
-local teams = import './teams.jsonnet';
-local CRUD = {
-  create: changes.foo.crud.create,
-  retrieve: changes.foo.crud.retrieve,
-  update: changes.foo.crud.update,
-  delete: changes.foo.crud.delete,
-};
+local changes = import 'changes.jsonnet';
+local schemas = import 'schemas.jsonnet';
+local teams = import 'teams.jsonnet';
+
 local chgToComm(x) = { changes: [x] };
+local CRUD = {
+  foo: {
+    create: changes.foo.crud.create,
+    retrieve: changes.foo.crud.retrieve,
+    update: changes.foo.crud.update,
+    delete: changes.foo.crud.delete,
+  },
+  bar: {
+    create: changes.bar.crud.create,
+    retrieve: changes.bar.crud.retrieve,
+    update: changes.bar.crud.update,
+    delete: changes.bar.crud.delete,
+  },
+};
 
 {
   local foo = self.foo,
@@ -23,10 +32,10 @@ local chgToComm(x) = { changes: [x] };
     team: teams.foo,
     commits:
       [
-        chgToComm(CRUD.create),
-        chgToComm(CRUD.retrieve),
-        chgToComm(CRUD.update),
-        chgToComm(CRUD.delete),
+        chgToComm(CRUD.foo.create),
+        chgToComm(CRUD.foo.retrieve),
+        chgToComm(CRUD.foo.update),
+        chgToComm(CRUD.foo.delete),
       ],
   },
 
@@ -34,28 +43,28 @@ local chgToComm(x) = { changes: [x] };
     create: foo {
       team: teams.foo,
       commits: [
-        chgToComm(CRUD.create),
+        chgToComm(CRUD.foo.create),
       ],
     },
 
     retrieve: foo {
       team: teams.foo,
       commits: [
-        chgToComm(CRUD.retrieve),
+        chgToComm(CRUD.foo.retrieve),
       ],
     },
 
     update: foo {
       team: teams.foo,
       commits: [
-        chgToComm(CRUD.update),
+        chgToComm(CRUD.foo.update),
       ],
     },
 
     delete: foo {
       team: teams.foo,
       commits: [
-        chgToComm(CRUD.delete),
+        chgToComm(CRUD.foo.delete),
       ],
     },
   },
