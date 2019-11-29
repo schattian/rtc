@@ -1,15 +1,11 @@
-local fooName = 'fooColumnName';
-local barName = 'barColumnName';
-
-
 {
   foo: {
-    name: fooName,
+    name: "fooColumnName",
     type: "string",
   },
 
   bar: {
-    name: barName,
+    name: "barColumnName",
     type: "int",
   },
   
