@@ -1,34 +1,30 @@
 local columns = import 'columns.jsonnet';
 
-local fooName = 'fooTableName';
-local barName = 'barTableName';
-local fooBarName = 'fooBarTableName';
-
-local fooOptionKey = 'fooOptionKey';
-local barOptionKey = 'barOptionKey';
-
 {
+  local foo = self.foo,
+  local bar = self.bar,
+
   foo: {
-    name: fooName,
+    name: 'fooTableName',
     columns: [columns.foo],
-    option_keys: [fooOptionKey],
+    option_keys: ['fooTableOptionKey'],
   },
 
   bar: {
-    name: barName,
+    name: 'barTableName',
     columns: [columns.bar],
-    option_keys: [barOptionKey],
+    option_keys: ['barTableOptionKey'],
   },
 
   foo_bar: {
-    name: fooBarName,
+    name: 'fooBarTableName',
     columns: [
       columns.foo,
       columns.bar,
     ],
     option_keys: [
-      fooOptionKey,
-      barOptionKey,
+      foo.option_keys[0],
+      bar.option_keys[0],
     ],
   },
 
