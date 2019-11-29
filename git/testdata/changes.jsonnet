@@ -36,7 +36,7 @@ local createCRUD(x) = {
       id: FooScale,
       entity_id: 'fooChangeEntityId',
       options: {
-        fooOptionKey: 'fooChangeOptionValue',
+        [tables.foo.option_keys[0]]: 'fooChangeOptionValue',
       },
     },
     id: base { id: alt.id },
@@ -67,7 +67,7 @@ local createCRUD(x) = {
       id: BarScale,
       entity_id: 'barChangeEntityId',
       options: {
-        barOptionKey: 'barChangeOptionValue',
+        [tables.bar.option_keys[0]]: 'barChangeOptionValue',
       },
     },
     table_name: base { table_name: tables.foo.name },
