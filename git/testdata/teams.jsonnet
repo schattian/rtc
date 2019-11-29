@@ -2,7 +2,6 @@ local schemas = import './schemas.jsonnet';
 local tables = import './tables.jsonnet';
 
 {
-  local foo = self.foo,
   foo: {
     assigned_schema: schemas.foo.name,
     members: [
@@ -23,12 +22,10 @@ local tables = import './tables.jsonnet';
   },
 
   inconsistent:
-    foo { members: [
-      { assigned_table: schemas.foo_bar.blueprint[0].name },
-    ] },
+    $.foo { members: [{ assigned_table: schemas.foo_bar.blueprint[0].name }] },
 
   zero_members:
-    foo { members: [] },
+    $.foo { members: [] },
 
   zero: {},
 }
