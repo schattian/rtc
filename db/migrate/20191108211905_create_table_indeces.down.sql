@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS indeces;
+DROP TABLE IF EXISTS indices;
