@@ -42,4 +42,7 @@ var (
 	// Owner
 	errNilProject   = errors.New("the PROJECT is NIL")
 	errEmptyProject = errors.New("the PROJECT does NOT contain ANY SCHEMA")
+
+	// Branch
+	errNilIndexId = errors.New("the branch's INDEX ID is NIL")
 )
