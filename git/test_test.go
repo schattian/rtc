@@ -11,6 +11,8 @@ var (
 	gChanges      goldenChanges
 	gTeams        goldenTeams
 	gPullRequests goldenPullRequests
+	gBranches     goldenBranches
+	gIndices      goldenindices
 
 	gSchemas schema.GoldenSchemas
 	gTables  schema.GoldenTables
@@ -21,12 +23,24 @@ func init() {
 	assist.DecodeJsonnet("changes", &gChanges)
 	assist.DecodeJsonnet("pull_requests", &gPullRequests)
 	assist.DecodeJsonnet("teams", &gTeams)
+	assist.DecodeJsonnet("branches", &gBranches)
+	assist.DecodeJsonnet("indices", &gIndices)
 
 	assist.DecodeJsonnet("schemas", &gSchemas)
 	assist.DecodeJsonnet("tables", &gTables)
 	assist.DecodeJsonnet("columns", &gColumns)
 }
 
+type goldenindices struct {
+	Foo  *Index `json:"foo,omitempty"`
+	Bar  *Index `json:"bar,omitempty"`
+	Zero *Index `json:"zero,omitempty"`
+}
+type goldenBranches struct {
+	Foo  *Branch `json:"foo,omitempty"`
+	Bar  *Branch `json:"bar,omitempty"`
+	Zero *Branch `json:"zero,omitempty"`
+}
 type goldenChanges struct {
 	Foo          variadicChanges `json:"foo,omitempty"`
 	Bar          variadicChanges `json:"bar,omitempty"`
@@ -49,6 +63,7 @@ type variadicChanges struct {
 	CleanValue   *Change `json:"clean_value,omitempty"`
 
 	Options *Change `json:"options,omitempty"`
+	IndexId *Change `json:"index_id,omitempty"`
 
 	ChgCRUD `json:"crud,omitempty"`
 }
