@@ -27,15 +27,23 @@ func sqlColumnNames(storable Storable) string {
 }
 
 // InsertToDB inserts the storable entity to the DB
-// Returns the inserted id
-func InsertToDB(ctx context.Context, storable Storable, db *sqlx.DB) (int64, error) {
+// Finally, it assigns the inserted Id to the given entity
+func InsertToDB(ctx context.Context, db *sqlx.DB, storable Storable) error {
+	if ctx == nil {
+		ctx = context.Background()
+	}
 	res, err := db.NamedExecContext(
 		ctx,
-		`INSERT INTO`+storable.SQLTable()+` `+sqlColumnNames(storable)+` VALUES `+sqlColumnValues(storable),
+		`INSERT INTO `+storable.SQLTable()+` `+sqlColumnNames(storable)+` VALUES `+sqlColumnValues(storable),
 		storable,
 	)
 	if err != nil {
-		return 0, err
+		return err
 	}
-	return res.LastInsertId()
+	id, err := res.LastInsertId()
+	if err != nil {
+		return err
+	}
+	storable.SetId(id)
+	return nil
 }
