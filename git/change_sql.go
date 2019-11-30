@@ -30,6 +30,7 @@ func (chg *Change) SQLColumns() []string {
 		"json_value",
 		"bytes_value",
 		"entity_id",
+		"index_id",
 		"type",
 		"options",
 		"commited",

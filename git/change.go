@@ -28,6 +28,8 @@ type Change struct {
 
 	Options Options
 
+	IndexId int64 `json:"index_id,omitempty"`
+
 	Commited bool `json:"commited,omitempty"`
 }
 
