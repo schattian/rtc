@@ -3,6 +3,7 @@ module github.com/sebach1/rtc
 go 1.13
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.3.3
 	github.com/client9/misspell v0.3.4 // indirect
 	github.com/gedex/inflector v0.0.0-20170307190818-16278e9db813
 	github.com/google/go-cmp v0.3.1
