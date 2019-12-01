@@ -118,7 +118,7 @@ func TestCommit_ToMap(t *testing.T) {
 			name: "CREATE commit with multiple columns",
 			comm: &Commit{Changes: []*Change{gChanges.Foo.Create}},
 			want: map[string]interface{}{
-				string(gChanges.Foo.Create.ColumnName): gChanges.Foo.Create.StrValue,
+				string(gChanges.Foo.Create.ColumnName): gChanges.Foo.Create.StringValue,
 			},
 		},
 		{
@@ -133,8 +133,8 @@ func TestCommit_ToMap(t *testing.T) {
 			comm: &Commit{Changes: []*Change{gChanges.Foo.None, gChanges.Foo.ColumnName}},
 			want: map[string]interface{}{
 				"id":                                 gChanges.Foo.None.EntityId,
-				string(gChanges.Foo.None.ColumnName): gChanges.Foo.None.StrValue,
-				string(gChanges.Foo.ColumnName.ColumnName): gChanges.Foo.ColumnName.StrValue,
+				string(gChanges.Foo.None.ColumnName): gChanges.Foo.None.StringValue,
+				string(gChanges.Foo.ColumnName.ColumnName): gChanges.Foo.ColumnName.StringValue,
 			},
 		},
 		{

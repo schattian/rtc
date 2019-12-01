@@ -1,8 +1,6 @@
 package git
 
 import (
-	"encoding/json"
-
 	"github.com/sebach1/rtc/integrity"
 )
 
@@ -13,12 +11,11 @@ type Change struct {
 	TableName  integrity.TableName  `json:"table_name,omitempty"`
 	ColumnName integrity.ColumnName `json:"column_name,omitempty"`
 
-	StrValue     string          `json:"str_value,omitempty"`
-	IntValue     int             `json:"int_value,omitempty"`
-	Float32Value float32         `json:"float_32_value,omitempty"`
-	Float64Value float64         `json:"float_64_value,omitempty"`
-	JSONValue    json.RawMessage `json:"json_value,omitempty"`
-	BytesValue   []byte          `json:"bytes_value,omitempty"`
+	StringValue  string  `json:"string_value,omitempty"`
+	IntValue     int     `json:"int_value,omitempty"`
+	Float32Value float32 `json:"float_32_value,omitempty"`
+	Float64Value float64 `json:"float_64_value,omitempty"`
+	BytesValue   []byte  `json:"bytes_value,omitempty"`
 
 	EntityId integrity.Id `json:"entity_id,omitempty"`
 
@@ -73,16 +70,14 @@ func (chg *Change) SetOption(key integrity.OptionKey, val interface{}) error {
 func (chg *Change) Value() interface{} {
 	switch chg.ValueType {
 	case "string":
-		return chg.StrValue
+		return chg.StringValue
 	case "int":
 		return chg.IntValue
-	case "float32":
+	case "float_32":
 		return chg.Float32Value
-	case "float64":
+	case "float_64":
 		return chg.Float64Value
-	case "json":
-		return chg.JSONValue
-	case "bytes":
+	case "json", "bytes":
 		return chg.BytesValue
 	}
 	return nil
@@ -95,7 +90,7 @@ func (chg *Change) SetValue(val interface{}) (err error) {
 	chg.tearDownValue()
 
 	if strVal, ok := val.(string); ok {
-		chg.StrValue = strVal
+		chg.StringValue = strVal
 		chg.ValueType = "string"
 		return
 	}
@@ -106,17 +101,12 @@ func (chg *Change) SetValue(val interface{}) (err error) {
 	}
 	if f32Val, ok := val.(float32); ok {
 		chg.Float32Value = f32Val
-		chg.ValueType = "float32"
+		chg.ValueType = "float_32"
 		return
 	}
 	if f64Val, ok := val.(float64); ok {
 		chg.Float64Value = f64Val
-		chg.ValueType = "float64"
-		return
-	}
-	if jsVal, ok := val.(json.RawMessage); ok {
-		chg.JSONValue = jsVal
-		chg.ValueType = "json"
+		chg.ValueType = "float_64"
 		return
 	}
 	if byVal, ok := val.([]byte); ok {
@@ -309,15 +299,13 @@ func (chg *Change) tearDownValue() {
 	defer func() { chg.ValueType = "" }()
 	switch chg.ValueType {
 	case "string":
-		chg.StrValue = ""
+		chg.StringValue = ""
 	case "int":
 		chg.IntValue = 0
 	case "float32":
 		chg.Float32Value = 0
 	case "float64":
 		chg.Float64Value = 0
-	case "json":
-		chg.JSONValue = json.RawMessage{}
 	case "bytes":
 		chg.BytesValue = nil
 	}

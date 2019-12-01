@@ -55,12 +55,12 @@ type variadicChanges struct {
 	TableName  *Change `json:"table_name,omitempty"`
 	ColumnName *Change `json:"column_name,omitempty"`
 
-	StrValue     *Change `json:"str_value,omitempty"`
+	StringValue  *Change `json:"string_value,omitempty"`
 	IntValue     *Change `json:"int_value,omitempty"`
 	Float32Value *Change `json:"float_32_value,omitempty"`
 	Float64Value *Change `json:"float_64_value,omitempty"`
-	JSONValue    *Change `json:"json_value,omitempty"`
 	CleanValue   *Change `json:"clean_value,omitempty"`
+	JSONValue    *Change `json:"json_value,omitempty"`
 
 	Options *Change `json:"options,omitempty"`
 	IndexId *Change `json:"index_id,omitempty"`

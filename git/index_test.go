@@ -41,8 +41,8 @@ func TestIdx_Add(t *testing.T) {
 		{
 			name:    "change modifies the value of a change already in the index",
 			idx:     &Index{Changes: []*Change{gChanges.Foo.Update}},
-			args:    args{chg: gChanges.Foo.StrValue.copy()},
-			newComm: &Index{Changes: []*Change{gChanges.Foo.StrValue.copy().changeType("update")}},
+			args:    args{chg: gChanges.Foo.StringValue.copy()},
+			newComm: &Index{Changes: []*Change{gChanges.Foo.StringValue.copy().changeType("update")}},
 			wantErr: nil,
 		},
 		{

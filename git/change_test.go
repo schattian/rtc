@@ -24,16 +24,16 @@ func TestChange_SetValue(t *testing.T) {
 		{
 			name:          "string",
 			chg:           randChg(cleansedChgs...),
-			args:          args{val: gChanges.Foo.StrValue.StrValue},
+			args:          args{val: gChanges.Foo.StringValue.StringValue},
 			wantErr:       nil,
 			wantValueType: "string",
 		},
 		{
 			name:          "json",
 			chg:           randChg(cleansedChgs...),
-			args:          args{val: gChanges.Foo.JSONValue.JSONValue},
+			args:          args{val: gChanges.Foo.JSONValue.BytesValue},
 			wantErr:       nil,
-			wantValueType: "json",
+			wantValueType: "bytes",
 		},
 		{
 			name:          "int",
@@ -43,18 +43,18 @@ func TestChange_SetValue(t *testing.T) {
 			wantValueType: "int",
 		},
 		{
-			name:          "float32",
+			name:          "float_32",
 			chg:           randChg(cleansedChgs...),
 			args:          args{val: gChanges.Foo.Float32Value.Float32Value},
 			wantErr:       nil,
-			wantValueType: "float32",
+			wantValueType: "float_32",
 		},
 		{
-			name:          "float64",
+			name:          "float_64",
 			chg:           randChg(cleansedChgs...),
 			args:          args{val: gChanges.Foo.Float64Value.Float64Value},
 			wantErr:       nil,
-			wantValueType: "float64",
+			wantValueType: "float_64",
 		},
 		{
 			name:    "nil",
@@ -85,12 +85,12 @@ func TestChange_Value(t *testing.T) {
 		{
 			name: "json",
 			chg:  gChanges.Foo.JSONValue,
-			want: gChanges.Foo.JSONValue.JSONValue,
+			want: gChanges.Foo.JSONValue.BytesValue,
 		},
 		{
 			name: "str",
 			chg:  gChanges.Foo.None,
-			want: gChanges.Foo.None.StrValue,
+			want: gChanges.Foo.None.StringValue,
 		},
 		{
 			name: "float32",
@@ -110,7 +110,7 @@ func TestChange_Value(t *testing.T) {
 		{
 			name: "str",
 			chg:  gChanges.Foo.None,
-			want: gChanges.Foo.None.StrValue,
+			want: gChanges.Foo.None.StringValue,
 		},
 	}
 	for _, tt := range tests {
