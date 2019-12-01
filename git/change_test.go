@@ -225,14 +225,14 @@ func TestChange_SetOption(t *testing.T) {
 		wantOptions Options
 	}{
 		{
-			name:        "ALREADY INITALIZED options",
+			name:        "ALREADY INITIALISED options",
 			chg:         gChanges.Foo.None.copy(),
 			args:        args{key: "testKey", val: "testVal"},
 			wantErr:     nil,
 			wantOptions: assignAndReturn(gChanges.Foo.None.copy().Options, "testKey", "testVal"),
 		},
 		{
-			name:        "UNINITALIZED options",
+			name:        "UNINITIALIZED options",
 			chg:         gChanges.Zero.copy(),
 			args:        args{key: "testKey", val: "testVal"},
 			wantErr:     nil,

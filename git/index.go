@@ -16,7 +16,7 @@ type Index struct {
 
 // FetchChanges retrieves the changes from DB by its .ChangeIds and assigns them to .Changes field
 func (idx *Index) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
-	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE commited=FALSE AND index_id=:id`, idx)
+	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE committed=FALSE AND index_id=:id`, idx)
 	if err != nil {
 		return
 	}

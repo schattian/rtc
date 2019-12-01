@@ -30,7 +30,7 @@ type Change struct {
 
 	IndexId int64 `json:"index_id,omitempty"`
 
-	Commited bool `json:"commited,omitempty"`
+	Committed bool `json:"committed,omitempty"`
 }
 
 // NewChange safety creates a new Change entity

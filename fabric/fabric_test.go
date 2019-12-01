@@ -52,7 +52,7 @@ func TestFabric_Produce(t *testing.T) {
 		},
 		{
 			name:     "SCHEMA does NOT PASS THE VALIdATIONS (is nil)",
-			fabric:   &Fabric{Dir: customDir}, // customDir: see that checking os existance of "" dir always returns true
+			fabric:   &Fabric{Dir: customDir}, // customDir: see that checking os existence of "" dir always returns true
 			args:     args{marshal: "json"},
 			wantDir:  customDir,
 			wantsErr: true,
@@ -69,7 +69,7 @@ func TestFabric_Produce(t *testing.T) {
 				t.Errorf("Fabric.Produce() DIFF DIR than expected; want: %v, got: %v", tt.wantDir, tt.fabric.Dir)
 			}
 			if (err != nil) != tt.wantsErr {
-				t.Errorf("Fabric.Produce() err behavior mismatch; wantsErr: %v, got: %v", tt.wantsErr, err)
+				t.Errorf("Fabric.Produce() err behaviour mismatch; wantsErr: %v, got: %v", tt.wantsErr, err)
 			}
 
 			if err != nil {

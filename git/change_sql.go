@@ -33,6 +33,6 @@ func (chg *Change) SQLColumns() []string {
 		"index_id",
 		"type",
 		"options",
-		"commited",
+		"committed",
 	}
 }

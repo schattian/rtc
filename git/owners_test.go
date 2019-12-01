@@ -29,7 +29,7 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 		wantQtErr int
 	}{
 		{
-			name: "successfull FULL CRUD",
+			name: "successful FULL CRUD",
 			own:  &Owner{Project: &schema.Planisphere{gSchemas.Foo}},
 			args: args{
 				sch: gSchemas.Foo,
@@ -261,31 +261,31 @@ func TestOwner_Orchestrate(t *testing.T) {
 // 		wantQtErr int
 // 	}{
 // 		{
-// 			name:      "successfull FULL CRUD",
+// 			name:      "successful FULL CRUD",
 // 			own:       new(Owner),
 // 			args:      args{pR: gPullRequests.Full.copy().mock(gChanges.Foo.None.TableName, nil), ctx: context.Background()},
 // 			wantQtErr: 0,
 // 		},
 // 		{
-// 			name:      "successfull ONLY one CREATE",
+// 			name:      "successful ONLY one CREATE",
 // 			own:       new(Owner),
 // 			args:      args{pR: gPullRequests.Create.copy().mock(gChanges.Foo.None.TableName, nil), ctx: context.Background()},
 // 			wantQtErr: 0,
 // 		},
 // 		{
-// 			name:      "successfull ONLY one RETRIEVE",
+// 			name:      "successful ONLY one RETRIEVE",
 // 			own:       new(Owner),
 // 			args:      args{pR: gPullRequests.Retrieve.copy().mock(gChanges.Foo.None.TableName, nil), ctx: context.Background()},
 // 			wantQtErr: 0,
 // 		},
 // 		{
-// 			name:      "successfull ONLY one UPDATE",
+// 			name:      "successful ONLY one UPDATE",
 // 			own:       new(Owner),
 // 			args:      args{pR: gPullRequests.Update.copy().mock(gChanges.Foo.None.TableName, nil), ctx: context.Background()},
 // 			wantQtErr: 0,
 // 		},
 // 		{
-// 			name:      "successfull ONLY one DELETE",
+// 			name:      "successful ONLY one DELETE",
 // 			own:       new(Owner),
 // 			args:      args{pR: gPullRequests.Delete.copy().mock(gChanges.Foo.None.TableName, nil), ctx: context.Background()},
 // 			wantQtErr: 0,
