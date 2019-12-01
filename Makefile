@@ -19,7 +19,7 @@ misspell:
 	misspell \
 		-locale GB \
 		-error \
-		*.md *.go
+		**/*.md **/*.go
 
 unconvert:
 	$(GO) get github.com/mdempsky/unconvert
