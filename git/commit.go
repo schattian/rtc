@@ -19,7 +19,7 @@ type Commit struct {
 	ChangeIds []int64      `json:"change_ids,omitempty"`
 	Reviewer  Collaborator `json:"reviewer,omitempty"`
 
-	Errored bool `json:"emrrored,omitempty"`
+	Errored bool `json:"errored,omitempty"`
 }
 
 // FetchChanges retrieves the changes from DB by its .ChangeIds and assigns them to .Changes field
