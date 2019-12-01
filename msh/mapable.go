@@ -1,5 +1,5 @@
 /*
-Pkg msh provides general marshal utilities, including custom Decoders/Encoders
+Package msh provides general marshal utilities, including custom Decoders/Encoders
 */
 package msh
 
