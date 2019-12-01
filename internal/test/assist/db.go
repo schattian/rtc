@@ -15,7 +15,7 @@ type ExecStubber struct {
 	Result driver.Result
 }
 
-// ExecStubber is the actor which performs stubs of db.Query()
+// QueryStubber is the actor which performs stubs of db.Query()
 type QueryStubber struct {
 	Expect string
 	Err    error
