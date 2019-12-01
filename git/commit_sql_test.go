@@ -10,7 +10,7 @@ import (
 	"github.com/sebach1/rtc/internal/name"
 )
 
-func TestCommit_columns(t *testing.T) {
+func TestCommitSQLColumns(t *testing.T) {
 	comm := Commit{}
 	exclusions := []string{"Reviewer", "Changes"}
 	typeOf := reflect.TypeOf(comm)
@@ -32,12 +32,12 @@ func TestCommit_columns(t *testing.T) {
 	}
 }
 
-func TestCommit_table(t *testing.T) {
+func TestCommitSQLTable(t *testing.T) {
 	comm := Commit{}
 	typeOf := reflect.TypeOf(comm)
 	want := inflector.Pluralize(name.ToSnakeCase(typeOf.Name()))
 	got := comm.SQLTable()
 	if diff := cmp.Diff(got, want); diff != "" {
-		t.Errorf("Branch.SQLTable() mismatch (-want +got): %s", diff)
+		t.Errorf("Commit.SQLTable() mismatch (-want +got): %s", diff)
 	}
 }

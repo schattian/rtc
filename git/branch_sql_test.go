@@ -10,7 +10,7 @@ import (
 	"github.com/sebach1/rtc/internal/name"
 )
 
-func TestBranch_columns(t *testing.T) {
+func TestBranchSQLColumns(t *testing.T) {
 	b := Branch{}
 	exclusions := []string{"Index", "Credentials"}
 	typeOf := reflect.TypeOf(b)
@@ -32,7 +32,7 @@ func TestBranch_columns(t *testing.T) {
 	}
 }
 
-func TestBranch_table(t *testing.T) {
+func TestBranchSQLTable(t *testing.T) {
 	b := Branch{}
 	typeOf := reflect.TypeOf(b)
 	want := inflector.Pluralize(name.ToSnakeCase(typeOf.Name()))

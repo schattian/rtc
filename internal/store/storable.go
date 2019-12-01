@@ -8,6 +8,7 @@ import (
 	"github.com/sebach1/rtc/internal/name"
 )
 
+// Storable entity is any entity that can be stored in an SQL database
 type Storable interface {
 	SetId(int64)
 	SQLTable() string

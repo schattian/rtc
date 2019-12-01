@@ -10,7 +10,7 @@ import (
 	"github.com/sebach1/rtc/internal/name"
 )
 
-func TestIndex_columns(t *testing.T) {
+func TestIndexSQLColumns(t *testing.T) {
 	idx := Index{}
 	exclusions := []string{"Changes"}
 	typeOf := reflect.TypeOf(idx)
@@ -32,7 +32,7 @@ func TestIndex_columns(t *testing.T) {
 	}
 }
 
-func TestIndex_table(t *testing.T) {
+func TestIndexSQLTable(t *testing.T) {
 	idx := Index{}
 	typeOf := reflect.TypeOf(idx)
 	want := inflector.Pluralize(name.ToSnakeCase(typeOf.Name()))

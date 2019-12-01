@@ -10,7 +10,7 @@ import (
 	"github.com/sebach1/rtc/internal/name"
 )
 
-func TestChange_columns(t *testing.T) {
+func TestChangeSQLColumns(t *testing.T) {
 	chg := Change{}
 	exclusions := []string{}
 	typeOf := reflect.TypeOf(chg)
@@ -32,7 +32,7 @@ func TestChange_columns(t *testing.T) {
 	}
 }
 
-func TestChange_table(t *testing.T) {
+func TestChangeSQLTable(t *testing.T) {
 	chg := Change{}
 	typeOf := reflect.TypeOf(chg)
 	want := inflector.Pluralize(name.ToSnakeCase(typeOf.Name()))
