@@ -2,7 +2,6 @@ package git
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/sebach1/rtc/integrity"
@@ -45,7 +44,6 @@ func NewBranchWithIndex(ctx context.Context, db *sqlx.DB, name integrity.BranchN
 
 // FetchIndex retrieves the Index by .IndexId and assigns it to .Index field
 func (b *Branch) FetchIndex(ctx context.Context, db *sqlx.DB) error {
-	fmt.Println(b.IndexId)
 	if b.IndexId == 0 {
 		return errNilIndexId
 	}
