@@ -5,7 +5,7 @@ local columns = import 'columns.jsonnet';
 local indices = import 'indices.jsonnet';
 local tables = import 'tables.jsonnet';
 
-local cleanVals(x) = x { str_value: '', int_value: 0, float_32_value: 0, float_64_value: 0, json_value: '', value_type: '' };
+local cleanVals(x) = x { str_value: '', int_value: 0, float_32_value: 0, float_64_value: 0, value_type: '' };
 local assignVal(base, val, typ) = cleanVals(base) { [std.format('%s_value', typ)]: val, value_type: typ };
 
 // CRUD
@@ -48,11 +48,11 @@ local createCRUD(x) = {
     options: base { options: alt.options },
     index_id: base { index_id: alt.index_id },
 
-    str_value: assignVal(base, bar.str_value.str_value, 'str'),
+    string_value: assignVal(base, bar.string_value.string_value, 'string'),
     int_value: assignVal(base, altns.foo * 2, 'int'),
-    float_32_value: assignVal(base, altns.foo * 3.2, 'float32'),
-    float_64_value: assignVal(base, altns.foo * 6.4, 'float64'),
-    json_value: assignVal(base, 'fooChangeJsonValue', 'json'),
+    float_32_value: assignVal(base, altns.foo * 3.2, 'float_32'),
+    float_64_value: assignVal(base, altns.foo * 6.4, 'float_64'),
+    json_value: assignVal(base, 'eyJmb28iOiAiQ2hhbmdlSlNPTlZhbHVlIn0=', 'bytes'),
     clean_value: cleanVals(base),
 
     crud: createCRUD(base),
@@ -81,11 +81,11 @@ local createCRUD(x) = {
     options: base { options: alt.options },
     index_id: base { index_id: alt.index_id },
 
-    str_value: assignVal(base, 'fooChangeStringValue', 'str'),
+    string_value: assignVal(base, "barChangeStringValue", 'string'),
     int_value: assignVal(base, altns.bar * 2, 'int'),
-    float_32_value: assignVal(base, altns.bar * 3.2, 'float32'),
-    float_64_value: assignVal(base, altns.bar * 6.4, 'float64'),
-    json_value: assignVal(base, 'barChangeJsonValue', 'json'),
+    float_32_value: assignVal(base, altns.bar * 3.2, 'float_32'),
+    float_64_value: assignVal(base, altns.bar * 6.4, 'float_64'),
+    json_value: assignVal(base, 'eyJmb28iOiAiQ2hhbmdlSlNPTlZhbHVlIn0=', 'bytes'),
     clean_value: cleanVals(base),
 
     crud: createCRUD(base),

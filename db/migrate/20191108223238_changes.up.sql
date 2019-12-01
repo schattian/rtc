@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS changes (
    int_value bigint,
    float_32_value decimal,
    float_64_value decimal,
-   json_value json,
    bytes_value text,
    entity_id varchar(100),
    value_type varchar(10),
