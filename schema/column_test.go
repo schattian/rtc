@@ -78,24 +78,28 @@ func TestColumn_applyBuiltinValidator(t *testing.T) {
 		{
 			name:          "STR type",
 			Type:          "string",
+			wantType:      "string",
 			wantValidator: valide.String,
 			wantErr:       nil,
 		},
 		{
 			name:          "INT type",
 			Type:          "int",
+			wantType:      "int",
 			wantValidator: valide.Int,
 			wantErr:       nil,
 		},
 		{
 			name:          "FLOAT32 type",
 			Type:          "float32",
+			wantType:      "float32",
 			wantValidator: valide.Float32,
 			wantErr:       nil,
 		},
 		{
 			name:          "FLOAT64 type",
 			Type:          "float64",
+			wantType:      "float64",
 			wantValidator: valide.Float64,
 			wantErr:       nil,
 		},
@@ -106,9 +110,10 @@ func TestColumn_applyBuiltinValidator(t *testing.T) {
 		},
 
 		{
-			name:    "INVALId type",
-			Type:    "invalid",
-			wantErr: errUnallowedColumnType,
+			name:     "INVALId type",
+			Type:     "invalid",
+			wantType: "invalid",
+			wantErr:  errUnallowedColumnType,
 		},
 	}
 	for _, tt := range tests {
@@ -120,23 +125,11 @@ func TestColumn_applyBuiltinValidator(t *testing.T) {
 			if err != tt.wantErr {
 				t.Errorf("Column.applyBuiltinValidator() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if err != nil {
-				if c.Validator != nil {
-					t.Errorf("Column.applyBuiltinValidator() ASSIGNED a VALIdATOR while it errored: %v", c.Validator)
-				}
-				if c.Type != tt.Type {
-					t.Errorf("Column.applyBuiltinValidator() CHANGED a TYPE while it errored: %v", c.Validator)
-				}
-				return
-			}
 
 			if fmt.Sprintf("%v", c.Validator) != fmt.Sprintf("%v", tt.wantValidator) {
 				t.Errorf("Column.applyBuiltinValidator() mismatch VALIdATOR")
 			}
 
-			if tt.wantType == "" {
-				tt.wantType = tt.Type
-			}
 			if diff := cmp.Diff(tt.wantType, c.Type); diff != "" {
 				t.Errorf("Column.applyBuiltinValidator() mismatch TYPE (-want +got): %s", diff)
 			}
