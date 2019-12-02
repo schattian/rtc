@@ -2,8 +2,9 @@ package git
 
 import (
 	"context"
-	"fmt"
 	"sync"
+
+	"github.com/sebach1/rtc/internal/store"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -14,32 +15,22 @@ type Index struct {
 	Changes []*Change `json:"changes,omitempty"`
 }
 
-// FetchChanges retrieves the changes from DB by its .ChangeIds and assigns them to .Changes field
-func (idx *Index) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
-	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE committed=FALSE AND index_id=:id`, idx)
-	if err != nil {
-		return
-	}
-	defer rows.Close()
-	for rows.Next() {
-		chg := Change{}
-		err = rows.StructScan(chg)
-		if err != nil {
-			return
-		}
-		idx.Changes = append(idx.Changes, &chg)
-	}
-	err = rows.Err()
+// add will attach the given change to the index changes
+// In case the change is invalid or is duplicated, it returns an error
+// Its reciprocal to idx.Rm() -excepting for the generated id, obviously-
+func (idx *Index) Add(ctx context.Context, db *sqlx.DB, chg *Change) error {
+	err := idx.FetchUncommittedChanges(ctx, db)
 	if err != nil {
 		return err
 	}
-
-	return
+	err = idx.add(chg)
+	if err != nil {
+		return err
+	}
+	return store.InsertIntoDB(ctx, db, chg)
 }
 
-// Add will attach the given change to the commit changes
-// In case the change is invalid or is duplicated, it returns an error
-func (idx *Index) Add(chg *Change) error {
+func (idx *Index) add(chg *Change) error {
 	err := chg.Validate()
 	if err != nil {
 		return err
@@ -57,16 +48,89 @@ func (idx *Index) Add(chg *Change) error {
 	return nil
 }
 
-// Rm deletes the given change from the commit
+// Rm deletes the given change
 // This action is irreversible
-func (idx *Index) Rm(chg *Change) error {
+// Its reciprocal to idx.Add() -excepting for the generated Id, obviously-
+func (idx *Index) Rm(ctx context.Context, db *sqlx.DB, chg *Change) error {
+	err := store.DeleteFromDB(ctx, db, chg)
+	if err != nil {
+		return err
+	}
+	idx.rm(chg)
+	return nil
+}
+
+func (idx *Index) rm(chg *Change) {
 	for i, otherChg := range idx.Changes {
 		if chg.Equals(otherChg) {
 			idx.rmChangeByIndex(i)
-			return nil
+			return
 		}
 	}
-	return fmt.Errorf("change %v NOT FOUND", chg)
+}
+
+// FetchUncommitedChanges retrieves the changes from DB by its .ChangeIds and assigns them to .Changes field
+// It filters commited changes in query
+func (idx *Index) FetchUncommittedChanges(ctx context.Context, db *sqlx.DB) (err error) {
+	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE commit_id=0 AND index_id=:id`, idx)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		chg := Change{}
+		err = rows.StructScan(chg)
+		if err != nil {
+			return
+		}
+		idx.Changes = append(idx.Changes, &chg)
+	}
+	return rows.Err()
+}
+
+// FetchChanges retrieves the changes from DB by its .ChangeIds and assigns them to .Changes field
+func (idx *Index) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
+	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE index_id=:id`, idx)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+	for rows.Next() {
+		chg := Change{}
+		err = rows.StructScan(chg)
+		if err != nil {
+			return
+		}
+		idx.Changes = append(idx.Changes, &chg)
+	}
+	return rows.Err()
+}
+
+// Commit returns a persisted commit with the index's uncommited changes.
+func (idx *Index) Commit(ctx context.Context, db *sqlx.DB) (*Commit, error) {
+	err := idx.FetchUncommittedChanges(ctx, db)
+	if err != nil {
+		return nil, err
+	}
+	comm := idx.commit()
+	err = store.InsertIntoDB(ctx, db, comm)
+	if err != nil {
+		return nil, err
+	}
+	batch := make([]store.Storable, len(idx.Changes))
+	for i, chg := range idx.Changes {
+		chg.CommitId = comm.Id
+		batch[i] = chg
+	}
+	err = store.UpdateBatchIntoDB(ctx, db, batch...)
+	if err != nil {
+		return nil, err
+	}
+	return comm, nil
+}
+
+func (idx *Index) commit() *Commit {
+	return NewCommit(idx.Changes)
 }
 
 // rmChangeByIndex will delete without preserving order giving the desired index to delete
