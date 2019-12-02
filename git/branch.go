@@ -35,7 +35,7 @@ func NewBranchWithIndex(ctx context.Context, db *sqlx.DB, name integrity.BranchN
 		return nil, err
 	}
 	branch := &Branch{Name: string(name), IndexId: idxId}
-	err = store.InsertToDB(ctx, db, branch)
+	err = store.InsertIntoDB(ctx, db, branch)
 	if err != nil {
 		return nil, err
 	}
