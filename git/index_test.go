@@ -4,9 +4,10 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/sebach1/rtc/internal/test/thelper"
 )
 
-func TestIdx_Add(t *testing.T) {
+func TestIdx_add(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		chg *Change
@@ -16,20 +17,20 @@ func TestIdx_Add(t *testing.T) {
 		idx     *Index
 		args    args
 		wantErr error
-		newComm *Index
+		newIdx  *Index
 	}{
 		{
 			name:    "change was already added",
 			idx:     &Index{Changes: []*Change{gChanges.Foo.Update.copy()}},
 			args:    args{chg: gChanges.Foo.None.copy()},
-			newComm: &Index{Changes: []*Change{gChanges.Foo.Update}},
+			newIdx:  &Index{Changes: []*Change{gChanges.Foo.Update}},
 			wantErr: nil,
 		},
 		{
 			name:    "both identical untracked changes",
 			idx:     &Index{Changes: []*Change{gChanges.Foo.Create.copy()}},
-			args:    args{chg: gChanges.Foo.Create.copy()},
-			newComm: &Index{Changes: []*Change{gChanges.Foo.Create, gChanges.Foo.Create}},
+			args:    args{chg: gChanges.Foo.Create.copy().rmIdAndReturn()},
+			newIdx:  &Index{Changes: []*Change{gChanges.Foo.Create, gChanges.Foo.Create.copy().rmIdAndReturn()}},
 			wantErr: nil,
 		},
 		{
@@ -42,14 +43,14 @@ func TestIdx_Add(t *testing.T) {
 			name:    "change modifies the value of a change already in the index",
 			idx:     &Index{Changes: []*Change{gChanges.Foo.Update}},
 			args:    args{chg: gChanges.Foo.StringValue.copy()},
-			newComm: &Index{Changes: []*Change{gChanges.Foo.StringValue.copy().changeType("update")}},
+			newIdx:  &Index{Changes: []*Change{gChanges.Foo.StringValue.copy().changeType("update")}},
 			wantErr: nil,
 		},
 		{
 			name:    "change modifies different col of same schema",
 			idx:     &Index{Changes: []*Change{gChanges.Foo.Update}},
 			args:    args{chg: gChanges.Foo.ColumnName.copy()},
-			newComm: &Index{Changes: []*Change{gChanges.Foo.Update, gChanges.Foo.ColumnName.copy().changeType("update")}},
+			newIdx:  &Index{Changes: []*Change{gChanges.Foo.Update, gChanges.Foo.ColumnName.copy().changeType("update")}},
 			wantErr: nil,
 		},
 	}
@@ -57,25 +58,17 @@ func TestIdx_Add(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			oldComm := tt.idx
-			err := tt.idx.Add(tt.args.chg)
+			oldIdx := tt.idx
+			err := tt.idx.add(tt.args.chg)
 			if err != tt.wantErr {
-				t.Errorf("Index.Add() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Index.add() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			if err != nil {
-				if diff := cmp.Diff(oldComm, tt.idx); diff != "" {
-					t.Errorf("Index.Add() mismatch (-want +got): %s", diff)
-				}
-				return
-			}
-			if diff := cmp.Diff(tt.newComm, tt.idx); diff != "" {
-				t.Errorf("Index.Add() mismatch (-want +got): %s", diff)
-			}
+			thelper.CmpIfErr(t, err, oldIdx, tt.idx, tt.newIdx, "Index.add()")
 		})
 	}
 }
 
-func TestIndex_Rm(t *testing.T) {
+func TestIndex_rm(t *testing.T) {
 	t.Parallel()
 	type args struct {
 		chg *Change
@@ -84,28 +77,33 @@ func TestIndex_Rm(t *testing.T) {
 		name    string
 		idx     *Index
 		args    args
-		wantErr bool
+		wantIdx *Index
 	}{
 		{
 			name:    "given change doesn't belongs to the index",
 			idx:     &Index{Changes: []*Change{gChanges.Foo.None.copy()}},
 			args:    args{chg: gChanges.Bar.None.copy()},
-			wantErr: true,
+			wantIdx: &Index{Changes: []*Change{gChanges.Foo.None.copy()}},
 		},
 		{
 			name:    "successfully remove",
 			idx:     &Index{Changes: []*Change{gChanges.Foo.None.copy()}},
 			args:    args{chg: gChanges.Foo.None.copy()},
-			wantErr: false,
+			wantIdx: &Index{Changes: []*Change{}},
 		},
 	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			if err := tt.idx.Rm(tt.args.chg); (err != nil) != tt.wantErr {
-				t.Errorf("Index.Rm() error = %v, wantErr %v", err, tt.wantErr)
+			tt.idx.rm(tt.args.chg)
+			if diff := cmp.Diff(tt.wantIdx, tt.idx); diff != "" {
+				t.Errorf("Index.rm() mismatch (-want, +got): %s", diff)
 			}
 		})
 	}
+}
+func (chg *Change) rmIdAndReturn() *Change {
+	chg.Id = 0
+	return chg
 }
