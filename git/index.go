@@ -69,8 +69,8 @@ func (idx *Index) rm(chg *Change) {
 	}
 }
 
-// FetchUncommitedChanges retrieves the changes from DB by its .ChangeIds and assigns them to .Changes field
-// It filters commited changes in query
+// FetchUncommittedChanges retrieves the changes from DB by its .ChangeIds and assigns them to .Changes field
+// It filters committed changes in query
 func (idx *Index) FetchUncommittedChanges(ctx context.Context, db *sqlx.DB) (err error) {
 	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE commit_id=0 AND index_id=:id`, idx)
 	if err != nil {
@@ -106,7 +106,7 @@ func (idx *Index) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
 	return rows.Err()
 }
 
-// Commit returns a persisted commit with the index's uncommited changes.
+// Commit returns a persisted commit with the index's uncommitted changes.
 func (idx *Index) Commit(ctx context.Context, db *sqlx.DB) (*Commit, error) {
 	err := idx.FetchUncommittedChanges(ctx, db)
 	if err != nil {
