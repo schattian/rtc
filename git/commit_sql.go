@@ -1,5 +1,10 @@
 package git
 
+// GetId wraps the id retrieval to implement Storable interface
+func (comm *Commit) GetId() int64 {
+	return comm.Id
+}
+
 // SetId wraps the id assignation to implement Storable interface
 func (comm *Commit) SetId(id int64) {
 	comm.Id = id
@@ -21,6 +26,5 @@ func (comm *Commit) SQLColumns() []string {
 	return []string{
 		"id",
 		"errored",
-		"change_ids",
 	}
 }

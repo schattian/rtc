@@ -1,5 +1,10 @@
 package git
 
+// GetId wraps the id retrieval to implement Storable interface
+func (b *Branch) GetId() int64 {
+	return b.Id
+}
+
 // SetId wraps the id assignation to implement Storable interface
 func (b *Branch) SetId(id int64) {
 	b.Id = id
