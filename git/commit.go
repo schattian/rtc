@@ -16,15 +16,18 @@ type Commit struct {
 	Id      int64     `json:"id,omitempty"`
 	Changes []*Change `json:"changes,omitempty"`
 
-	ChangeIds []int64      `json:"change_ids,omitempty"`
-	Reviewer  Collaborator `json:"reviewer,omitempty"`
+	Reviewer Collaborator `json:"reviewer,omitempty"`
 
 	Errored bool `json:"errored,omitempty"`
 }
 
+func NewCommit(changes []*Change) *Commit {
+	return &Commit{Changes: changes}
+}
+
 // FetchChanges retrieves the changes from DB by its .ChangeIds and assigns them to .Changes field
 func (comm *Commit) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
-	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE id=ANY(:change_ids)`, comm)
+	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM changes WHERE commit_id=:id`, comm)
 	if err != nil {
 		return
 	}
@@ -37,12 +40,7 @@ func (comm *Commit) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
 		}
 		comm.Changes = append(comm.Changes, &chg)
 	}
-	err = rows.Err()
-	if err != nil {
-		return err
-	}
-
-	return
+	return rows.Err()
 }
 
 // GroupBy splits the commit's changes by the given comparator criteria
