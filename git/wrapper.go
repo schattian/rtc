@@ -42,15 +42,10 @@ func Add(
 		return err
 	}
 
-	err = branch.Index.Add(chg)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return branch.Index.Add(ctx, db, chg)
 }
 
-// Rm wraps change removing from the inferred index
+// Rm wraps change removal from the inferred index
 func Rm(
 	ctx context.Context,
 	db *sqlx.DB,
@@ -81,10 +76,31 @@ func Rm(
 		return err
 	}
 
-	err = branch.Index.Rm(chg)
-	if err != nil {
-		return err
-	}
+	return branch.Index.Rm(ctx, db, chg)
+}
 
+// func (own *Owner) Orchestrate(
+// 	ctx context.Context,
+// 	community *Community,
+// 	schName integrity.SchemaName,
+// 	comm *Commit,
+// 	strategy changesMatcher,
+// )
+// 	ctx context.Context,
+// 	db *sqlx.DB,
+// 	entityId integrity.Id,
+// 	tableName integrity.TableName,
+// 	columnName integrity.ColumnName,
+// 	branchName integrity.BranchName,
+// 	val interface{},
+// 	Type integrity.CRUD,
+// 	opts Options,
+func Orchestrate(
+	ctx context.Context,
+	branchName integrity.BranchName,
+	schemaName integrity.SchemaName,
+	community *Community,
+	strategy changesMatcher,
+) error {
 	return nil
 }
