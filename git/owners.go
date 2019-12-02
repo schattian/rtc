@@ -63,7 +63,7 @@ func (own *Owner) Delegate(
 	strategy changesMatcher,
 ) (*PullRequest, error) {
 
-	err := own.Validate()
+	err := own.validate()
 	if err != nil {
 		return nil, err
 	}
@@ -192,8 +192,8 @@ func (own *Owner) Delete(ctx context.Context, comm *Commit) (*Commit, error) {
 	return comm, nil
 }
 
-// Validate validates itself integrity to be able to perform orchestration & reviewing (owner)
-func (own *Owner) Validate() error {
+// validate validates itself integrity to be able to perform orchestration & reviewing (owner)
+func (own *Owner) validate() error {
 	if own.Project == nil {
 		return errNilProject
 	}
