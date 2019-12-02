@@ -14,10 +14,10 @@ local toRetrieve(x) = x { value_type: '', str_value: '', type: 'retrieve' };
 local toUpdate(x) = x { type: 'update' };
 local toDelete(x) = cleanVals(x) { column_name: '', type: 'delete' };
 local createCRUD(x) = {
-  create: toCreate(x),
-  retrieve: toRetrieve(x),
-  update: toUpdate(x),
-  delete: toDelete(x),
+  create: toCreate(x) { id: x.id + 1 },
+  retrieve: toRetrieve(x) { id: x.id + 2 },
+  update: toUpdate(x) { id: x.id + 3 },
+  delete: toDelete(x) { id: x.id + 4 },
 };
 
 //  Notice that foo & bar types are all from UPDATE operation type
@@ -81,11 +81,11 @@ local createCRUD(x) = {
     options: base { options: alt.options },
     index_id: base { index_id: alt.index_id },
 
-    string_value: assignVal(base, "barChangeStringValue", 'string'),
+    string_value: assignVal(base, 'barChangeStringValue', 'string'),
     int_value: assignVal(base, altns.bar * 2, 'int'),
     float_32_value: assignVal(base, altns.bar * 3.2, 'float_32'),
     float_64_value: assignVal(base, altns.bar * 6.4, 'float_64'),
-    json_value: assignVal(base, 'eyJmb28iOiAiQ2hhbmdlSlNPTlZhbHVlIn0=', 'bytes'),
+    json_value: assignVal(base, 'eyJiYXIiOiAiQ2hhbmdlSlNPTlZhbHVlIn0=', 'bytes'),
     clean_value: cleanVals(base),
 
     crud: createCRUD(base),
