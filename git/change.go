@@ -27,7 +27,7 @@ type Change struct {
 
 	IndexId int64 `json:"index_id,omitempty"`
 
-	Committed bool `json:"committed,omitempty"`
+	CommitId int64 `json:"commit_id,omitempty"`
 }
 
 // NewChange safety creates a new Change entity
@@ -129,7 +129,12 @@ func Overrides(chg, otherChg *Change) bool {
 }
 
 // Equals checks if the given change will trigger the exactly same action as itself
+// skips comparison in case of Id matching (and Id exists for both of 'em)
 func (chg *Change) Equals(otherChg *Change) bool {
+	if chg.Id == otherChg.Id && (chg.Id != 0) {
+		return true
+	}
+
 	if !AreCompatible(chg, otherChg) {
 		return false
 	}
