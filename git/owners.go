@@ -12,6 +12,8 @@ import (
 
 // Owner is the agent which coordinates any given action
 // Notice that an Owner is a Collaborator
+// The unique difference between an owner and a lower-level collaborator is that it
+// stores any result of collaborator actions inside the .Summary
 type Owner struct {
 	Project *schema.Planisphere
 	Summary chan *Result
