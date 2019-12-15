@@ -80,26 +80,26 @@ RTC provides git-like abstractions to avoid a high cognitive load.
 
 Currently, those are:
 
-- Change: a change of value on a column of a table. It can be a deletion or addition.
+- **Change:** a change of value on a column of a table. It can be a deletion or addition.
 
-- Commit: a group of changes signed (ensuring persistence).
+- **Commit:** a group of changes signed (ensuring persistence).
 
-- Branch: a parallel context instantiation for communicating via multiple actors. It contains an index and multiple commits. For practical purposes, it stores all the credentials for the services it'll communicate.
+- **Branch:** a parallel context instantiation for communicating via multiple actors. It contains an index and multiple commits. For practical purposes, it stores all the credentials for the services it'll communicate.
 
-- Index: it contains the group of changes that weren't committed and were done over the branch it belongs to.
+- **Index:** it contains the group of changes that weren't committed and were done over the branch it belongs to.
 
-- Collaborator: it's responsible for communicating with a specific service using its own interface. It can push, pull, delete and init.
+- **Collaborator:** it's responsible for communicating with a specific service using its own interface. It can push, pull, delete and init.
 
-- Member: a collaborator assigned to a table.
+- **Member:** a collaborator assigned to a table.
 
-- Team: a group of members assigned to a schema.
+- **Team:** a group of members assigned to a schema.
 
-- Community: a group of teams that are available to collaborate.
+- **Community:** a group of teams that are available to collaborate.
 
-- Project: a group of schemas.
+- **Project:** a group of schemas.
 
-- Owner: it's responsible for orchestrating its own project given a community. It's a collaborator too.
+- **Owner:** it's responsible for orchestrating its own project given a community. It's a collaborator too.
 
-- Strategy: strategy used to merge commits.
+- **Strategy:** strategy used to merge commits.
 
-- Pull request: a group of commits performed by a team.
+- **Pull request:** a group of commits performed by a team.
