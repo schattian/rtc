@@ -15,7 +15,7 @@ It focuses on be:
 
 - **Cross-language:** providing APIs over HTTP / gRPC to use it and also config via YAML files.
 
-- **No-protocol limited:** protocols of services are not a limitation at the hour of integrating any of them. For more, see the [list of supported protocols].
+- **No-protocol limited:** protocols of services are not a limitation at the hour of integrating any of them. For more, see the [list of supported protocols]().
 
 - **Simple:** to ensure simplicity over differences across services and provide a normalized way to interact with data pipelines, it uses [git abstractions]() and a [schema]().
 
@@ -44,4 +44,55 @@ Its very harmful (and then, a frequent mistake) to choose bad data structures by
 
 ## Usage
 
-In case you use Go, its recommendable to inspect the [godoc] for a complete usage guide omitting the usage of an API.
+In case you use Go, its recommendable to inspect the [godoc]() for a complete usage guide omitting the usage of an API.
+
+## Concepts
+
+### Schema
+
+A schema describes the data structure of a callable transactional service.
+The definition of it can be served across HTTPs (k8s like) or over a filesystem via YAML. For more, see the [Schema reference]().
+
+It also has its own structure. Formed by a tiny sql abstraction:
+
+- **Blueprint:** the group of tables a schema contains. It just describes all the structure, but it doesn't relate it.
+
+- **Tables:** *sql-like* concept. It describes a collection of abstractions that are described by the same columns.
+
+- **Columns:** *sql-like* concept. It holds a specific type of data (*type-safe*) and describes a field over an entity.
+  
+  - **Type:** limits the type a column can have.
+
+- **Option:** just a key-value storage used to pass extra information about the transaction that can't be expressed through columns of an entity (e.g: scopes).
+
+  - **Option key:** limits the possible key of the storage.
+
+### Git
+
+RTC provides git-like abstractions to avoid a high cognitive load.
+
+Currently, those are:
+
+- Change: a change of value on a column of a table. It can be a deletion or addition.
+
+- Commit: a group of changes signed (ensuring persistence).
+
+- Branch: a parallel context instantiation for communicating via multiple actors. It contains an index and multiple commits. For practical purposes, it stores all the credentials for the services it'll communicate.
+
+- Index: it contains the group of changes that weren't committed and were done over the branch it belongs to.
+
+- Collaborator: it's responsible for communicating with a specific service using its own interface. It can push, pull, delete and init.
+
+- Member: a collaborator assigned to a table.
+
+- Team: a group of members assigned to a schema.
+
+- Community: a group of teams that are available to collaborate.
+
+- Project: a group of schemas.
+
+- Owner: it's responsible for orchestrating its own project given a community. It's a collaborator too.
+
+- Strategy: strategy used to merge commits.
+
+- Pull request: a group of commits performed by a team.
