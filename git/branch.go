@@ -57,12 +57,3 @@ func (b *Branch) FetchIndex(ctx context.Context, db *sqlx.DB) error {
 	}
 	return nil
 }
-
-func (b *Branch) copy() *Branch {
-	if b == nil {
-		return nil
-	}
-	newBranch := &Branch{}
-	*newBranch = *b
-	return newBranch
-}

@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"encoding/json"
 	"os"
 
@@ -18,9 +17,9 @@ func Router(reqCtx *fasthttp.RequestCtx) {
 	db := databaseHandler(reqCtx)
 	switch string(reqCtx.Path()) {
 	case "/add":
-		addHandler(context.TODO(), db, reqCtx)
+		addHandler(reqCtx, db)
 	case "/rm":
-		rmHandler(context.TODO(), db, reqCtx)
+		rmHandler(reqCtx, db)
 	default:
 		reqCtx.NotFound()
 	}
@@ -54,19 +53,21 @@ func decoderHandler(reqCtx *fasthttp.RequestCtx, validator func(body *reqBody) e
 	return body
 }
 
-func addHandler(ctx context.Context, db *sqlx.DB, reqCtx *fasthttp.RequestCtx) {
+func addHandler(reqCtx *fasthttp.RequestCtx, db *sqlx.DB) {
 	body := decoderHandler(reqCtx, validateAdd)
-	err := git.Add(ctx, db,
-		body.Entity, body.Table, body.Column, body.Branch, body.Value, body.Type, body.Opts)
+	err := git.Add(reqCtx, db,
+		body.Entity, body.Table, body.Column, body.Branch, body.Value, body.Type, body.Opts,
+	)
 	if err != nil {
 		reqCtx.Error(err.Error(), fasthttp.StatusBadRequest)
 	}
 }
 
-func rmHandler(ctx context.Context, db *sqlx.DB, reqCtx *fasthttp.RequestCtx) {
+func rmHandler(reqCtx *fasthttp.RequestCtx, db *sqlx.DB) {
 	body := decoderHandler(reqCtx, validateRm)
-	err := git.Rm(ctx, db,
-		body.Entity, body.Table, body.Column, body.Branch, body.Value, body.Type, body.Opts)
+	err := git.Rm(reqCtx, db,
+		body.Entity, body.Table, body.Column, body.Branch, body.Value, body.Type, body.Opts,
+	)
 	if err != nil {
 		reqCtx.Error(err.Error(), fasthttp.StatusBadRequest)
 	}

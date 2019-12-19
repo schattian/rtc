@@ -226,27 +226,27 @@ func TestChange_SetOption(t *testing.T) {
 	}{
 		{
 			name:        "ALREADY INITIALISED options",
-			chg:         gChanges.Foo.None.copy(),
+			chg:         gChanges.Foo.None.copy(t),
 			args:        args{key: "testKey", val: "testVal"},
 			wantErr:     nil,
-			wantOptions: assignAndReturn(gChanges.Foo.None.copy().Options, "testKey", "testVal"),
+			wantOptions: assignAndReturn(gChanges.Foo.None.copy(t).Options, "testKey", "testVal"),
 		},
 		{
 			name:        "UNINITIALIZED options",
-			chg:         gChanges.Zero.copy(),
+			chg:         gChanges.Zero.copy(t),
 			args:        args{key: "testKey", val: "testVal"},
 			wantErr:     nil,
 			wantOptions: Options{"testKey": "testVal"},
 		},
 		{
 			name:    "EMPTY KEY ERROR",
-			chg:     gChanges.Zero.copy(),
+			chg:     gChanges.Zero.copy(t),
 			args:    args{key: "", val: "testVal"},
 			wantErr: errNilOptionKey,
 		},
 		{
 			name:        "CHANGE OPTION VALUE",
-			chg:         gChanges.Foo.None.copy(),
+			chg:         gChanges.Foo.None.copy(t),
 			args:        args{key: gChanges.Foo.None.Options.Keys()[0], val: "testVal"},
 			wantErr:     nil,
 			wantOptions: Options{gChanges.Foo.None.Options.Keys()[0]: "testVal"},

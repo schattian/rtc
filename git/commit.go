@@ -210,17 +210,3 @@ func checkIntInSlice(slice []int, elem int) bool {
 	}
 	return false
 }
-
-func (comm *Commit) copy() *Commit {
-	if comm == nil {
-		return nil
-	}
-	newComm := new(Commit)
-	*newComm = *comm
-	var newChgs []*Change
-	for _, chg := range comm.Changes {
-		newChgs = append(newChgs, chg.copy())
-	}
-	newComm.Changes = newChgs
-	return newComm
-}

@@ -21,14 +21,14 @@ func TestTeam_Delegate(t *testing.T) {
 	}{
 		{
 			name:    "a member is assigned to the given table",
-			team:    gTeams.ZeroMembers.copy().mock(gChanges.Foo.None.TableName, nil),
+			team:    gTeams.ZeroMembers.copy(t).mock(gChanges.Foo.None.TableName, nil),
 			args:    args{tableName: gChanges.Foo.None.TableName},
 			want:    &collabMock{},
 			wantErr: nil,
 		},
 		{
 			name:    "a member isn't assigned to the given table",
-			team:    gTeams.ZeroMembers.copy().mock(gChanges.Foo.None.TableName, nil),
+			team:    gTeams.ZeroMembers.copy(t).mock(gChanges.Foo.None.TableName, nil),
 			args:    args{tableName: gChanges.Foo.TableName.TableName},
 			want:    &collabMock{},
 			wantErr: errNoMembers,

@@ -40,13 +40,6 @@ func (c *Column) validationErr(err error) *xerrors.ValidationError {
 	return &xerrors.ValidationError{Err: err, OriginType: "column", OriginName: name}
 }
 
-// Copy returns a copy of the given column
-func (c *Column) Copy() *Column {
-	newCol := new(Column)
-	*newCol = *c
-	return newCol
-}
-
 // Validate wraps the column validator func and returns its result
 func (c *Column) Validate(val interface{}) error {
 	if c.Validator == nil || val == nil {

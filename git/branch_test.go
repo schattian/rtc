@@ -119,22 +119,22 @@ func TestBranch_FetchIndex(t *testing.T) {
 		{
 			name:    "INDEX query returns ERR on db CONNECTion",
 			wantErr: errFoo,
-			branch:  gBranches.Foo.copy(),
+			branch:  gBranches.Foo.copy(t),
 			stubs: []*assist.QueryStubber{
 				{Expect: "SELECT * FROM indices", Err: errFoo},
 			},
 		},
 		{
 			name:      "fetches index through index id SUCCESSfully",
-			branch:    gBranches.Foo.copy().rmIndexAndReturn(),
-			newBranch: gBranches.Foo.copy().rmIndexChangesAndReturn(),
+			branch:    gBranches.Foo.copy(t).rmIndexAndReturn(),
+			newBranch: gBranches.Foo.copy(t).rmIndexChangesAndReturn(),
 			stubs: []*assist.QueryStubber{
 				{Expect: "SELECT * FROM indices WHERE id=?", Rows: assist.RowsFor(&Index{}).AddRow(gIndices.Foo.Id)},
 			},
 		},
 		{
 			name:    "the given branch has NIL INDEX ID",
-			branch:  gBranches.Foo.copy().rmIndexIdAndReturn(),
+			branch:  gBranches.Foo.copy(t).rmIndexIdAndReturn(),
 			wantErr: errNilIndexId,
 		},
 	}
@@ -147,7 +147,7 @@ func TestBranch_FetchIndex(t *testing.T) {
 			if tt.args.ctx == nil {
 				tt.args.ctx = context.Background()
 			}
-			originalBranch := tt.branch.copy()
+			originalBranch := tt.branch.copy(t)
 			err := tt.branch.FetchIndex(tt.args.ctx, db)
 			if err != tt.wantErr {
 				t.Errorf("Branch.FetchIndex() error = %v, wantErr %v", err, tt.wantErr)

@@ -11,6 +11,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/mitchellh/copystructure"
 	"github.com/sebach1/rtc/integrity"
 	"github.com/sebach1/rtc/internal/name"
 	"github.com/sebach1/rtc/schema"
@@ -31,12 +32,17 @@ type Fabric struct {
 
 // Produce is the main Fabric wrapper
 func (f *Fabric) Produce(marshal string, fs afero.Fs) error {
-	err := f.Schema.ValidateSelf()
+	verr := f.Schema.ValidateSelf()
+	if verr != nil {
+		return verr
+	}
+
+	var err error
+	f.Schema, err = copySchema(f.Schema)
 	if err != nil {
 		return err
 	}
 
-	f.Schema = f.Schema.Copy()
 	f.Schema.Name = integrity.SchemaName(strings.ToLower(string(f.Schema.Name)))
 	if f.Dir == "" {
 		f.Dir = fmt.Sprintf("fabric/%v", f.Schema.Name)
@@ -140,4 +146,16 @@ type columnData struct {
 	Name string
 	Type integrity.ValueType
 	Tag  string
+}
+
+func copySchema(sch *schema.Schema) (*schema.Schema, error) {
+	new, err := copystructure.Copy(sch)
+	if err != nil {
+		return nil, fmt.Errorf("could not be able to copy schema: %v", err)
+	}
+	newSch, ok := new.(*schema.Schema)
+	if !ok {
+		return nil, fmt.Errorf("could not be able to switch type from copied schema: %v", err)
+	}
+	return newSch, nil
 }

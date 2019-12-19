@@ -19,18 +19,6 @@ type Schema struct {
 	Blueprint []*Table             `json:"blueprint,omitempty"`
 }
 
-// Copy returns a copy of the given schema, including a deep copy if its blueprint
-func (sch *Schema) Copy() *Schema {
-	newSch := &Schema{}
-	*newSch = *sch
-	var newBlueprint []*Table
-	for _, table := range newSch.Blueprint {
-		newBlueprint = append(newBlueprint, table.Copy())
-	}
-	newSch.Blueprint = newBlueprint
-	return newSch
-}
-
 // ValidateSelf performs a deep self-validation to check data integrity
 // It wraps internal method validateSelf
 func (sch *Schema) ValidateSelf() (errs xerrors.MultiErr) {

@@ -52,18 +52,6 @@ func (t *Table) validationErr(err error) *xerrors.ValidationError {
 	return &xerrors.ValidationError{Err: err, OriginType: "table", OriginName: name}
 }
 
-// Copy returns a copy of the given table, including embedded cols
-func (t *Table) Copy() *Table {
-	newTab := new(Table)
-	*newTab = *t
-	var newCols []*Column
-	for _, col := range newTab.Columns {
-		newCols = append(newCols, col.Copy())
-	}
-	newTab.Columns = newCols
-	return newTab
-}
-
 func (t *Table) columnNames() (colNames []integrity.ColumnName) {
 	for _, column := range t.Columns {
 		colNames = append(colNames, column.Name)

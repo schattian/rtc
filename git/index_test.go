@@ -21,36 +21,36 @@ func TestIdx_add(t *testing.T) {
 	}{
 		{
 			name:    "change was already added",
-			idx:     &Index{Changes: []*Change{gChanges.Foo.Update.copy()}},
-			args:    args{chg: gChanges.Foo.None.copy()},
+			idx:     &Index{Changes: []*Change{gChanges.Foo.Update.copy(t)}},
+			args:    args{chg: gChanges.Foo.None.copy(t)},
 			newIdx:  &Index{Changes: []*Change{gChanges.Foo.Update}},
 			wantErr: nil,
 		},
 		{
 			name:    "both identical untracked changes",
-			idx:     &Index{Changes: []*Change{gChanges.Foo.Create.copy()}},
-			args:    args{chg: gChanges.Foo.Create.copy().rmIdAndReturn()},
-			newIdx:  &Index{Changes: []*Change{gChanges.Foo.Create, gChanges.Foo.Create.copy().rmIdAndReturn()}},
+			idx:     &Index{Changes: []*Change{gChanges.Foo.Create.copy(t)}},
+			args:    args{chg: gChanges.Foo.Create.copy(t).rmIdAndReturn()},
+			newIdx:  &Index{Changes: []*Change{gChanges.Foo.Create, gChanges.Foo.Create.copy(t).rmIdAndReturn()}},
 			wantErr: nil,
 		},
 		{
 			name:    "table inconsistency",
 			idx:     &Index{Changes: []*Change{gChanges.Foo.Update}},
-			args:    args{chg: gChanges.Inconsistent.TableName.copy()},
+			args:    args{chg: gChanges.Inconsistent.TableName.copy(t)},
 			wantErr: errNilTable,
 		},
 		{
 			name:    "change modifies the value of a change already in the index",
 			idx:     &Index{Changes: []*Change{gChanges.Foo.Update}},
-			args:    args{chg: gChanges.Foo.StringValue.copy()},
-			newIdx:  &Index{Changes: []*Change{gChanges.Foo.StringValue.copy().changeType("update")}},
+			args:    args{chg: gChanges.Foo.StringValue.copy(t)},
+			newIdx:  &Index{Changes: []*Change{gChanges.Foo.StringValue.copy(t).changeType("update")}},
 			wantErr: nil,
 		},
 		{
 			name:    "change modifies different col of same schema",
 			idx:     &Index{Changes: []*Change{gChanges.Foo.Update}},
-			args:    args{chg: gChanges.Foo.ColumnName.copy()},
-			newIdx:  &Index{Changes: []*Change{gChanges.Foo.Update, gChanges.Foo.ColumnName.copy().changeType("update")}},
+			args:    args{chg: gChanges.Foo.ColumnName.copy(t)},
+			newIdx:  &Index{Changes: []*Change{gChanges.Foo.Update, gChanges.Foo.ColumnName.copy(t).changeType("update")}},
 			wantErr: nil,
 		},
 	}
@@ -81,14 +81,14 @@ func TestIndex_rm(t *testing.T) {
 	}{
 		{
 			name:    "given change doesn't belongs to the index",
-			idx:     &Index{Changes: []*Change{gChanges.Foo.None.copy()}},
-			args:    args{chg: gChanges.Bar.None.copy()},
-			wantIdx: &Index{Changes: []*Change{gChanges.Foo.None.copy()}},
+			idx:     &Index{Changes: []*Change{gChanges.Foo.None.copy(t)}},
+			args:    args{chg: gChanges.Bar.None.copy(t)},
+			wantIdx: &Index{Changes: []*Change{gChanges.Foo.None.copy(t)}},
 		},
 		{
 			name:    "successfully remove",
-			idx:     &Index{Changes: []*Change{gChanges.Foo.None.copy()}},
-			args:    args{chg: gChanges.Foo.None.copy()},
+			idx:     &Index{Changes: []*Change{gChanges.Foo.None.copy(t)}},
+			args:    args{chg: gChanges.Foo.None.copy(t)},
 			wantIdx: &Index{Changes: []*Change{}},
 		},
 	}

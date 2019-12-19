@@ -98,7 +98,7 @@ func TestSchema_ValidateCtx(t *testing.T) {
 		},
 		{
 			name: "value doesn't pass the column validator func",
-			sch:  gSchemas.Foo.Copy().addColValidator(gColumns.Foo.Name, valide.String),
+			sch:  gSchemas.Foo.copy(t).addColValidator(gColumns.Foo.Name, valide.String),
 			args: args{
 				tableName:   gTables.Foo.Name,
 				colName:     gColumns.Foo.Name,
@@ -187,7 +187,7 @@ func TestSchema_WrapValidateSelf(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			sch := tt.function(gSchemas.Foo.Copy())
+			sch := tt.function(gSchemas.Foo.copy(t))
 			errs := sch.ValidateSelf().UnwrapAll(xerrors.UnwrapValidationError)
 			var wantErr []error
 			if tt.err != nil {
@@ -230,7 +230,7 @@ func TestSchema_WrapValidateSelf_Fuzzy(t *testing.T) {
 	for k, test := range fuzzyFactorial(fuzzyTests) {
 		test := test
 		var wantErrs []error
-		sch := gSchemas.Foo.Copy()
+		sch := gSchemas.Foo.copy(t)
 		for _, tt := range test {
 			sch = tt.function(sch)
 			wantErrs = append(wantErrs, tt.err)

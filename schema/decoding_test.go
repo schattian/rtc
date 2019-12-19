@@ -31,7 +31,7 @@ func TestFromFilename(t *testing.T) {
 		{
 			name:           "CORRECT USAGE",
 			goldenFilename: "schemas.jsonnet",
-			want:           UnmarshalValidatorsAndReturn(t, gSchemas.Foo.Copy()),
+			want:           UnmarshalValidatorsAndReturn(t, gSchemas.Foo.copy(t)),
 			wantErr:        nil,
 		},
 		{
