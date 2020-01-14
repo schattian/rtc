@@ -14,6 +14,8 @@ github.com/google/go-jsonnet v0.14.0 h1:as/sAfmjOHqY/OMBR4mv9I8ZY0/jNuqN3u44Aicw
 github.com/google/go-jsonnet v0.14.0/go.mod h1:zPGC9lj/TbjkBtUACIvYR/ILHrFqKRhxeEA+bLyeMnY=
 github.com/jmoiron/sqlx v1.2.0 h1:41Ip0zITnmWNR/vHV+S4m+VoUivnWY5E4OJfLZjCJMA=
 github.com/jmoiron/sqlx v1.2.0/go.mod h1:1FEQNm3xlJgrMD+FBdI9+xvCksHtbpVBBw5dYhBSsks=
+github.com/jmoiron/sqlx v1.2.1-0.20191203222853-2ba0fc60eb4a h1:lFdq2R2hQMsOxn5o17mEN0/RCbCCmcXoTiLh+wtfQSs=
+github.com/jmoiron/sqlx v1.2.1-0.20191203222853-2ba0fc60eb4a/go.mod h1:1FEQNm3xlJgrMD+FBdI9+xvCksHtbpVBBw5dYhBSsks=
 github.com/klauspost/compress v1.8.2 h1:Bx0qjetmNjdFXASH02NSAREKpiaDwkO1DRZ3dV2KCcs=
 github.com/klauspost/compress v1.8.2/go.mod h1:RyIbtBH6LamlWaDj8nUwkbUhJ87Yi3uG0guNDohfE1A=
 github.com/klauspost/cpuid v1.2.1 h1:vJi+O/nMdFt0vqm8NZBI6wzALWdA2X+egi0ogNyrC/w=

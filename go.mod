@@ -7,7 +7,7 @@ require (
 	github.com/gedex/inflector v0.0.0-20170307190818-16278e9db813
 	github.com/google/go-cmp v0.3.1
 	github.com/google/go-jsonnet v0.14.0
-	github.com/jmoiron/sqlx v1.2.0
+	github.com/jmoiron/sqlx v1.2.1-0.20191203222853-2ba0fc60eb4a
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lib/pq v1.2.0
 	github.com/mitchellh/copystructure v1.0.0
