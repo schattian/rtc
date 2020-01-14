@@ -4,11 +4,13 @@ import "context"
 
 // Collaborator is any agent which performs transactions
 type Collaborator interface {
-	Push(context.Context, *Commit) (*Commit, error)
+	Init(context.Context) error
 
-	Pull(context.Context, *Commit) (*Commit, error)
+	Create(context.Context, *Commit) (*Commit, error)
+
+	Retrieve(context.Context, *Commit) (*Commit, error)
+
+	Update(context.Context, *Commit) (*Commit, error)
 
 	Delete(context.Context, *Commit) (*Commit, error)
-
-	Init(context.Context) error
 }
