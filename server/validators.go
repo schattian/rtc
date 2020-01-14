@@ -13,6 +13,13 @@ func validateRm(body *reqBody) error {
 	return nil
 }
 
+func validateCommit(body *reqBody) error {
+	if body.Branch == "" {
+		return errNoBranch
+	}
+	return nil
+}
+
 func validateAdd(body *reqBody) error {
 	if body.Branch == "" {
 		return errNoBranch
