@@ -16,3 +16,13 @@ func BranchByName(ctx context.Context, db *sqlx.DB, branchName integrity.BranchN
 	}
 	return &branch, nil
 }
+
+// CommitById finds a commit in the DB given its id
+func CommitById(ctx context.Context, db *sqlx.DB, id int64) (*Commit, error) {
+	comm := &Commit{}
+	err := db.GetContext(ctx, comm, `SELECT * FROM commits WHERE id=?`, id)
+	if err != nil {
+		return nil, err
+	}
+	return comm, nil
+}
