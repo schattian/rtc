@@ -26,5 +26,7 @@ func (comm *Commit) SQLColumns() []string {
 	return []string{
 		"id",
 		"errored",
+		"merged",
+		"branch_id",
 	}
 }
