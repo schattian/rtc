@@ -18,11 +18,32 @@ type Commit struct {
 
 	Reviewer Collaborator `json:"reviewer,omitempty"`
 
+	BranchId int64 `json:"branch_id,omitempty"`
+
+	Merged bool `json:"merged,omitempty"`
+
 	Errored bool `json:"errored,omitempty"`
 }
 
 func NewCommit(changes []*Change) *Commit {
 	return &Commit{Changes: changes}
+}
+
+func (comm *Commit) Branch(ctx context.Context, db *sqlx.DB) (*Branch, error) {
+	if comm.BranchId == 0 {
+		return nil, errNilBranchId
+	}
+	row := db.QueryRowxContext(ctx, `SELECT * FROM branches WHERE branch_id=?`, comm.BranchId)
+	err := row.Err()
+	if err != nil {
+		return nil, err
+	}
+	b := &Branch{}
+	err = row.StructScan(b)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
 }
 
 // FetchChanges retrieves the changes from DB by its .ChangeIds and assigns them to .Changes field
