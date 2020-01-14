@@ -129,7 +129,7 @@ func TestBranch_FetchIndex(t *testing.T) {
 			branch:    gBranches.Foo.copy(t).rmIndexAndReturn(),
 			newBranch: gBranches.Foo.copy(t).rmIndexChangesAndReturn(),
 			stubs: []*assist.QueryStubber{
-				{Expect: "SELECT * FROM indices WHERE id=?", Rows: assist.RowsFor(&Index{}).AddRow(gIndices.Foo.Id)},
+				{Expect: "SELECT * FROM indices WHERE id=?", Rows: sqlmock.NewRows(&Index{}.SQLColumns()).AddRow(gIndices.Foo.Id)},
 			},
 		},
 		{
