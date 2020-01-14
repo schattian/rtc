@@ -20,7 +20,7 @@ It focuses on be:
 
 - **Centralized:** transactions will be executed following a unique pipeline.
 
-- **Cross-language:** providing APIs over HTTP / gRPC to use it and also config via YAML files.
+- **Language agnostic:** providing APIs over HTTP / gRPC / CLI to use it and also config via YAML files.
 
 - **No-protocol limited:** protocols of services are not a limitation at the hour of integrating any of them. For more, see the [list of supported protocols]().
 
@@ -99,7 +99,5 @@ Currently, those are:
 - **Project:** a group of schemas.
 
 - **Owner:** it's responsible for orchestrating its own project given a community. It's a collaborator too.
-
-- **Strategy:** strategy used to merge commits.
 
 - **Pull request:** a group of commits performed by a team.
