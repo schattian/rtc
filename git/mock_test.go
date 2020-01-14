@@ -11,14 +11,21 @@ type collabMock struct {
 	Err error
 }
 
-func (mock *collabMock) Push(ctx context.Context, comm *Commit) (*Commit, error) {
+func (mock *collabMock) Create(ctx context.Context, comm *Commit) (*Commit, error) {
 	if err := mock.Err; err != nil {
 		return nil, err
 	}
 	return comm, nil
 }
 
-func (mock *collabMock) Pull(ctx context.Context, comm *Commit) (*Commit, error) {
+func (mock *collabMock) Retrieve(ctx context.Context, comm *Commit) (*Commit, error) {
+	if err := mock.Err; err != nil {
+		return nil, err
+	}
+	return comm, nil
+}
+
+func (mock *collabMock) Update(ctx context.Context, comm *Commit) (*Commit, error) {
 	if err := mock.Err; err != nil {
 		return nil, err
 	}
