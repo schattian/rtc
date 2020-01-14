@@ -5,7 +5,6 @@ import (
 	"regexp"
 
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/sebach1/rtc/internal/store"
 )
 
 // ExecStubber is the actor which performs stubs of db.Exec()
@@ -42,9 +41,4 @@ func (query *QueryStubber) Stub(mock sqlmock.Sqlmock) *sqlmock.ExpectedQuery {
 		return expect.WillReturnError(query.Err)
 	}
 	return expect.WillReturnRows(query.Rows)
-}
-
-// RowsFor returns sqlmock.Rows with the respective row of columns given a store.Storable entity
-func RowsFor(entity store.Storable) *sqlmock.Rows {
-	return sqlmock.NewRows(entity.SQLColumns())
 }
