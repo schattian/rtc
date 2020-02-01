@@ -128,3 +128,7 @@ func DeleteFromDB(ctx context.Context, db *sqlx.DB, storable Storable) error {
 func execBoilerplate(action string, storable Storable) string {
 	return action + ` ` + storable.SQLTable() + ` ` + sqlColumnNames(storable) + ` VALUES ` + sqlColumnValues(storable)
 }
+
+func SQLColumns(storable Storable) []string {
+	return storable.SQLColumns()
+}
