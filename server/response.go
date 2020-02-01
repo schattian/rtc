@@ -9,6 +9,6 @@ type respBody struct {
 	PullRequest *git.PullRequest
 }
 
-type respBodyErr struct {
-	Err error
-}
+// type respBodyErr struct {
+// 	Err error
+// }
