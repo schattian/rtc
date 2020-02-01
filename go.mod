@@ -12,6 +12,7 @@ require (
 	github.com/lib/pq v1.2.0
 	github.com/mitchellh/copystructure v1.0.0
 	github.com/mitchellh/reflectwalk v1.0.1 // indirect
+	github.com/pkg/errors v0.9.1
 	github.com/spf13/afero v1.2.2
 	github.com/valyala/fasthttp v1.6.0
 	google.golang.org/appengine v1.6.5 // indirect
