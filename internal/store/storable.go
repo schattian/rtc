@@ -2,10 +2,10 @@ package store
 
 import (
 	"context"
-	"errors"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
 	"github.com/sebach1/rtc/internal/name"
 )
 
@@ -40,31 +40,32 @@ func UpsertIntoDB(ctx context.Context, db *sqlx.DB, storables ...Storable) error
 	}
 	err := UpdateIntoDB(ctx, db, updates...)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "update into db")
 	}
-	// err = InsertIntoDB(ctx, db, inserts...)
-	// if err != nil {
-	// 	return err
-	// }
+	err = InsertIntoDB(ctx, db, inserts...)
+	if err != nil {
+		return errors.Wrap(err, "insert into db")
+	}
 	return nil
 }
 
 func UpdateIntoDB(ctx context.Context, db *sqlx.DB, storables ...Storable) error {
-	if len(storables) == 0 {
+	qtToStore := len(storables)
+	if qtToStore == 0 {
 		return nil
 	}
 
 	ref := storables[0] // takes it as a reference for all entities given
 	qr := execBoilerplate("UPDATE", ref)
-	res, err := db.NamedExecContext(ctx, qr, storables)
+	rows, err := db.NamedExecContext(ctx, qr, storables)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "named exec ctx")
 	}
-	rowsAff, err := res.RowsAffected()
+	rowsQt, err := rows.RowsAffected()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "rows affected")
 	}
-	if rowsAff != int64(len(storables)) {
+	if int(rowsQt) != qtToStore {
 		return errMismatchAffectedRows
 	}
 	return nil
@@ -74,23 +75,34 @@ var errNilStorableEntity = errors.New("nil storable entity")
 var errMismatchAffectedRows = errors.New("the affected rows quantity does not match with the given storables")
 
 // InsertIntoDB inserts the storable entity to the DB
-// Finally, it assigns the inserted Id to the given entity
+// Finally, it assigns the inserted Id to the given entities
 func InsertIntoDB(ctx context.Context, db *sqlx.DB, storables ...Storable) error {
 	if len(storables) == 0 {
 		return errNilStorableEntity
 	}
 	ref := storables[0] // takes it as a reference for all entities given
 	qr := execBoilerplate("INSERT INTO", ref) + " RETURNING id"
-	row, err := db.NamedExecContext(ctx, qr, storables)
+	ids, err := db.NamedQueryContext(ctx, qr, storables)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "named query ctx")
+	}
+	defer ids.Close()
+
+	var i int
+	for ids.Next() {
+		var id int64
+		err := ids.Scan(&id)
+		if err != nil {
+			return errors.Wrap(err, "id scan")
+		}
+		storables[i].SetId(id)
+		i += 1
+	}
+	err = ids.Err()
+	if err != nil {
+		return errors.Wrap(err, "cursor err")
 	}
 
-	id, err := row.LastInsertId()
-	if err != nil {
-		return err
-	}
-	storable.SetId(id)
 	return nil
 }
 
@@ -107,7 +119,10 @@ func DeleteFromDB(ctx context.Context, db *sqlx.DB, storable Storable) error {
 		`DELETE FROM `+storable.SQLTable()+` WHERE id=:id`,
 		storable,
 	)
-	return err
+	if err != nil {
+		return errors.Wrap(err, "named exec ctx")
+	}
+	return nil
 }
 
 func execBoilerplate(action string, storable Storable) string {

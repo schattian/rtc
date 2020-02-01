@@ -2,11 +2,11 @@ package store
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/google/go-cmp/cmp"
+	"github.com/pkg/errors"
 	"github.com/sebach1/rtc/internal/test/assist"
 	"github.com/sebach1/rtc/internal/test/thelper"
 )
@@ -23,7 +23,7 @@ func TestInsertIntoDB(t *testing.T) {
 		args          args
 		wantErr       error
 		wantStorables []Storable
-		stub          *assist.ExecStubber
+		stub          *assist.QueryStubber
 	}{
 		{
 			name: "successfully single insert",
@@ -31,7 +31,9 @@ func TestInsertIntoDB(t *testing.T) {
 				storables: []Storable{&storableStub{Name: "foo"}},
 			},
 			wantStorables: []Storable{&storableStub{Name: "foo", Id: 10}},
-			stub:          &assist.ExecStubber{Expect: "INSERT INTO entities_stub", Result: sqlmock.NewResult(10, 0)},
+			stub: &assist.QueryStubber{
+				Expect: "INSERT INTO entities_stub", Rows: sqlmock.NewRows([]string{"id"}).AddRow(10),
+			},
 		},
 		{
 			name: "exec returns err",
@@ -40,13 +42,13 @@ func TestInsertIntoDB(t *testing.T) {
 			},
 			wantStorables: []Storable{&storableStub{}},
 			wantErr:       errFoo,
-			stub:          &assist.ExecStubber{Expect: "INSERT INTO entities_stub", Result: sqlmock.NewErrorResult(errFoo)},
+			stub:          &assist.QueryStubber{Expect: "INSERT INTO entities_stub", Err: errFoo},
 		},
 		{
 			name:    "nil interface given",
 			args:    args{},
 			wantErr: errNilStorableEntity,
-			stub:    &assist.ExecStubber{Expect: "INSERT INTO entities_stub", Result: sqlmock.NewErrorResult(errFoo)},
+			stub:    &assist.QueryStubber{Expect: "INSERT INTO entities_stub", Err: errFoo},
 		},
 	}
 	for _, tt := range tests {
@@ -58,7 +60,7 @@ func TestInsertIntoDB(t *testing.T) {
 				tt.args.ctx = context.Background()
 			}
 			err := InsertIntoDB(tt.args.ctx, db, tt.args.storables...)
-			if err != tt.wantErr {
+			if errors.Cause(err) != errors.Cause(tt.wantErr) {
 				t.Errorf("InsertIntoDB() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if err != nil {
@@ -73,6 +75,7 @@ func TestInsertIntoDB(t *testing.T) {
 		})
 	}
 }
+
 func TestUpdateIntoDB(t *testing.T) {
 	type args struct {
 		ctx       context.Context
@@ -103,7 +106,7 @@ func TestUpdateIntoDB(t *testing.T) {
 				tt.args.ctx = context.Background()
 			}
 			err := UpdateIntoDB(tt.args.ctx, db, tt.args.storables...)
-			if err != tt.wantErr {
+			if errors.Cause(err) != errors.Cause(tt.wantErr) {
 				t.Errorf("UpdateIntoDB() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
