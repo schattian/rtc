@@ -19,7 +19,7 @@ func (orgs *organizations) URL(owner string) string {
 	return fmt.Sprintf("%v/orgs/%v", baseURL, owner)
 }
 
-func (orgs *organizations) Push(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
+func (orgs *organizations) Create(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
 	commType, _ := comm.Type()
 
 	body, err := msh.ToJSON(comm)

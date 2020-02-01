@@ -85,7 +85,11 @@ func (idx *Index) FetchUncommittedChanges(ctx context.Context, db *sqlx.DB) (err
 		}
 		idx.Changes = append(idx.Changes, &chg)
 	}
-	return rows.Err()
+	err = rows.Err()
+	if err != nil {
+		return
+	}
+	return
 }
 
 // FetchChanges retrieves the changes from DB by its .ChangeIds and assigns them to .Changes field
@@ -103,34 +107,49 @@ func (idx *Index) FetchChanges(ctx context.Context, db *sqlx.DB) (err error) {
 		}
 		idx.Changes = append(idx.Changes, &chg)
 	}
-	return rows.Err()
+	err = rows.Err()
+	if err != nil {
+		return
+	}
+	return
 }
 
 // Commit returns a persisted commit with the index's uncommitted changes.
-func (idx *Index) Commit(ctx context.Context, db *sqlx.DB) (*Commit, error) {
+func (idx *Index) Commit(ctx context.Context, db *sqlx.DB) ([]*Commit, error) {
 	err := idx.FetchUncommittedChanges(ctx, db)
 	if err != nil {
 		return nil, err
 	}
-	comm := idx.commit()
-	err = store.InsertIntoDB(ctx, db, comm)
+	comms, err := idx.commit(ctx, db)
 	if err != nil {
 		return nil, err
 	}
-	batch := make([]store.Storable, len(idx.Changes))
-	for i, chg := range idx.Changes {
-		chg.CommitId = comm.Id
-		batch[i] = chg
-	}
-	err = store.UpdateBatchIntoDB(ctx, db, batch...)
-	if err != nil {
-		return nil, err
-	}
-	return comm, nil
+	return comms, nil
 }
 
-func (idx *Index) commit() *Commit {
-	return NewCommit(idx.Changes)
+func (idx *Index) commit(ctx context.Context, db *sqlx.DB) ([]*Commit, error) {
+	var comms []*Commit
+	comm := NewCommit(idx.Changes)
+
+	var batch []store.Storable
+	for _, changes := range comm.GroupBy(AreCompatible) {
+		comm := &Commit{Changes: changes}
+		err := store.InsertIntoDB(ctx, db, comm)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, chg := range changes {
+			chg.CommitId = comm.Id
+			batch = append(batch, chg)
+		}
+		comms = append(comms, comm)
+	}
+	err := store.UpdateIntoDB(ctx, db, batch...)
+	if err != nil {
+		return nil, err
+	}
+	return comms, nil
 }
 
 // rmChangeByIndex will delete without preserving order giving the desired index to delete

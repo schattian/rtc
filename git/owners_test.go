@@ -127,11 +127,10 @@ func TestOwner_ReviewPRCommit(t *testing.T) {
 func TestOwner_Orchestrate(t *testing.T) {
 	t.Parallel()
 	type args struct {
-		ctx       context.Context
-		community *Community
-		schName   integrity.SchemaName
-		comm      *Commit
-		strategy  changesMatcher
+		ctx         context.Context
+		community   *Community
+		schName     integrity.SchemaName
+		pullRequest *PullRequest
 	}
 	tests := []struct {
 		name          string
@@ -148,13 +147,12 @@ func TestOwner_Orchestrate(t *testing.T) {
 				ctx:       context.Background(),
 				community: &Community{gTeams.Foo.copy(t).mock(gChanges.Foo.None.TableName, nil)},
 				schName:   gSchemas.Foo.Name,
-				comm: &Commit{Changes: []*Change{
-					gChanges.Foo.Create.copy(t),
-					gChanges.Foo.Retrieve.copy(t),
-					gChanges.Foo.Update.copy(t),
-					gChanges.Foo.Delete.copy(t),
+				pullRequest: &PullRequest{Commits: []*Commit{
+					{Changes: []*Change{gChanges.Foo.Create.copy(t)}},
+					{Changes: []*Change{gChanges.Foo.Retrieve.copy(t)}},
+					{Changes: []*Change{gChanges.Foo.Update.copy(t)}},
+					{Changes: []*Change{gChanges.Foo.Delete.copy(t)}},
 				}},
-				strategy: AreCompatible,
 			},
 			wantErr:       nil,
 			wantQtResErrs: 0,
@@ -166,8 +164,9 @@ func TestOwner_Orchestrate(t *testing.T) {
 				ctx:       context.Background(),
 				community: &Community{gTeams.Foo},
 				schName:   gSchemas.Foo.Name,
-				comm:      &Commit{Changes: []*Change{gChanges.Foo.None.copy(t)}},
-				strategy:  AreCompatible,
+				pullRequest: &PullRequest{Commits: []*Commit{
+					{Changes: []*Change{gChanges.Foo.None.copy(t)}},
+				}},
 			},
 			wantErr: errNilProject,
 		},
@@ -178,8 +177,9 @@ func TestOwner_Orchestrate(t *testing.T) {
 				ctx:       context.Background(),
 				community: &Community{gTeams.Foo.copy(t)},
 				schName:   gSchemas.Foo.Name,
-				comm:      &Commit{Changes: []*Change{gChanges.Foo.None.copy(t)}},
-				strategy:  AreCompatible,
+				pullRequest: &PullRequest{Commits: []*Commit{
+					{Changes: []*Change{gChanges.Foo.None.copy(t)}},
+				}},
 			},
 			wantErr:       nil,
 			wantQtResErrs: 1,
@@ -191,13 +191,12 @@ func TestOwner_Orchestrate(t *testing.T) {
 				ctx:       context.Background(),
 				community: &Community{gTeams.Foo.copy(t).mock(gChanges.Foo.None.TableName, errors.New("test"))},
 				schName:   gSchemas.Foo.Name,
-				comm: &Commit{Changes: []*Change{
-					gChanges.Foo.Create.copy(t),
-					gChanges.Foo.Retrieve.copy(t),
-					gChanges.Foo.Update.copy(t),
-					gChanges.Foo.Delete.copy(t),
+				pullRequest: &PullRequest{Commits: []*Commit{
+					{Changes: []*Change{gChanges.Foo.Create.copy(t)}},
+					{Changes: []*Change{gChanges.Foo.Retrieve.copy(t)}},
+					{Changes: []*Change{gChanges.Foo.Update.copy(t)}},
+					{Changes: []*Change{gChanges.Foo.Delete.copy(t)}},
 				}},
-				strategy: AreCompatible,
 			},
 			wantErr:       nil,
 			wantQtResErrs: 4,
@@ -209,8 +208,9 @@ func TestOwner_Orchestrate(t *testing.T) {
 				ctx:       context.Background(),
 				community: &Community{gTeams.Foo.copy(t).mock(gChanges.Foo.None.TableName, nil)},
 				schName:   gSchemas.Foo.Name,
-				comm:      &Commit{Changes: []*Change{gChanges.Foo.None.copy(t)}},
-				strategy:  AreCompatible,
+				pullRequest: &PullRequest{Commits: []*Commit{
+					{Changes: []*Change{gChanges.Foo.None.copy(t)}},
+				}},
 			},
 			wantsErr: true,
 		},
@@ -220,7 +220,7 @@ func TestOwner_Orchestrate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			tt.own.Waiter.Add(1) // Prevent a line of the boilerplate when calling orchestra (and ensures it'll have it's own WG)
-			go tt.own.Orchestrate(tt.args.ctx, tt.args.community, tt.args.schName, tt.args.comm, tt.args.strategy)
+			go tt.own.Orchestrate(tt.args.ctx, tt.args.community, tt.args.schName, tt.args.pullRequest)
 			err := tt.own.WaitAndClose()
 			if err != tt.wantErr && (tt.wantsErr != (err != nil)) {
 				t.Errorf("Owner.Orchestrate() error = %v, wantErr %v", err, tt.wantErr)

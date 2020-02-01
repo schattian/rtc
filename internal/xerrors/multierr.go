@@ -26,6 +26,13 @@ func NewMultiErr(errs ...error) (mErr MultiErr) {
 	return
 }
 
+func NewMultiErrFromCh(errCh chan error) (mErr MultiErr) {
+	for err := range errCh {
+		mErr = append(mErr, err)
+	}
+	return
+}
+
 func (errs MultiErr) Error() string {
 	var strBaseErr string
 	for _, err := range errs {

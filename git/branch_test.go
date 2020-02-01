@@ -2,9 +2,11 @@ package git
 
 import (
 	"context"
-	"errors"
 	"reflect"
 	"testing"
+
+	"github.com/pkg/errors"
+	"github.com/sebach1/rtc/internal/store"
 
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/sebach1/rtc/integrity"
@@ -22,17 +24,18 @@ func TestNewBranchWithIndex(t *testing.T) {
 		name integrity.BranchName
 	}
 	tests := []struct {
-		name    string
-		args    args
-		stubs   []*assist.ExecStubber
-		want    *Branch
-		wantErr error
+		name      string
+		args      args
+		execStubs []*assist.ExecStubber
+		qrStubs   []*assist.QueryStubber
+		want      *Branch
+		wantErr   error
 	}{
 		{
 			name:    "INDEX creation returns ERR on db CONNECTion",
 			args:    args{name: "foo"},
 			wantErr: errFoo,
-			stubs: []*assist.ExecStubber{
+			execStubs: []*assist.ExecStubber{
 				{Expect: "INSERT INTO indices DEFAULT VALUES", Err: errFoo},
 			},
 		},
@@ -40,7 +43,7 @@ func TestNewBranchWithIndex(t *testing.T) {
 			name:    "INDEX creation returns ERR on TX",
 			args:    args{name: "foo"},
 			wantErr: errFoo,
-			stubs: []*assist.ExecStubber{
+			execStubs: []*assist.ExecStubber{
 				{Expect: "INSERT INTO indices DEFAULT VALUES", Result: sqlmock.NewErrorResult(errFoo)},
 			},
 		},
@@ -48,17 +51,21 @@ func TestNewBranchWithIndex(t *testing.T) {
 			name:    "BRANCH creation returns ERR on TX",
 			args:    args{name: "foo"},
 			wantErr: errFoo,
-			stubs: []*assist.ExecStubber{
+			execStubs: []*assist.ExecStubber{
 				{Expect: "INSERT INTO indices DEFAULT VALUES", Result: sqlmock.NewResult(1, 1)},
-				{Expect: "INSERT INTO branches", Result: sqlmock.NewErrorResult(errFoo)},
+			},
+			qrStubs: []*assist.QueryStubber{
+				{Expect: "INSERT INTO branches", Err: errFoo},
 			},
 		},
 		{
 			name:    "BRANCH creation returns ERR on CONNECTion",
 			args:    args{name: "foo"},
 			wantErr: errFoo,
-			stubs: []*assist.ExecStubber{
+			execStubs: []*assist.ExecStubber{
 				{Expect: "INSERT INTO indices DEFAULT VALUES", Result: sqlmock.NewResult(1, 1)},
+			},
+			qrStubs: []*assist.QueryStubber{
 				{Expect: "INSERT INTO branches", Err: errFoo},
 			},
 		},
@@ -67,33 +74,29 @@ func TestNewBranchWithIndex(t *testing.T) {
 			args:    args{name: "foo"},
 			wantErr: nil,
 			want:    &Branch{Id: 10, IndexId: 1, Name: "foo"},
-			stubs: []*assist.ExecStubber{
+			execStubs: []*assist.ExecStubber{
 				{Expect: "INSERT INTO indices DEFAULT VALUES", Result: sqlmock.NewResult(1, 1)},
-				{Expect: "INSERT INTO branches", Result: sqlmock.NewResult(10, 1)},
 			},
-		},
-		{
-			name:    "CTX CANCEL",
-			args:    args{name: "foo"},
-			wantErr: nil,
-			want:    &Branch{Id: 10, IndexId: 1, Name: "foo"},
-			stubs: []*assist.ExecStubber{
-				{Expect: "INSERT INTO indices DEFAULT VALUES", Result: sqlmock.NewResult(1, 1)},
-				{Expect: "INSERT INTO branches", Result: sqlmock.NewResult(10, 1)},
+			qrStubs: []*assist.QueryStubber{
+				{Expect: "INSERT INTO branches", Rows: sqlmock.NewRows([]string{"id"}).AddRow(10)},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			db, mock := thelper.MockDB(t)
-			for _, stub := range tt.stubs {
+			for _, stub := range tt.execStubs {
 				stub.Stub(mock)
 			}
+			for _, stub := range tt.qrStubs {
+				stub.Stub(mock)
+			}
+
 			if tt.args.ctx == nil {
 				tt.args.ctx = context.Background()
 			}
 			got, err := NewBranchWithIndex(tt.args.ctx, db, tt.args.name)
-			if err != tt.wantErr {
+			if errors.Cause(err) != errors.Cause(tt.wantErr) {
 				t.Errorf("NewBranchWithIndex() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
@@ -129,7 +132,7 @@ func TestBranch_FetchIndex(t *testing.T) {
 			branch:    gBranches.Foo.copy(t).rmIndexAndReturn(),
 			newBranch: gBranches.Foo.copy(t).rmIndexChangesAndReturn(),
 			stubs: []*assist.QueryStubber{
-				{Expect: "SELECT * FROM indices WHERE id=?", Rows: assist.RowsFor(&Index{}).AddRow(gIndices.Foo.Id)},
+				{Expect: "SELECT * FROM indices WHERE id=?", Rows: sqlmock.NewRows(store.SQLColumns(&Index{})).AddRow(gIndices.Foo.Id)},
 			},
 		},
 		{

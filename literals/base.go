@@ -12,13 +12,18 @@ import (
 // Notice that all the Collaborator methods it implements returns errors
 type BaseCollab struct{}
 
-// Push is a base not-implemented method to achieve the Collaborator interface
-func (b *BaseCollab) Push(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
+// Create is a base not-implemented method to achieve the Collaborator interface
+func (b *BaseCollab) Create(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
 	return nil, errNotImplemented
 }
 
-// Pull is a base not-implemented method to achieve the Collaborator interface
-func (b *BaseCollab) Pull(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
+// Update is a base not-implemented method to achieve the Collaborator interface
+func (b *BaseCollab) Update(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
+	return nil, errNotImplemented
+}
+
+// Retrieve is a base not-implemented method to achieve the Collaborator interface
+func (b *BaseCollab) Retrieve(ctx context.Context, comm *git.Commit) (*git.Commit, error) {
 	return nil, errNotImplemented
 }
 

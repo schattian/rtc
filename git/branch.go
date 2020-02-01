@@ -20,6 +20,28 @@ type Branch struct {
 	IndexId int64 `json:"index_id,omitempty"`
 }
 
+func (b *Branch) UnmergedCommits(ctx context.Context, db *sqlx.DB) ([]*Commit, error) {
+	rows, err := db.NamedQueryContext(ctx, `SELECT * FROM commits WHERE merged=false AND branch_id=:id`, b)
+	if err != nil {
+		return nil, err
+	}
+	var comms []*Commit
+	defer rows.Close()
+	for rows.Next() {
+		comm := &Commit{}
+		err = rows.StructScan(comm)
+		if err != nil {
+			return nil, err
+		}
+		comms = append(comms, comm)
+	}
+	err = rows.Err()
+	if err != nil {
+		return nil, err
+	}
+	return comms, nil
+}
+
 // NewBranchWithIndex safety creates a new Branch entity and assigns a new index_id to it
 // Notice it persists on the db and assigns the inserted id
 func NewBranchWithIndex(ctx context.Context, db *sqlx.DB, name integrity.BranchName) (*Branch, error) {

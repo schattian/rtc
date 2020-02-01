@@ -23,10 +23,9 @@ type Change struct {
 
 	Type integrity.CRUD `json:"type,omitempty"`
 
-	Options Options
+	Options Options `json:"options,omitempty"`
 
-	IndexId int64 `json:"index_id,omitempty"`
-
+	IndexId  int64 `json:"index_id,omitempty"`
 	CommitId int64 `json:"commit_id,omitempty"`
 }
 
