@@ -32,7 +32,7 @@ func TestInsertIntoDB(t *testing.T) {
 			},
 			wantStorables: []Storable{&storableStub{Name: "foo", Id: 10}},
 			stub: &assist.QueryStubber{
-				Expect: "INSERT INTO entities_stub", Rows: sqlmock.NewRows(SQLColumns(&storableStub{})).AddRow(10),
+				Expect: "INSERT INTO entities_stub", Rows: sqlmock.NewRows([]string{"id"}).AddRow(10),
 			},
 		},
 		{
