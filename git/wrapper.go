@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
 	"github.com/sebach1/rtc/integrity"
 	"github.com/sebach1/rtc/internal/store"
 	"github.com/sebach1/rtc/schema"
@@ -17,15 +18,15 @@ func Comm(
 ) ([]*Commit, error) {
 	branch, err := BranchByName(ctx, db, branchName)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "find branch by name")
 	}
 	err = branch.FetchIndex(ctx, db)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "index fetch")
 	}
 	comms, err := branch.Index.Commit(ctx, db)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "index commitment")
 	}
 	return comms, nil
 }
@@ -44,28 +45,28 @@ func Add(
 ) (*Change, error) {
 	chg, err := NewChange(entityId, tableName, columnName, val, Type, opts) // The specific order is to avoid creating new branch with unvalid change
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "new change")
 	}
 
 	branch, err := BranchByName(ctx, db, branchName)
-	if err == sql.ErrNoRows {
+	if errors.Cause(err) == sql.ErrNoRows {
 		branch, err = NewBranchWithIndex(ctx, db, branchName)
 	}
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "find branch by name")
 	}
 
 	err = branch.FetchIndex(ctx, db)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "fetch index")
 	}
 	err = branch.Index.FetchChanges(ctx, db)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "fetch changes")
 	}
 	err = branch.Index.Add(ctx, db, chg)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "index add change")
 	}
 	return chg, nil
 }
@@ -84,26 +85,26 @@ func Rm(
 ) (*Change, error) {
 	branch, err := BranchByName(ctx, db, branchName)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "find branch by name")
 	}
 
 	err = branch.FetchIndex(ctx, db)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "index fetch")
 	}
 	err = branch.Index.FetchChanges(ctx, db)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "index changes fetch")
 	}
 
 	chg, err := NewChange(entityId, tableName, columnName, val, Type, opts)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "index new change")
 	}
 
 	err = branch.Index.Rm(ctx, db, chg)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "index rm change")
 	}
 	return chg, nil
 }
@@ -122,11 +123,11 @@ func Orchestrate(
 	}
 	branch, err := BranchByName(ctx, db, branchName)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "find branch by name")
 	}
 	commits, err := branch.UnmergedCommits(ctx, db)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "branch fetch unmerged commits")
 	}
 	pR := NewPullRequest(commits)
 
@@ -134,11 +135,11 @@ func Orchestrate(
 	go own.Orchestrate(ctx, community, schemaName, pR)
 	err = own.WaitAndClose()
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "owner wait and close")
 	}
 	err = store.UpsertIntoDB(ctx, db, pR)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "upsert pull request into db")
 	}
 
 	var comms []store.Storable
@@ -147,7 +148,7 @@ func Orchestrate(
 	}
 	err = store.UpsertIntoDB(ctx, db, comms...)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "upsert commits into db")
 	}
 
 	return pR, nil
