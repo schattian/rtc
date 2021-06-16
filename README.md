@@ -1,6 +1,6 @@
 # RTC
 
-[![Build Status](https://travis-ci.com/sebach1/rtc.svg?branch=master)](https://travis-ci.com/sebach1/rtc)
+[![Build Status](https://travis-ci.com/schattian/rtc.svg?branch=master)](https://travis-ci.com/sebach1/rtc)
 [![Go Report Card](https://goreportcard.com/badge/github.com/sebach1/rtc)](https://goreportcard.com/report/github.com/sebach1/rtc)
 
   - [Overview](#overview)
